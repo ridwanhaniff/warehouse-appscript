@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>Ina Basic Store Warehouse</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    #reader {
+      border: 0 !important;
+    }
+
+    #reader video {
+      object-fit: cover;
+    }
+
+    .spinner {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-slate-100 text-slate-800 antialiased">
+  <div class="mx-auto flex min-h-screen max-w-md flex-col">
+
+    <header class="bg-slate-900 px-5 pb-6 pt-8 text-white" style="padding-top: max(2rem, env(safe-area-inset-top));">
+      <p class="text-xs uppercase tracking-widest text-slate-400">Warehouse</p>
+      <h1 class="mt-1 text-xl font-semibold">Ina Basic Store</h1>
+    </header>
+
+    <main class="flex-1 px-5 py-6">
+
+      <!-- ============ LAYAR 1: PILIH AKTIVITAS ============ -->
+      <section id="screen-home">
+        <h2 class="mb-4 text-sm font-medium text-slate-500">Pilih aktivitas</h2>
+        <div id="activity-list" class="grid grid-cols-2 gap-4"></div>
+      </section>
+
+      <!-- ============ LAYAR 2: SCAN BARCODE ============ -->
+      <section id="screen-scan" class="hidden">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 id="scan-title" class="text-lg font-semibold"></h2>
+          <button id="btn-cancel-scan" type="button"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 active:bg-slate-200">Batal</button>
+        </div>
+
+        <div class="overflow-hidden rounded-2xl bg-black shadow-lg">
+          <div id="reader" class="min-h-[260px] w-full"></div>
+        </div>
+        <p id="scan-status" class="mt-4 text-center text-sm text-slate-500"></p>
+
+        <button id="btn-manual-toggle" type="button"
+          class="mx-auto mt-3 block text-sm font-medium text-indigo-600 underline underline-offset-2">
+          Ketik barcode manual
+        </button>
+        <form id="manual-form" class="mt-3 hidden gap-2">
+          <input id="manual-barcode" type="text" inputmode="numeric" autocomplete="off" placeholder="Masukkan barcode"
+            class="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          <button type="submit"
+            class="rounded-xl bg-slate-900 px-5 py-3 font-medium text-white active:bg-slate-700">OK</button>
+        </form>
+      </section>
+
+      <!-- ============ LAYAR 3: FORM INPUT ============ -->
+      <section id="screen-form" class="hidden">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 id="form-title" class="text-lg font-semibold"></h2>
+          <button id="btn-back" type="button"
+            class="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 active:bg-slate-200">Batal</button>
+        </div>
+
+        <form id="trx-form" class="space-y-5 rounded-2xl bg-white p-5 shadow-sm" novalidate>
+          <div>
+            <label class="mb-1 block text-sm font-medium text-slate-600" for="f-barcode">Barcode</label>
+            <input id="f-barcode" type="text" readonly
+              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-base text-slate-700">
+          </div>
+
+          <div id="row-from">
+            <label id="label-from" class="mb-1 block text-sm font-medium text-slate-600" for="f-from">Lokasi
+              Asal</label>
+            <input id="f-from" type="text" autocomplete="off" autocapitalize="characters" placeholder="mis. A-01-02"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base uppercase focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+
+          <div id="row-to">
+            <label id="label-to" class="mb-1 block text-sm font-medium text-slate-600" for="f-to">Lokasi Tujuan</label>
+            <input id="f-to" type="text" autocomplete="off" autocapitalize="characters" placeholder="mis. B-03-01"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base uppercase focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+
+          <div>
+            <label id="label-qty" class="mb-1 block text-sm font-medium text-slate-600" for="f-qty">Kuantitas</label>
+            <input id="f-qty" type="number" inputmode="numeric" step="1" min="1" placeholder="0"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-2xl font-semibold focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+
+          <button id="btn-submit" type="submit"
+            class="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-4 text-base font-semibold text-white shadow active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-400">
+            <span id="btn-submit-text">Simpan</span>
+          </button>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast-root" class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 p-4"
+    style="padding-top: max(1rem, env(safe-area-inset-top));" aria-live="polite"></div>
+
+  <script>
+    // ===================== KONFIGURASI =====================
+    // Ganti dengan URL Web App hasil deploy Google Apps Script (berakhiran /exec)
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzIVIhE6ToZm-3jzBAL61fhJJyNJFRNK68h3qRyiBR6MX8qRgb7IaL2fnKIV8BwBh_riQ/exec';
+    const FETCH_TIMEOUT_MS = 30000;
+
+    const ICONS = {
+      masuk: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3',
+      keluar: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5',
+      mutasi: 'M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5',
+      opname: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+    };
+
+    // value = nilai yang dikirim ke GAS sebagai `activity`
+    const ACTIVITIES = {
+      masuk: {
+        label: 'Barang Masuk', value: 'Masuk', color: 'bg-emerald-100 text-emerald-700',
+        fields: ['to'], labelTo: 'Lokasi Tujuan (Rak)', labelQty: 'Kuantitas Masuk', minQty: 1
+      },
+      keluar: {
+        label: 'Barang Keluar', value: 'Keluar', color: 'bg-rose-100 text-rose-700',
+        fields: ['from'], labelFrom: 'Lokasi Asal (Rak)', labelQty: 'Kuantitas Keluar', minQty: 1
+      },
+      mutasi: {
+        label: 'Pindah Lokasi', value: 'Mutasi', color: 'bg-sky-100 text-sky-700',
+        fields: ['from', 'to'], labelFrom: 'Lokasi Asal (Rak)', labelTo: 'Lokasi Tujuan (Rak)',
+        labelQty: 'Kuantitas Dipindah', minQty: 1
+      },
+      opname: {
+        label: 'Stock Opname', value: 'Opname', color: 'bg-amber-100 text-amber-700',
+        fields: ['to'], labelTo: 'Lokasi Rak yang Dihitung', labelQty: 'Jumlah Hasil Hitung Fisik', minQty: 0
+      }
+    };
+
+    // ===================== STATE & HELPER =====================
+    const $ = (id) => document.getElementById(id);
+    const state = { key: null, barcode: '', trxId: null, uncertain: false, submitting: false };
+    let scanner = null;
+    let scanLocked = false;
+
+    function show(name) {
+      ['home', 'scan', 'form'].forEach((n) => $('screen-' + n).classList.toggle('hidden', n !== name));
+      window.scrollTo(0, 0);
+    }
+
+    function genTrxId() {
+      const rand = Math.random().toString(36).slice(2, 8).toUpperCase();
+      return 'TRX-' + Date.now() + '-' + rand;
+    }
+
+    // ===================== TOAST =====================
+    function toast(message, type = 'success') {
+      const ok = type === 'success';
+      const el = document.createElement('div');
+      el.className = 'pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl px-4 py-3 text-white shadow-xl ' +
+        'transition duration-300 ease-out -translate-y-6 opacity-0 ' + (ok ? 'bg-emerald-600' : 'bg-rose-600');
+      el.setAttribute('role', ok ? 'status' : 'alert');
+
+      const NS = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      svg.setAttribute('class', 'mt-0.5 h-5 w-5 shrink-0');
+      const path = document.createElementNS(NS, 'path');
+      path.setAttribute('stroke-linecap', 'round');
+      path.setAttribute('stroke-linejoin', 'round');
+      path.setAttribute('d', ok ? 'm4.5 12.75 6 6 9-13.5'
+        : 'M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z');
+      svg.appendChild(path);
+
+      const p = document.createElement('p');
+      p.className = 'text-sm font-medium leading-snug';
+      p.textContent = message; // textContent: aman dari injeksi HTML
+
+      el.append(svg, p);
+      $('toast-root').appendChild(el);
+      requestAnimationFrame(() => el.classList.remove('-translate-y-6', 'opacity-0'));
+
+      const close = () => {
+        el.classList.add('-translate-y-6', 'opacity-0');
+        setTimeout(() => el.remove(), 300);
+      };
+      el.addEventListener('click', close);
+      setTimeout(close, ok ? 4000 : 6500);
+    }
+
+    // ===================== LAYAR 1: HOME =====================
+    function renderActivities() {
+      const list = $('activity-list');
+      Object.keys(ACTIVITIES).forEach((key) => {
+        const a = ACTIVITIES[key];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl bg-white p-4 ' +
+          'shadow-sm ring-1 ring-slate-200 transition active:scale-95 active:bg-slate-50';
+        btn.innerHTML =
+          '<span class="flex h-14 w-14 items-center justify-center rounded-2xl ' + a.color + '">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-7 w-7">' +
+          '<path stroke-linecap="round" stroke-linejoin="round" d="' + ICONS[key] + '"/></svg>' +
+          '</span>' +
+          '<span class="text-center text-sm font-semibold leading-tight">' + a.label + '</span>';
+        btn.addEventListener('click', () => startScan(key));
+        list.appendChild(btn);
+      });
+    }
+
+    // ===================== LAYAR 2: SCAN =====================
+    function setStatus(text) { $('scan-status').textContent = text; }
+
+    async function stopScanner() {
+      if (!scanner) return;
+      try {
+        if (scanner.isScanning) await scanner.stop();
+        scanner.clear();
+      } catch (e) { /* abaikan */ }
+      scanner = null;
+    }
+
+    async function startScan(key) {
+      state.key = key;
+      scanLocked = false;
+      $('scan-title').textContent = ACTIVITIES[key].label;
+      $('manual-form').classList.add('hidden');
+      $('manual-form').classList.remove('flex');
+      $('manual-barcode').value = '';
+      setStatus('Membuka kamera...');
+      show('scan');
+
+      try {
+        const F = Html5QrcodeSupportedFormats;
+        scanner = new Html5Qrcode('reader', {
+          formatsToSupport: [F.EAN_13, F.EAN_8, F.UPC_A, F.UPC_E, F.CODE_128, F.CODE_39, F.ITF, F.QR_CODE],
+          experimentalFeatures: { useBarCodeDetectorIfSupported: true },
+          verbose: false
+        });
+        await scanner.start(
+          { facingMode: 'environment' }, // kamera belakang
+          {
+            fps: 10,
+            qrbox: (w, h) => ({ width: Math.floor(Math.min(w * 0.9, 340)), height: Math.floor(Math.min(h * 0.55, 180)) })
+          },
+          onScanSuccess,
+          () => { /* frame tanpa barcode: abaikan */ }
+        );
+        setStatus('Arahkan kamera ke barcode produk');
+      } catch (err) {
+        console.error(err);
+        await stopScanner();
+        setStatus('Kamera tidak dapat dibuka. Izinkan akses kamera (butuh HTTPS) atau ketik barcode manual.');
+        $('manual-form').classList.remove('hidden');
+        $('manual-form').classList.add('flex');
+      }
+    }
+
+    async function onScanSuccess(text) {
+      if (scanLocked) return; // cegah callback ganda
+      scanLocked = true;
+      if (navigator.vibrate) navigator.vibrate(80);
+      await stopScanner();     // kamera tertutup
+      openForm(text);
+    }
+
+    async function cancelScan() {
+      scanLocked = true;
+      await stopScanner();
+      resetToHome();
+    }
+
+    // ===================== LAYAR 3: FORM =====================
+    function openForm(barcode) {
+      const a = ACTIVITIES[state.key];
+      state.barcode = String(barcode).trim();
+      state.trxId = null;
+      state.uncertain = false;
+
+      $('form-title').textContent = a.label;
+      $('f-barcode').value = state.barcode;
+      $('f-from').value = '';
+      $('f-to').value = '';
+      $('f-qty').value = '';
+
+      const hasFrom = a.fields.includes('from');
+      const hasTo = a.fields.includes('to');
+      $('row-from').classList.toggle('hidden', !hasFrom);
+      $('row-to').classList.toggle('hidden', !hasTo);
+      if (hasFrom) $('label-from').textContent = a.labelFrom;
+      if (hasTo) $('label-to').textContent = a.labelTo;
+      $('label-qty').textContent = a.labelQty;
+      $('f-qty').min = a.minQty;
+      $('f-qty').placeholder = a.minQty === 0 ? 'Hasil hitung' : '0';
+
+      show('form');
+      setTimeout(() => (hasFrom ? $('f-from') : hasTo ? $('f-to') : $('f-qty')).focus(), 150);
+    }
+
+    function setLoading(loading) {
+      state.submitting = loading;
+      const btn = $('btn-submit');
+      btn.disabled = loading;
+      $('btn-submit-text').textContent = loading ? 'Loading...' : 'Simpan';
+      ['f-from', 'f-to', 'f-qty'].forEach((id) => ($(id).disabled = loading));
+      $('btn-back').disabled = loading;
+
+      const old = btn.querySelector('.spinner');
+      if (loading && !old) {
+        const s = document.createElement('span');
+        s.className = 'spinner h-4 w-4 rounded-full border-2 border-white/40 border-t-white';
+        btn.prepend(s);
+      } else if (!loading && old) {
+        old.remove();
+      }
+    }
+
+    function resetToHome() {
+      state.key = null;
+      state.barcode = '';
+      state.trxId = null;
+      state.uncertain = false;
+      $('trx-form').reset();
+      setLoading(false);
+      show('home');
+    }
+
+    async function postToGas(payload) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          // text/plain = "simple request" -> tidak memicu preflight CORS (tidak didukung Apps Script)
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal
+        });
+        return await res.json();
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    async function onSubmit(e) {
+      e.preventDefault();
+      if (state.submitting) return; // pengaman tambahan dari sisi logika
+
+      const a = ACTIVITIES[state.key];
+      if (!a) return resetToHome();
+
+      if (!GAS_URL || GAS_URL.indexOf('GANTI_') === 0) {
+        return toast('GAS_URL belum diisi di index.html.', 'error');
+      }
+
+      const from = a.fields.includes('from') ? $('f-from').value.trim().toUpperCase() : '';
+      const to = a.fields.includes('to') ? $('f-to').value.trim().toUpperCase() : '';
+      const qtyRaw = $('f-qty').value.trim();
+      const qty = Number(qtyRaw);
+
+      if (a.fields.includes('from') && !from) return toast('Lokasi asal wajib diisi.', 'error');
+      if (a.fields.includes('to') && !to) return toast('Lokasi tujuan wajib diisi.', 'error');
+      if (a.value === 'Mutasi' && from === to) return toast('Lokasi asal dan tujuan tidak boleh sama.', 'error');
+      if (qtyRaw === '' || !Number.isInteger(qty) || qty < a.minQty) {
+        return toast(a.minQty === 0 ? 'Jumlah harus bilangan bulat 0 atau lebih.'
+          : 'Kuantitas harus bilangan bulat lebih dari 0.', 'error');
+      }
+
+      // ID dibuat saat pertama kali dikirim, lalu dipakai ulang bila kirim ulang setelah gangguan jaringan
+      if (!state.trxId) state.trxId = genTrxId();
+
+      const payload = {
+        transaction_id: state.trxId,
+        activity: a.value,
+        barcode: state.barcode,
+        location_from: from,
+        location_to: to,
+        qty: qty
+      };
+
+      setLoading(true);
+      try {
+        const data = await postToGas(payload);
+        let ok = data && data.success === true;
+        let msg = (data && data.message) || (ok ? 'Berhasil disimpan.' : 'Terjadi kesalahan.');
+
+        // Kirim ulang setelah koneksi putus, tapi ternyata transaksi sebelumnya sudah masuk
+        if (!ok && state.uncertain && /sudah pernah diproses/i.test(msg)) {
+          ok = true;
+          msg = 'Transaksi sebelumnya sudah tersimpan.';
+        }
+
+        toast(msg, ok ? 'success' : 'error');
+        resetToHome();
+      } catch (err) {
+        console.error(err);
+        state.uncertain = true; // status server tidak diketahui; ID yang sama akan dipakai lagi
+        setLoading(false);
+        toast('Koneksi gagal atau respons tidak valid. Periksa jaringan lalu tekan Simpan lagi (tidak akan tercatat ganda).', 'error');
+      }
+    }
+
+    // ===================== EVENT =====================
+    $('btn-cancel-scan').addEventListener('click', cancelScan);
+    $('btn-back').addEventListener('click', resetToHome);
+    $('trx-form').addEventListener('submit', onSubmit);
+
+    $('btn-manual-toggle').addEventListener('click', () => {
+      const f = $('manual-form');
+      f.classList.toggle('hidden');
+      f.classList.toggle('flex');
+      if (!f.classList.contains('hidden')) $('manual-barcode').focus();
+    });
+
+    $('manual-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const v = $('manual-barcode').value.trim();
+      if (!v) return toast('Barcode belum diisi.', 'error');
+      scanLocked = true;
+      await stopScanner();
+      openForm(v);
+    });
+
+    window.addEventListener('pagehide', stopScanner);
+
+    renderActivities();
+    show('home');
+  </script>
+</body>
+
+</html>
