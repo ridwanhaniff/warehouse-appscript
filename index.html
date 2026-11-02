@@ -5,6 +5,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Ina Warehouse">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ina Basic Store Warehouse</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -32,9 +39,16 @@
 <body class="bg-slate-100 text-slate-800 antialiased">
   <div class="mx-auto flex min-h-screen max-w-md flex-col">
 
-    <header class="bg-slate-900 px-5 pb-6 pt-8 text-white" style="padding-top: max(2rem, env(safe-area-inset-top));">
-      <p class="text-xs uppercase tracking-widest text-slate-400">Warehouse</p>
-      <h1 class="mt-1 text-xl font-semibold">Ina Basic Store</h1>
+    <header class="flex items-end justify-between gap-3 bg-slate-900 px-5 pb-6 pt-8 text-white"
+      style="padding-top: max(2rem, env(safe-area-inset-top));">
+      <div>
+        <p class="text-xs uppercase tracking-widest text-slate-400">Warehouse</p>
+        <h1 class="mt-1 text-xl font-semibold">Ina Basic Store</h1>
+      </div>
+      <button id="btn-install" type="button"
+        class="hidden shrink-0 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/20 active:bg-white/20">
+        Pasang Aplikasi
+      </button>
     </header>
 
     <main class="flex-1 px-5 py-6">
@@ -43,6 +57,11 @@
       <section id="screen-home">
         <h2 class="mb-4 text-sm font-medium text-slate-500">Pilih aktivitas</h2>
         <div id="activity-list" class="grid grid-cols-2 gap-4"></div>
+        <p id="ios-hint"
+          class="mt-6 hidden rounded-xl bg-white p-4 text-xs leading-relaxed text-slate-500 ring-1 ring-slate-200">
+          Untuk memasang sebagai aplikasi di iPhone: buka lewat Safari, ketuk ikon Bagikan, lalu pilih "Tambah ke Layar
+          Utama".
+        </p>
       </section>
 
       <!-- ============ LAYAR 2: SCAN BARCODE ============ -->
@@ -86,16 +105,13 @@
           </div>
 
           <div id="row-from">
-            <label id="label-from" class="mb-1 block text-sm font-medium text-slate-600" for="f-from">Lokasi
-              Asal</label>
-            <input id="f-from" type="text" autocomplete="off" autocapitalize="characters" placeholder="mis. A-01-02"
-              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base uppercase focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+            <label id="label-from" class="mb-1 block text-sm font-medium text-slate-600">Toko Asal</label>
+            <div id="dd-from" class="relative"></div>
           </div>
 
           <div id="row-to">
-            <label id="label-to" class="mb-1 block text-sm font-medium text-slate-600" for="f-to">Lokasi Tujuan</label>
-            <input id="f-to" type="text" autocomplete="off" autocapitalize="characters" placeholder="mis. B-03-01"
-              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base uppercase focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+            <label id="label-to" class="mb-1 block text-sm font-medium text-slate-600">Toko Tujuan</label>
+            <div id="dd-to" class="relative"></div>
           </div>
 
           <div>
@@ -124,6 +140,13 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbzIVIhE6ToZm-3jzBAL61fhJJyNJFRNK68h3qRyiBR6MX8qRgb7IaL2fnKIV8BwBh_riQ/exec';
     const FETCH_TIMEOUT_MS = 30000;
 
+    // Daftar toko/marketplace untuk dropdown. Tambah toko baru cukup dengan menambah satu baris di sini.
+    // `value` dikirim ke GAS sebagai location_from / location_to (tersimpan di kolom Lokasi_Rak).
+    const LOCATIONS = [
+      { value: 'Shopee', label: 'Shopee', dot: 'bg-orange-500' },
+      { value: 'TikTok Shop', label: 'TikTok Shop', dot: 'bg-slate-900' }
+    ];
+
     const ICONS = {
       masuk: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3',
       keluar: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5',
@@ -135,20 +158,20 @@
     const ACTIVITIES = {
       masuk: {
         label: 'Barang Masuk', value: 'Masuk', color: 'bg-emerald-100 text-emerald-700',
-        fields: ['to'], labelTo: 'Lokasi Tujuan (Rak)', labelQty: 'Kuantitas Masuk', minQty: 1
+        fields: ['to'], labelTo: 'Toko Tujuan', labelQty: 'Kuantitas Masuk', minQty: 1
       },
       keluar: {
         label: 'Barang Keluar', value: 'Keluar', color: 'bg-rose-100 text-rose-700',
-        fields: ['from'], labelFrom: 'Lokasi Asal (Rak)', labelQty: 'Kuantitas Keluar', minQty: 1
+        fields: ['from'], labelFrom: 'Toko Asal', labelQty: 'Kuantitas Keluar', minQty: 1
       },
       mutasi: {
         label: 'Pindah Lokasi', value: 'Mutasi', color: 'bg-sky-100 text-sky-700',
-        fields: ['from', 'to'], labelFrom: 'Lokasi Asal (Rak)', labelTo: 'Lokasi Tujuan (Rak)',
+        fields: ['from', 'to'], labelFrom: 'Toko Asal', labelTo: 'Toko Tujuan',
         labelQty: 'Kuantitas Dipindah', minQty: 1
       },
       opname: {
         label: 'Stock Opname', value: 'Opname', color: 'bg-amber-100 text-amber-700',
-        fields: ['to'], labelTo: 'Lokasi Rak yang Dihitung', labelQty: 'Jumlah Hasil Hitung Fisik', minQty: 0
+        fields: ['to'], labelTo: 'Toko yang Dihitung', labelQty: 'Jumlah Hasil Hitung Fisik', minQty: 0
       }
     };
 
@@ -204,6 +227,100 @@
       };
       el.addEventListener('click', close);
       setTimeout(close, ok ? 4000 : 6500);
+    }
+
+    // ===================== DROPDOWN TOKO =====================
+    function createDropdown(rootId, labelId) {
+      const root = $(rootId);
+      const CHEVRON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5 text-slate-400 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/></svg>';
+      const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>';
+      let value = '';
+      root.innerHTML = '';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'flex w-full items-center justify-between gap-3 rounded-xl border border-slate-300 bg-white px-4 py-3 text-left text-base ' +
+        'transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200 disabled:bg-slate-100 disabled:text-slate-400';
+      btn.setAttribute('aria-haspopup', 'listbox');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.setAttribute('aria-labelledby', labelId);
+
+      const current = document.createElement('span');
+      current.className = 'flex min-w-0 items-center gap-3';
+      const chevron = document.createElement('span');
+      chevron.innerHTML = CHEVRON;
+      btn.append(current, chevron);
+
+      const menu = document.createElement('ul');
+      menu.setAttribute('role', 'listbox');
+      menu.className = 'absolute z-20 mt-2 hidden w-full overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl';
+
+      const items = [];
+
+      function render() {
+        current.innerHTML = '';
+        const sel = LOCATIONS.find((l) => l.value === value);
+        if (!sel) {
+          const ph = document.createElement('span');
+          ph.className = 'text-slate-400';
+          ph.textContent = 'Pilih toko';
+          current.appendChild(ph);
+        } else {
+          const dot = document.createElement('span');
+          dot.className = 'h-3 w-3 shrink-0 rounded-full ' + sel.dot;
+          const name = document.createElement('span');
+          name.className = 'truncate font-medium';
+          name.textContent = sel.label;
+          current.append(dot, name);
+        }
+        items.forEach((it) => {
+          const on = it.loc.value === value;
+          it.item.setAttribute('aria-selected', String(on));
+          it.check.classList.toggle('hidden', !on);
+        });
+      }
+
+      function setOpen(open) {
+        menu.classList.toggle('hidden', !open);
+        btn.setAttribute('aria-expanded', String(open));
+        chevron.querySelector('svg').classList.toggle('rotate-180', open);
+      }
+
+      const api = {
+        get value() { return value; },
+        set(v) { value = v; render(); },
+        reset() { value = ''; render(); setOpen(false); },
+        setDisabled(d) { btn.disabled = d; if (d) setOpen(false); }
+      };
+
+      LOCATIONS.forEach((loc) => {
+        const li = document.createElement('li');
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.setAttribute('role', 'option');
+        item.className = 'flex w-full items-center gap-3 px-4 py-3.5 text-left text-base hover:bg-slate-50 active:bg-slate-100';
+        const dot = document.createElement('span');
+        dot.className = 'h-3 w-3 shrink-0 rounded-full ' + loc.dot;
+        const name = document.createElement('span');
+        name.className = 'flex-1 font-medium';
+        name.textContent = loc.label;
+        const check = document.createElement('span');
+        check.className = 'hidden text-indigo-600';
+        check.innerHTML = CHECK;
+        item.append(dot, name, check);
+        item.addEventListener('click', () => { api.set(loc.value); setOpen(false); btn.focus(); });
+        li.appendChild(item);
+        menu.appendChild(li);
+        items.push({ loc, item, check });
+      });
+
+      btn.addEventListener('click', () => setOpen(menu.classList.contains('hidden')));
+      document.addEventListener('click', (e) => { if (!root.contains(e.target)) setOpen(false); });
+      root.addEventListener('keydown', (e) => { if (e.key === 'Escape') { setOpen(false); btn.focus(); } });
+
+      root.append(btn, menu);
+      render();
+      return api;
     }
 
     // ===================== LAYAR 1: HOME =====================
@@ -297,8 +414,8 @@
 
       $('form-title').textContent = a.label;
       $('f-barcode').value = state.barcode;
-      $('f-from').value = '';
-      $('f-to').value = '';
+      ddFrom.reset();
+      ddTo.reset();
       $('f-qty').value = '';
 
       const hasFrom = a.fields.includes('from');
@@ -312,7 +429,6 @@
       $('f-qty').placeholder = a.minQty === 0 ? 'Hasil hitung' : '0';
 
       show('form');
-      setTimeout(() => (hasFrom ? $('f-from') : hasTo ? $('f-to') : $('f-qty')).focus(), 150);
     }
 
     function setLoading(loading) {
@@ -320,7 +436,9 @@
       const btn = $('btn-submit');
       btn.disabled = loading;
       $('btn-submit-text').textContent = loading ? 'Loading...' : 'Simpan';
-      ['f-from', 'f-to', 'f-qty'].forEach((id) => ($(id).disabled = loading));
+      $('f-qty').disabled = loading;
+      ddFrom.setDisabled(loading);
+      ddTo.setDisabled(loading);
       $('btn-back').disabled = loading;
 
       const old = btn.querySelector('.spinner');
@@ -339,6 +457,8 @@
       state.trxId = null;
       state.uncertain = false;
       $('trx-form').reset();
+      ddFrom.reset();
+      ddTo.reset();
       setLoading(false);
       show('home');
     }
@@ -371,14 +491,14 @@
         return toast('GAS_URL belum diisi di index.html.', 'error');
       }
 
-      const from = a.fields.includes('from') ? $('f-from').value.trim().toUpperCase() : '';
-      const to = a.fields.includes('to') ? $('f-to').value.trim().toUpperCase() : '';
+      const from = a.fields.includes('from') ? ddFrom.value : '';
+      const to = a.fields.includes('to') ? ddTo.value : '';
       const qtyRaw = $('f-qty').value.trim();
       const qty = Number(qtyRaw);
 
-      if (a.fields.includes('from') && !from) return toast('Lokasi asal wajib diisi.', 'error');
-      if (a.fields.includes('to') && !to) return toast('Lokasi tujuan wajib diisi.', 'error');
-      if (a.value === 'Mutasi' && from === to) return toast('Lokasi asal dan tujuan tidak boleh sama.', 'error');
+      if (a.fields.includes('from') && !from) return toast('Pilih ' + a.labelFrom.toLowerCase() + ' terlebih dahulu.', 'error');
+      if (a.fields.includes('to') && !to) return toast('Pilih ' + a.labelTo.toLowerCase() + ' terlebih dahulu.', 'error');
+      if (a.value === 'Mutasi' && from === to) return toast('Toko asal dan tujuan tidak boleh sama.', 'error');
       if (qtyRaw === '' || !Number.isInteger(qty) || qty < a.minQty) {
         return toast(a.minQty === 0 ? 'Jumlah harus bilangan bulat 0 atau lebih.'
           : 'Kuantitas harus bilangan bulat lebih dari 0.', 'error');
@@ -440,6 +560,36 @@
     });
 
     window.addEventListener('pagehide', stopScanner);
+
+    const ddFrom = createDropdown('dd-from', 'label-from');
+    const ddTo = createDropdown('dd-to', 'label-to');
+
+    // ===================== PWA (bisa dipasang sebagai aplikasi) =====================
+    let deferredInstall = null;
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstall = e;
+      if (!isStandalone) $('btn-install').classList.remove('hidden');
+    });
+    $('btn-install').addEventListener('click', async () => {
+      if (!deferredInstall) return;
+      deferredInstall.prompt();
+      await deferredInstall.userChoice;
+      deferredInstall = null;
+      $('btn-install').classList.add('hidden');
+    });
+    window.addEventListener('appinstalled', () => {
+      $('btn-install').classList.add('hidden');
+      toast('Aplikasi berhasil dipasang.');
+    });
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !isStandalone) {
+      $('ios-hint').classList.remove('hidden');
+    }
+    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(console.error));
+    }
 
     renderActivities();
     show('home');
