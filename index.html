@@ -16,26 +16,53 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
-    * { -webkit-tap-highlight-color: transparent; }
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
 
-    #reader { border: 0 !important; }
-    #reader video { object-fit: cover; }
+    #reader {
+      border: 0 !important;
+    }
 
-    .spinner { animation: spin 0.8s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    #reader video {
+      object-fit: cover;
+    }
+
+    .spinner {
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
 
     /* slide-up screen transition */
     .screen-enter {
-      animation: slideUp 0.22s cubic-bezier(.25,.46,.45,.94) forwards;
+      animation: slideUp 0.22s cubic-bezier(.25, .46, .45, .94) forwards;
     }
+
     @keyframes slideUp {
-      from { opacity: 0; transform: translateY(18px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Activity card press effect */
-    .activity-card { transition: transform 0.1s ease, box-shadow 0.1s ease; }
-    .activity-card:active { transform: scale(0.96); }
+    .activity-card {
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+
+    .activity-card:active {
+      transform: scale(0.96);
+    }
 
     /* Gradient header */
     .app-header {
@@ -43,29 +70,44 @@
     }
 
     /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
 
     /* Input focus glow */
-    input:focus { outline: none; }
+    input:focus {
+      outline: none;
+    }
+
     .input-field {
       transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
+
     .input-field:focus {
       border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
 
     /* Dropdown menu */
     .dd-menu {
       transition: opacity 0.12s ease, transform 0.12s ease;
     }
+
     .dd-menu.open {
       opacity: 1;
       transform: translateY(0);
       pointer-events: auto;
     }
+
     .dd-menu.closed {
       opacity: 0;
       transform: translateY(-6px);
@@ -86,11 +128,19 @@
 
     /* Toast */
     .toast-item {
-      animation: toastIn 0.25s cubic-bezier(.25,.46,.45,.94);
+      animation: toastIn 0.25s cubic-bezier(.25, .46, .45, .94);
     }
+
     @keyframes toastIn {
-      from { opacity: 0; transform: translateY(-12px) scale(0.95); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
+      from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
     }
   </style>
 </head>
@@ -102,7 +152,8 @@
     <header class="app-header px-5 pb-5 pt-12 text-white" style="padding-top: max(3rem, env(safe-area-inset-top));">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
+          <div
+            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
             <img src="logo.png" alt="Logo" class="h-7 w-7 rounded-lg object-contain">
           </div>
           <div>
@@ -112,7 +163,9 @@
         </div>
         <button id="btn-install" type="button"
           class="hidden items-center gap-1.5 rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/30 active:bg-indigo-600">
-          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m-8-8h16"/></svg>
+          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m-8-8h16" />
+          </svg>
           Install
         </button>
       </div>
@@ -140,7 +193,10 @@
         <p id="ios-hint"
           class="mt-5 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-500 shadow-sm">
           <span class="mb-1 flex items-center gap-1.5 font-semibold text-slate-700">
-            <svg class="h-3.5 w-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <svg class="h-3.5 w-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             Pasang di iPhone
           </span>
           Buka lewat Safari → ketuk tombol <strong>Bagikan</strong> → pilih <strong>"Tambah ke Layar Utama"</strong>.
@@ -153,7 +209,9 @@
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-cancel-scan" type="button"
             class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
           <div>
             <h2 id="scan-title" class="text-base font-bold text-slate-800"></h2>
@@ -170,7 +228,8 @@
               <span class="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-white/70 rounded-tl-lg"></span>
               <span class="absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-white/70 rounded-tr-lg"></span>
               <span class="absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-white/70 rounded-bl-lg"></span>
-              <span class="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-white/70 rounded-br-lg"></span>
+              <span
+                class="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-white/70 rounded-br-lg"></span>
             </div>
           </div>
         </div>
@@ -179,11 +238,13 @@
         <div class="mt-4">
           <button id="btn-manual-toggle" type="button"
             class="mx-auto flex items-center gap-1.5 text-sm font-medium text-indigo-600">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m-8-8h16"/></svg>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m-8-8h16" />
+            </svg>
             Ketik barcode manual
           </button>
           <form id="manual-form" class="mt-3 hidden flex gap-2">
-            <input id="manual-barcode" type="text" inputmode="numeric" placeholder="Masukkan barcode..."
+            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan barcode..."
               class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:ring-0">
             <button type="submit"
               class="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white active:bg-slate-700">OK</button>
@@ -197,7 +258,9 @@
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back" type="button"
             class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
           <div>
             <h2 id="form-title" class="text-base font-bold text-slate-800"></h2>
@@ -210,46 +273,68 @@
           <!-- Barcode chip -->
           <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100">
-              <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+              </svg>
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode · Kode Produk</p>
               <input id="f-barcode" type="text" readonly
                 class="w-full bg-transparent font-mono text-sm font-semibold text-slate-700">
+              <p class="mt-1 text-[10px] text-slate-400">Kode hasil scan ini otomatis menjadi identitas produk.</p>
             </div>
           </div>
 
           <!-- Card wrapper for fields -->
           <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <!-- SKU -->
-            <div id="row-sku" class="hidden border-b border-slate-100 px-4 py-3.5">
-              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">SKU</label>
-              <input id="f-sku" type="text" placeholder="mis. KS-001"
-                class="input-field w-full bg-transparent text-sm font-medium text-slate-700 uppercase placeholder:text-slate-300 focus:ring-0 border-0">
-            </div>
-
             <!-- Nama Produk -->
             <div id="row-nama" class="hidden border-b border-slate-100 px-4 py-3.5">
-              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Produk</label>
+              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama
+                Produk</label>
               <input id="f-nama" type="text" placeholder="mis. Kaos Polos Hitam"
                 class="input-field w-full bg-transparent text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:ring-0 border-0">
             </div>
 
+            <!-- Status Aktif (hanya tampil saat Produk Baru) -->
+            <div id="row-status" class="hidden border-b border-slate-100 px-4 py-3.5">
+              <label class="mb-2.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Status
+                Produk</label>
+              <div class="flex gap-2">
+                <button type="button" id="status-aktif-btn" data-value="true" onclick="setStatusAktif(true)"
+                  class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all">
+                  <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                  Aktif
+                </button>
+                <button type="button" id="status-nonaktif-btn" data-value="false" onclick="setStatusAktif(false)"
+                  class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all">
+                  <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                  Nonaktif
+                </button>
+              </div>
+              <input type="hidden" id="f-status-aktif" value="true">
+            </div>
+
             <!-- Lokasi Asal -->
             <div id="row-from" class="border-b border-slate-100 px-4 py-3.5">
-              <label id="label-from" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi Asal</label>
+              <label id="label-from"
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
+                Asal</label>
               <div id="dd-from" class="relative"></div>
             </div>
 
             <!-- Lokasi Tujuan -->
             <div id="row-to" class="border-b border-slate-100 px-4 py-3.5">
-              <label id="label-to" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi Tujuan</label>
+              <label id="label-to"
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
+                Tujuan</label>
               <div id="dd-to" class="relative"></div>
             </div>
 
             <!-- Kuantitas -->
             <div id="row-qty" class="px-4 py-3.5">
-              <label id="label-qty" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
+              <label id="label-qty"
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
               <input id="f-qty" type="number" inputmode="numeric" placeholder="0"
                 class="input-field w-full bg-transparent text-3xl font-bold text-slate-800 placeholder:text-slate-200 focus:ring-0 border-0">
             </div>
@@ -258,7 +343,9 @@
           <!-- Submit -->
           <button id="btn-submit" type="submit"
             class="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
             <span id="btn-submit-text">Simpan Data</span>
           </button>
         </form>
@@ -268,10 +355,11 @@
   </div>
 
   <!-- TOAST -->
-  <div id="toast-root" class="fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4 pointer-events-none" aria-live="polite"></div>
+  <div id="toast-root" class="fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4 pointer-events-none"
+    aria-live="polite"></div>
 
   <script>
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycbzIVIhE6ToZm-3jzBAL61fhJJyNJFRNK68h3qRyiBR6MX8qRgb7IaL2fnKIV8BwBh_riQ/exec';
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec';
 
     const LOCATIONS = [
       { value: 'Rak Utama', label: 'Rak Utama', dot: 'bg-indigo-500' },
@@ -280,25 +368,25 @@
     ];
 
     const ACTIVITIES = {
-      masuk:  { label: 'Barang Masuk',  value: 'Masuk',      color: 'emerald', fields: ['to'],          labelTo: 'Toko Tujuan',          labelQty: 'Stok Masuk',  min: 1 },
-      keluar: { label: 'Barang Keluar', value: 'Keluar',     color: 'rose',    fields: ['from'],         labelFrom: 'Toko Asal',          labelQty: 'Stok Keluar', min: 1 },
-      mutasi: { label: 'Pindah Lokasi', value: 'Mutasi',     color: 'sky',     fields: ['from', 'to'],  labelFrom: 'Toko Asal',           labelTo: 'Toko Tujuan (Selain Asal)', min: 1 },
-      opname: { label: 'Stock Opname',  value: 'Opname',     color: 'amber',   fields: ['to'],           labelTo: 'Lokasi Opname',         labelQty: 'Hasil Fisik', min: 0 },
-      produk: { label: 'Produk Baru',   value: 'ProdukBaru', color: 'violet',  fields: ['to'],           labelTo: 'Lokasi Awal',           labelQty: 'Stok Awal',   min: 0, isProd: true, wide: true }
+      masuk: { label: 'Barang Masuk', value: 'Masuk', color: 'emerald', fields: ['to'], labelTo: 'Toko Tujuan', labelQty: 'Stok Masuk', min: 1 },
+      keluar: { label: 'Barang Keluar', value: 'Keluar', color: 'rose', fields: ['from'], labelFrom: 'Toko Asal', labelQty: 'Stok Keluar', min: 1 },
+      mutasi: { label: 'Pindah Lokasi', value: 'Mutasi', color: 'sky', fields: ['from', 'to'], labelFrom: 'Toko Asal', labelTo: 'Toko Tujuan (Selain Asal)', min: 1 },
+      opname: { label: 'Stock Opname', value: 'Opname', color: 'amber', fields: ['to'], labelTo: 'Lokasi Opname', labelQty: 'Hasil Fisik', min: 0 },
+      produk: { label: 'Produk Baru', value: 'ProdukBaru', color: 'violet', fields: ['to'], labelTo: 'Lokasi Awal', labelQty: 'Stok Awal', min: 0, isProd: true, wide: true }
     };
 
     // Color map for activity cards
     const COLOR_MAP = {
       emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: 'bg-emerald-500', border: 'border-emerald-100' },
-      rose:    { bg: 'bg-rose-50',    text: 'text-rose-700',    icon: 'bg-rose-500',    border: 'border-rose-100' },
-      sky:     { bg: 'bg-sky-50',     text: 'text-sky-700',     icon: 'bg-sky-500',     border: 'border-sky-100' },
-      amber:   { bg: 'bg-amber-50',   text: 'text-amber-700',   icon: 'bg-amber-500',   border: 'border-amber-100' },
-      violet:  { bg: 'bg-violet-50',  text: 'text-violet-700',  icon: 'bg-violet-500',  border: 'border-violet-100' }
+      rose: { bg: 'bg-rose-50', text: 'text-rose-700', icon: 'bg-rose-500', border: 'border-rose-100' },
+      sky: { bg: 'bg-sky-50', text: 'text-sky-700', icon: 'bg-sky-500', border: 'border-sky-100' },
+      amber: { bg: 'bg-amber-50', text: 'text-amber-700', icon: 'bg-amber-500', border: 'border-amber-100' },
+      violet: { bg: 'bg-violet-50', text: 'text-violet-700', icon: 'bg-violet-500', border: 'border-violet-100' }
     };
 
     // Activity icons (heroicons outline paths)
     const ICONS = {
-      masuk:  'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3',
+      masuk: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3',
       keluar: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
       mutasi: 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5',
       opname: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
@@ -312,15 +400,14 @@
     // ===================== TOAST =====================
     function toast(msg, type = 'success') {
       const el = document.createElement('div');
-      el.className = `toast-item pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${
-        type === 'success' ? 'bg-slate-900' : 'bg-rose-600'
-      }`;
+      el.className = `toast-item pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'
+        }`;
       el.innerHTML = `
         <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-400'}">
           <svg class="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             ${type === 'success'
-              ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>'
-              : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>'}
+          ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>'
+          : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>'}
           </svg>
         </span>
         <span class="flex-1">${msg}</span>`;
@@ -412,11 +499,31 @@
     }
 
     const ddFrom = createDropdown('dd-from');
-    const ddTo   = createDropdown('dd-to');
+    const ddTo = createDropdown('dd-to');
 
     ddFrom.onChange = (val) => {
       if (state.key === 'mutasi') ddTo.exclude(val);
     };
+
+    // ===================== STATUS AKTIF TOGGLE =====================
+    function setStatusAktif(isAktif) {
+      $('f-status-aktif').value = isAktif ? 'true' : 'false';
+
+      const btnAktif = $('status-aktif-btn');
+      const btnNon = $('status-nonaktif-btn');
+
+      if (isAktif) {
+        btnAktif.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all';
+        btnNon.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all';
+        btnAktif.querySelector('span').className = 'h-2 w-2 rounded-full bg-emerald-500';
+        btnNon.querySelector('span').className = 'h-2 w-2 rounded-full bg-slate-300';
+      } else {
+        btnNon.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-rose-400 bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-600 transition-all';
+        btnAktif.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all';
+        btnNon.querySelector('span').className = 'h-2 w-2 rounded-full bg-rose-500';
+        btnAktif.querySelector('span').className = 'h-2 w-2 rounded-full bg-slate-300';
+      }
+    }
 
     // ===================== RENDER ACTIVITIES =====================
     function renderActivities() {
@@ -476,7 +583,7 @@
       try {
         await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: 220 }, (text) => {
           scanner.stop(); openForm(text);
-        }, () => {});
+        }, () => { });
       } catch (e) {
         $('manual-form').classList.remove('hidden');
         $('manual-form').classList.add('flex');
@@ -489,19 +596,20 @@
       state.barcode = barcode;
       $('form-title').textContent = a.label;
       $('f-barcode').value = barcode;
-      $('f-sku').value = ''; $('f-nama').value = ''; $('f-qty').value = '';
+      $('f-nama').value = ''; $('f-qty').value = '';
       ddFrom.reset(); ddTo.reset();
 
-      $('row-sku').classList.toggle('hidden', !a.isProd);
       $('row-nama').classList.toggle('hidden', !a.isProd);
+      $('row-status').classList.toggle('hidden', !a.isProd);
+      if (a.isProd) setStatusAktif(true); // default Aktif setiap kali form dibuka
 
       const hasFrom = a.fields.includes('from');
-      const hasTo   = a.fields.includes('to');
+      const hasTo = a.fields.includes('to');
       $('row-from').classList.toggle('hidden', !hasFrom);
       $('row-to').classList.toggle('hidden', !hasTo);
 
       if (hasFrom) $('label-from').textContent = a.labelFrom;
-      if (hasTo)   $('label-to').textContent   = a.labelTo;
+      if (hasTo) $('label-to').textContent = a.labelTo;
       $('label-qty').textContent = a.labelQty || 'Kuantitas';
       $('f-qty').placeholder = `Min: ${a.min}`;
 
@@ -509,10 +617,10 @@
       const c = COLOR_MAP[a.color];
       const submitColors = {
         emerald: 'bg-emerald-600 shadow-emerald-500/25 active:bg-emerald-700',
-        rose:    'bg-rose-600 shadow-rose-500/25 active:bg-rose-700',
-        sky:     'bg-sky-600 shadow-sky-500/25 active:bg-sky-700',
-        amber:   'bg-amber-500 shadow-amber-500/25 active:bg-amber-600',
-        violet:  'bg-violet-600 shadow-violet-500/25 active:bg-violet-700'
+        rose: 'bg-rose-600 shadow-rose-500/25 active:bg-rose-700',
+        sky: 'bg-sky-600 shadow-sky-500/25 active:bg-sky-700',
+        amber: 'bg-amber-500 shadow-amber-500/25 active:bg-amber-600',
+        violet: 'bg-violet-600 shadow-violet-500/25 active:bg-violet-700'
       };
       const btn = $('btn-submit');
       btn.className = btn.className.replace(/bg-\w+-\d+ shadow-\w+-\d+\/\d+ active:bg-\w+-\d+/g, '');
@@ -528,15 +636,16 @@
       const from = ddFrom.value, to = ddTo.value, qty = Number($('f-qty').value);
 
       if (a.isProd) {
-        const sku = $('f-sku').value.trim(), nama = $('f-nama').value.trim();
-        if (!sku || !nama || !to) return toast('SKU, Nama, dan Lokasi wajib diisi!', 'error');
+        const nama = $('f-nama').value.trim();
+        const statusAktif = $('f-status-aktif').value === 'true';
+        if (!state.barcode || !nama || !to) return toast('Barcode, Nama, dan Lokasi wajib diisi!', 'error');
         if ($('f-qty').value === '' || qty < 0) return toast('Isi stok awal (min 0)', 'error');
         state.trxId = state.trxId || `TRX-${Date.now()}`;
-        return kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, sku, nama, location_to: to, qty });
+        return kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, nama, location_to: to, qty, status_aktif: statusAktif });
       }
 
       if (a.fields.includes('from') && !from) return toast('Pilih Lokasi Asal', 'error');
-      if (a.fields.includes('to')   && !to)   return toast('Pilih Lokasi Tujuan', 'error');
+      if (a.fields.includes('to') && !to) return toast('Pilih Lokasi Tujuan', 'error');
       if ($('f-qty').value === '' || qty < a.min) return toast('Kuantitas tidak valid', 'error');
 
       state.trxId = state.trxId || `TRX-${Date.now()}`;
@@ -547,7 +656,7 @@
       $('btn-submit').disabled = true;
       $('btn-submit-text').textContent = 'Menyimpan...';
       try {
-        const res  = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
         const json = await res.json();
         toast(json.message, json.success ? 'success' : 'error');
         if (json.success) { show('home'); }
