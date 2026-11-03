@@ -17,7 +17,7 @@ var HEADERS = {
 };
 
 var LOCK_TIMEOUT_MS = 10000; // antrean 10 detik
-var ACTIVITIES = { 'masuk': 'Masuk', 'keluar': 'Keluar', 'mutasi': 'Mutasi', 'opname': 'Opname' };
+var ACTIVITIES = { 'masuk': 'Masuk', 'keluar': 'Keluar', 'mutasi': 'Mutasi', 'opname': 'Opname', 'produkbaru': 'ProdukBaru' };
 
 // ===================== SETUP =====================
 /**
@@ -81,6 +81,9 @@ function doPost(e) {
     if (!trxId)    return respond_(false, 'transaction_id wajib diisi.');
     if (!activity) return respond_(false, "activity harus 'Masuk', 'Keluar', atau 'Mutasi'.");
     if (!barcode)  return respond_(false, 'barcode wajib diisi.');
+
+    // Pendaftaran produk baru punya alur sendiri (tidak memakai qty/lokasi)
+    if (activity === 'ProdukBaru') return registerProduct_(p, trxId, barcode);
     if (str_(p.qty) === '') return respond_(false, 'qty wajib diisi.');
     var minQty = (activity === 'Opname') ? 0 : 1;
     if (!isFinite(qty) || qty < minQty || Math.floor(qty) !== qty) {
@@ -218,6 +221,67 @@ function doPost(e) {
 // Opsional: untuk tes cepat lewat browser
 function doGet() {
   return respond_(true, 'Ina Basic Store Warehouse API aktif. Gunakan POST.');
+}
+
+// ===================== PRODUK BARU =====================
+/**
+ * Mendaftarkan produk baru ke MASTER_PRODUK (Status_Aktif = TRUE).
+ * Payload: transaction_id, activity:'ProdukBaru', barcode, sku, nama.
+ * Dipanggil dari doPost, jadi sudah berada di dalam LockService.
+ */
+function registerProduct_(p, trxId, barcode) {
+  var sku  = str_(p.sku);
+  var nama = str_(p.nama);
+
+  if (!sku)  return respond_(false, 'SKU wajib diisi.');
+  if (!nama) return respond_(false, 'Nama produk wajib diisi.');
+  if (sku.length > 50 || barcode.length > 64 || nama.length > 150) {
+    return respond_(false, 'SKU maks. 50, barcode maks. 64, nama maks. 150 karakter.');
+  }
+
+  var ss       = SpreadsheetApp.getActiveSpreadsheet();
+  var shMaster = ss.getSheetByName(SHEET_MASTER);
+  var shLog    = ss.getSheetByName(SHEET_LOG);
+  if (!shMaster || !shLog) {
+    return respond_(false, 'Sheet belum lengkap. Jalankan setup() terlebih dahulu.');
+  }
+
+  // Cegah double submission
+  if (trxExists_(shLog, trxId)) {
+    return respond_(false, 'transaction_id sudah pernah diproses: ' + trxId);
+  }
+
+  // Tolak barcode atau SKU yang sudah ada (SKU dibandingkan tanpa peka huruf besar/kecil)
+  var last = shMaster.getLastRow();
+  if (last >= 2) {
+    var rows = shMaster.getRange(2, 1, last - 1, 2).getValues(); // SKU, Barcode
+    for (var i = 0; i < rows.length; i++) {
+      if (str_(rows[i][1]) === barcode) {
+        return respond_(false, 'Barcode sudah terdaftar untuk SKU: ' + str_(rows[i][0]));
+      }
+      if (str_(rows[i][0]).toLowerCase() === sku.toLowerCase()) {
+        return respond_(false, 'SKU sudah terdaftar: ' + str_(rows[i][0]));
+      }
+    }
+  }
+
+  var rowIdx = last + 1;
+  try {
+    var range = shMaster.getRange(rowIdx, 1, 1, 4);
+    // Format teks agar barcode tidak berubah jadi angka dan isi yang diawali "=" tidak dianggap rumus
+    range.setNumberFormats([['@', '@', '@', 'General']]);
+    range.setValues([[sku, barcode, nama, true]]);
+    shLog.appendRow([new Date(), trxId, 'ProdukBaru', sku, '', '', 0, 'SUCCESS']);
+    SpreadsheetApp.flush();
+  } catch (err) {
+    // Batalkan baris produk bila pencatatan log gagal
+    try { if (shMaster.getLastRow() >= rowIdx) shMaster.deleteRow(rowIdx); } catch (e) {}
+    throw err;
+  }
+
+  return respond_(true, 'Produk baru terdaftar: ' + sku + ' - ' + nama + '.', {
+    transaction_id: trxId, sku: sku, barcode: barcode, nama: nama
+  });
 }
 
 // ===================== HELPER =====================

@@ -104,6 +104,19 @@
               class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 font-mono text-base text-slate-700">
           </div>
 
+          <div id="row-sku" class="hidden">
+            <label class="mb-1 block text-sm font-medium text-slate-600" for="f-sku">SKU</label>
+            <input id="f-sku" type="text" maxlength="50" autocomplete="off" autocapitalize="characters"
+              placeholder="mis. KS-001"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+
+          <div id="row-nama" class="hidden">
+            <label class="mb-1 block text-sm font-medium text-slate-600" for="f-nama">Nama Produk</label>
+            <input id="f-nama" type="text" maxlength="150" autocomplete="off" placeholder="mis. Kaos Polos Hitam M"
+              class="w-full rounded-xl border border-slate-300 px-4 py-3 text-base focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
+          </div>
+
           <div id="row-from">
             <label id="label-from" class="mb-1 block text-sm font-medium text-slate-600">Toko Asal</label>
             <div id="dd-from" class="relative"></div>
@@ -114,7 +127,7 @@
             <div id="dd-to" class="relative"></div>
           </div>
 
-          <div>
+          <div id="row-qty">
             <label id="label-qty" class="mb-1 block text-sm font-medium text-slate-600" for="f-qty">Kuantitas</label>
             <input id="f-qty" type="number" inputmode="numeric" step="1" min="1" placeholder="0"
               class="w-full rounded-xl border border-slate-300 px-4 py-3 text-2xl font-semibold focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200">
@@ -151,7 +164,8 @@
       masuk: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3',
       keluar: 'M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5',
       mutasi: 'M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5',
-      opname: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'
+      opname: 'M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+      produk: 'M12 4.5v15m7.5-7.5h-15'
     };
 
     // value = nilai yang dikirim ke GAS sebagai `activity`
@@ -172,6 +186,10 @@
       opname: {
         label: 'Stock Opname', value: 'Opname', color: 'bg-amber-100 text-amber-700',
         fields: ['to'], labelTo: 'Toko yang Dihitung', labelQty: 'Jumlah Hasil Hitung Fisik', minQty: 0
+      },
+      produk: {
+        label: 'Produk Baru', value: 'ProdukBaru', color: 'bg-violet-100 text-violet-700',
+        fields: [], isProduct: true, wide: true
       }
     };
 
@@ -330,7 +348,9 @@
         const a = ACTIVITIES[key];
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl bg-white p-4 ' +
+        btn.className = (a.wide ? 'col-span-2 flex items-center justify-center gap-4 '
+          : 'flex aspect-square flex-col items-center justify-center gap-3 ') +
+          'rounded-2xl bg-white p-4 ' +
           'shadow-sm ring-1 ring-slate-200 transition active:scale-95 active:bg-slate-50';
         btn.innerHTML =
           '<span class="flex h-14 w-14 items-center justify-center rounded-2xl ' + a.color + '">' +
@@ -417,6 +437,13 @@
       ddFrom.reset();
       ddTo.reset();
       $('f-qty').value = '';
+      $('f-sku').value = '';
+      $('f-nama').value = '';
+
+      const isProduct = !!a.isProduct;
+      $('row-sku').classList.toggle('hidden', !isProduct);
+      $('row-nama').classList.toggle('hidden', !isProduct);
+      $('row-qty').classList.toggle('hidden', isProduct);
 
       const hasFrom = a.fields.includes('from');
       const hasTo = a.fields.includes('to');
@@ -424,11 +451,14 @@
       $('row-to').classList.toggle('hidden', !hasTo);
       if (hasFrom) $('label-from').textContent = a.labelFrom;
       if (hasTo) $('label-to').textContent = a.labelTo;
-      $('label-qty').textContent = a.labelQty;
-      $('f-qty').min = a.minQty;
-      $('f-qty').placeholder = a.minQty === 0 ? 'Hasil hitung' : '0';
+      if (!isProduct) {
+        $('label-qty').textContent = a.labelQty;
+        $('f-qty').min = a.minQty;
+        $('f-qty').placeholder = a.minQty === 0 ? 'Hasil hitung' : '0';
+      }
 
       show('form');
+      if (isProduct) setTimeout(() => $('f-sku').focus(), 150);
     }
 
     function setLoading(loading) {
@@ -437,6 +467,8 @@
       btn.disabled = loading;
       $('btn-submit-text').textContent = loading ? 'Loading...' : 'Simpan';
       $('f-qty').disabled = loading;
+      $('f-sku').disabled = loading;
+      $('f-nama').disabled = loading;
       ddFrom.setDisabled(loading);
       ddTo.setDisabled(loading);
       $('btn-back').disabled = loading;
@@ -491,6 +523,21 @@
         return toast('GAS_URL belum diisi di index.html.', 'error');
       }
 
+      if (a.isProduct) {
+        const sku = $('f-sku').value.trim();
+        const nama = $('f-nama').value.trim();
+        if (!sku) return toast('SKU wajib diisi.', 'error');
+        if (!nama) return toast('Nama produk wajib diisi.', 'error');
+        if (!state.trxId) state.trxId = genTrxId();
+        return sendPayload({
+          transaction_id: state.trxId,
+          activity: a.value,
+          barcode: state.barcode,
+          sku: sku,
+          nama: nama
+        });
+      }
+
       const from = a.fields.includes('from') ? ddFrom.value : '';
       const to = a.fields.includes('to') ? ddTo.value : '';
       const qtyRaw = $('f-qty').value.trim();
@@ -516,6 +563,10 @@
         qty: qty
       };
 
+      return sendPayload(payload);
+    }
+
+    async function sendPayload(payload) {
       setLoading(true);
       try {
         const data = await postToGas(payload);
