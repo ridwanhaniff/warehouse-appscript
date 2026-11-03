@@ -1,7 +1,18 @@
 // Service worker Ina Warehouse: cache "app shell" supaya aplikasi cepat terbuka.
 // Request POST ke Google Apps Script TIDAK pernah disentuh/di-cache.
-const CACHE = 'ina-warehouse-v1';
-const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
+const CACHE = 'ina-warehouse-v2';
+const SHELL = [
+  './',
+  'index.html',
+  'manifest.webmanifest',
+  'logo.png',
+  'logo-192.png',
+  'logo-512.png',
+  'logo-maskable-512.png',
+  'icon-192.png',
+  'icon-512.png',
+  'icon-maskable-512.png'
+];
 const CDN = [
   'https://cdn.tailwindcss.com',
   'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
@@ -10,7 +21,7 @@ const CDN = [
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
     const c = await caches.open(CACHE);
-    await c.addAll(SHELL);
+    await Promise.all(SHELL.map((u) => c.add(u).catch((err) => console.warn('Cache warning:', u, err))));
     await Promise.all(CDN.map((u) =>
       fetch(u, { mode: 'no-cors' }).then((r) => c.put(u, r)).catch(() => {})
     ));

@@ -1,11 +1,7 @@
 /**
- * INA BASIC STORE WAREHOUSE - Backend API (Google Apps Script)
- * Deploy: Deploy > New deployment > Web app
- *   - Execute as: Me
- *   - Who has access: Anyone
+ * INA BASIC STORE WAREHOUSE - Backend API Final
  */
 
-// ===================== KONFIGURASI =====================
 var SHEET_MASTER = 'MASTER_PRODUK';
 var SHEET_STOK   = 'STOK_LOKASI';
 var SHEET_LOG    = 'OPERATION_LOG';
@@ -16,60 +12,33 @@ var HEADERS = {
   OPERATION_LOG: ['Timestamp', 'ID_Transaksi', 'Aktivitas', 'SKU', 'Lokasi_Asal', 'Lokasi_Tujuan', 'Qty', 'Status']
 };
 
-var LOCK_TIMEOUT_MS = 10000; // antrean 10 detik
+var LOCK_TIMEOUT_MS = 10000;
 var ACTIVITIES = { 'masuk': 'Masuk', 'keluar': 'Keluar', 'mutasi': 'Mutasi', 'opname': 'Opname', 'produkbaru': 'ProdukBaru' };
 
-// ===================== SETUP =====================
-/**
- * Jalankan sekali secara manual dari editor Apps Script.
- * Membuat 3 sheet beserta header jika belum ada.
- */
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-
   Object.keys(HEADERS).forEach(function (name) {
     var sheet = ss.getSheetByName(name);
     if (!sheet) sheet = ss.insertSheet(name);
-
-    var headers = HEADERS[name];
     if (sheet.getLastRow() === 0) {
-      sheet.getRange(1, 1, 1, headers.length)
-        .setValues([headers])
-        .setFontWeight('bold')
-        .setBackground('#f3f3f3');
+      sheet.getRange(1, 1, 1, HEADERS[name].length).setValues([HEADERS[name]]).setFontWeight('bold').setBackground('#f3f3f3');
       sheet.setFrozenRows(1);
     }
   });
-
-  // Paksa kolom identitas jadi teks agar barcode/SKU angka tidak berubah format
-  // (mis. "00123" tidak menjadi 123, barcode panjang tidak jadi notasi ilmiah).
   ss.getSheetByName(SHEET_MASTER).getRange('A:B').setNumberFormat('@');
   ss.getSheetByName(SHEET_STOK).getRange('A:B').setNumberFormat('@');
   ss.getSheetByName(SHEET_LOG).getRange('B:B').setNumberFormat('@');
   ss.getSheetByName(SHEET_LOG).getRange('D:F').setNumberFormat('@');
-
-  Logger.log('Setup selesai.');
 }
 
-// ===================== ENDPOINT =====================
 function doPost(e) {
   var lock = LockService.getScriptLock();
+  if (!lock.tryLock(LOCK_TIMEOUT_MS)) return respond_(false, 'Server sibuk, coba lagi.');
 
-  // 1. Antrean lock 10 detik
-  if (!lock.tryLock(LOCK_TIMEOUT_MS)) {
-    return respond_(false, 'Server sibuk, silakan coba lagi.');
-  }
-
-  var undo = []; // jejak perubahan stok untuk rollback bila pencatatan log gagal
-
+  var undo = []; 
   try {
-    // ---- Parse & validasi payload ----
     var p;
-    try {
-      p = JSON.parse(e.postData.contents);
-    } catch (err) {
-      return respond_(false, 'Payload bukan JSON yang valid.');
-    }
+    try { p = JSON.parse(e.postData.contents); } catch (err) { return respond_(false, 'Format JSON salah.'); }
 
     var trxId    = str_(p.transaction_id);
     var activity = ACTIVITIES[str_(p.activity).toLowerCase()];
@@ -78,66 +47,41 @@ function doPost(e) {
     var to       = str_(p.location_to);
     var qty      = Number(p.qty);
 
-    if (!trxId)    return respond_(false, 'transaction_id wajib diisi.');
-    if (!activity) return respond_(false, "activity harus 'Masuk', 'Keluar', atau 'Mutasi'.");
-    if (!barcode)  return respond_(false, 'barcode wajib diisi.');
+    if (!trxId) return respond_(false, 'transaction_id wajib diisi.');
+    if (!activity) return respond_(false, 'activity tidak valid.');
+    if (!barcode) return respond_(false, 'barcode wajib diisi.');
 
-    // Pendaftaran produk baru punya alur sendiri (tidak memakai qty/lokasi)
-    if (activity === 'ProdukBaru') return registerProduct_(p, trxId, barcode);
-    if (str_(p.qty) === '') return respond_(false, 'qty wajib diisi.');
+    if (activity === 'ProdukBaru') return registerProduct_(p, trxId, barcode, to, qty);
+
+    if (str_(p.qty) === '') return respond_(false, 'Kuantitas wajib diisi.');
     var minQty = (activity === 'Opname') ? 0 : 1;
-    if (!isFinite(qty) || qty < minQty || Math.floor(qty) !== qty) {
-      return respond_(false, activity === 'Opname'
-        ? 'qty hasil hitung harus bilangan bulat >= 0.'
-        : 'qty harus berupa bilangan bulat positif.');
-    }
-    if ((activity === 'Keluar' || activity === 'Mutasi') && !from) {
-      return respond_(false, 'location_from wajib diisi untuk aktivitas ' + activity + '.');
-    }
-    if ((activity === 'Masuk' || activity === 'Mutasi' || activity === 'Opname') && !to) {
-      return respond_(false, 'location_to wajib diisi untuk aktivitas ' + activity + '.');
-    }
-    if (activity === 'Mutasi' && from === to) {
-      return respond_(false, 'Lokasi asal dan tujuan tidak boleh sama.');
-    }
+    if (!isFinite(qty) || qty < minQty || Math.floor(qty) !== qty) return respond_(false, 'Kuantitas harus bilangan bulat valid.');
+    
+    if ((activity === 'Keluar' || activity === 'Mutasi') && !from) return respond_(false, 'Lokasi asal wajib diisi.');
+    if ((activity === 'Masuk' || activity === 'Mutasi' || activity === 'Opname') && !to) return respond_(false, 'Lokasi tujuan wajib diisi.');
+    if (activity === 'Mutasi' && from === to) return respond_(false, 'Lokasi asal dan tujuan tidak boleh sama.');
 
-    var ss       = SpreadsheetApp.getActiveSpreadsheet();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var shMaster = ss.getSheetByName(SHEET_MASTER);
-    var shStok   = ss.getSheetByName(SHEET_STOK);
-    var shLog    = ss.getSheetByName(SHEET_LOG);
-    if (!shMaster || !shStok || !shLog) {
-      return respond_(false, 'Sheet belum lengkap. Jalankan setup() terlebih dahulu.');
-    }
+    var shStok = ss.getSheetByName(SHEET_STOK);
+    var shLog = ss.getSheetByName(SHEET_LOG);
 
-    // ---- 2. Cegah double submission ----
-    if (trxExists_(shLog, trxId)) {
-      return respond_(false, 'transaction_id sudah pernah diproses: ' + trxId);
-    }
+    if (trxExists_(shLog, trxId)) return respond_(false, 'Transaksi sudah pernah diproses.');
 
-    // ---- 3. Cari SKU berdasarkan barcode ----
     var produk = findProductByBarcode_(shMaster, barcode);
-    if (!produk) {
-      return respond_(false, 'Barcode tidak ditemukan di MASTER_PRODUK: ' + barcode);
-    }
-    if (!produk.aktif) {
-      return respond_(false, 'Produk nonaktif (Status_Aktif = FALSE): ' + produk.sku);
-    }
+    if (!produk) return respond_(false, 'Barcode belum terdaftar di Master Produk.');
+    if (!produk.aktif) return respond_(false, 'Produk nonaktif.');
     var sku = produk.sku;
 
-    // ---- 4. Cek stok untuk Keluar / Mutasi ----
     var stokData = readStok_(shStok);
     var stokAsal = null;
 
     if (activity === 'Keluar' || activity === 'Mutasi') {
       stokAsal = findStokRow_(stokData, sku, from);
       var tersedia = stokAsal ? stokAsal.qty : 0;
-      if (tersedia < qty) {
-        return respond_(false,
-          'Stok tidak cukup di ' + from + '. Tersedia: ' + tersedia + ', diminta: ' + qty + '.');
-      }
+      if (tersedia < qty) return respond_(false, 'Stok di ' + from + ' tidak cukup. Tersedia: ' + tersedia);
     }
 
-    // ---- 5. Update STOK_LOKASI ----
     if (activity === 'Keluar' || activity === 'Mutasi') {
       undo.push({ type: 'set', row: stokAsal.row, old: stokAsal.qty });
       shStok.getRange(stokAsal.row, 3).setValue(stokAsal.qty - qty);
@@ -154,16 +98,13 @@ function doPost(e) {
       }
     }
 
-    // ---- 5b. Stock Opname: stok di location_to DITIMPA dengan hasil hitung fisik (qty) ----
     var logStatus = 'SUCCESS';
-    var message = 'Transaksi ' + activity + ' berhasil dicatat.';
-    var extra = null;
+    var message = 'Transaksi berhasil disimpan.';
 
     if (activity === 'Opname') {
       var stokOp = findStokRow_(stokData, sku, to);
       var sebelum = stokOp ? stokOp.qty : 0;
-      var selisih = qty - sebelum;
-
+      
       if (stokOp) {
         undo.push({ type: 'set', row: stokOp.row, old: stokOp.qty });
         shStok.getRange(stokOp.row, 3).setValue(qty);
@@ -171,168 +112,96 @@ function doPost(e) {
         shStok.appendRow([sku, to, qty]);
         undo.push({ type: 'append', row: shStok.getLastRow() });
       }
-
-      var selisihTxt = (selisih > 0 ? '+' : '') + selisih;
-      logStatus = 'SUCCESS (selisih: ' + selisihTxt + ')';
-      message = 'Stock Opname berhasil. Sistem: ' + sebelum + ', hitung fisik: ' + qty +
-                ', selisih: ' + selisihTxt + '.';
-      extra = { stok_sebelum: sebelum, stok_sesudah: qty, selisih: selisih };
+      logStatus = 'SUCCESS (Hitung fisik: ' + qty + ')';
     }
 
-    // ---- 6. Catat ke OPERATION_LOG ----
     shLog.appendRow([new Date(), trxId, activity, sku, from, to, qty, logStatus]);
     SpreadsheetApp.flush();
 
-    var result = {
-      transaction_id: trxId,
-      sku: sku,
-      nama: produk.nama,
-      activity: activity,
-      qty: qty
-    };
-    if (extra) {
-      result.stok_sebelum = extra.stok_sebelum;
-      result.stok_sesudah = extra.stok_sesudah;
-      result.selisih = extra.selisih;
-    }
-    return respond_(true, message, result);
+    return respond_(true, message, { sku: sku, nama: produk.nama });
 
   } catch (err) {
-    // Rollback perubahan stok jika terjadi error di tengah proses
-    try {
-      for (var i = undo.length - 1; i >= 0; i--) {
-        var u = undo[i];
-        var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_STOK);
-        if (u.type === 'set') sh.getRange(u.row, 3).setValue(u.old);
-        else if (u.type === 'append') sh.deleteRow(u.row);
-      }
-      SpreadsheetApp.flush();
-    } catch (rollbackErr) {
-      Logger.log('Rollback gagal: ' + rollbackErr);
+    for (var i = undo.length - 1; i >= 0; i--) {
+      var u = undo[i];
+      var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_STOK);
+      if (u.type === 'set') sh.getRange(u.row, 3).setValue(u.old);
+      else if (u.type === 'append') sh.deleteRow(u.row);
     }
-    Logger.log('doPost error: ' + err);
-    return respond_(false, 'Terjadi kesalahan server: ' + err.message);
-
+    return respond_(false, 'Error Server: ' + err.message);
   } finally {
     lock.releaseLock();
   }
 }
 
-// Opsional: untuk tes cepat lewat browser
-function doGet() {
-  return respond_(true, 'Ina Basic Store Warehouse API aktif. Gunakan POST.');
-}
-
-// ===================== PRODUK BARU =====================
-/**
- * Mendaftarkan produk baru ke MASTER_PRODUK (Status_Aktif = TRUE).
- * Payload: transaction_id, activity:'ProdukBaru', barcode, sku, nama.
- * Dipanggil dari doPost, jadi sudah berada di dalam LockService.
- */
-function registerProduct_(p, trxId, barcode) {
-  var sku  = str_(p.sku);
+function registerProduct_(p, trxId, barcode, locTo, qty) {
+  var sku = str_(p.sku);
   var nama = str_(p.nama);
 
-  if (!sku)  return respond_(false, 'SKU wajib diisi.');
-  if (!nama) return respond_(false, 'Nama produk wajib diisi.');
-  if (sku.length > 50 || barcode.length > 64 || nama.length > 150) {
-    return respond_(false, 'SKU maks. 50, barcode maks. 64, nama maks. 150 karakter.');
-  }
-
-  var ss       = SpreadsheetApp.getActiveSpreadsheet();
+  if (!sku || !nama || !locTo) return respond_(false, 'SKU, Nama, dan Lokasi wajib diisi.');
+  if (typeof qty !== 'number' || qty < 0) return respond_(false, 'Stok awal harus bilangan positif.');
+  
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
   var shMaster = ss.getSheetByName(SHEET_MASTER);
-  var shLog    = ss.getSheetByName(SHEET_LOG);
-  if (!shMaster || !shLog) {
-    return respond_(false, 'Sheet belum lengkap. Jalankan setup() terlebih dahulu.');
-  }
+  var shStok = ss.getSheetByName(SHEET_STOK);
+  var shLog = ss.getSheetByName(SHEET_LOG);
 
-  // Cegah double submission
-  if (trxExists_(shLog, trxId)) {
-    return respond_(false, 'transaction_id sudah pernah diproses: ' + trxId);
-  }
+  if (trxExists_(shLog, trxId)) return respond_(false, 'Transaksi terdeteksi duplikat.');
 
-  // Tolak barcode atau SKU yang sudah ada (SKU dibandingkan tanpa peka huruf besar/kecil)
   var last = shMaster.getLastRow();
   if (last >= 2) {
-    var rows = shMaster.getRange(2, 1, last - 1, 2).getValues(); // SKU, Barcode
+    var rows = shMaster.getRange(2, 1, last - 1, 2).getValues();
     for (var i = 0; i < rows.length; i++) {
-      if (str_(rows[i][1]) === barcode) {
-        return respond_(false, 'Barcode sudah terdaftar untuk SKU: ' + str_(rows[i][0]));
-      }
-      if (str_(rows[i][0]).toLowerCase() === sku.toLowerCase()) {
-        return respond_(false, 'SKU sudah terdaftar: ' + str_(rows[i][0]));
-      }
+      if (str_(rows[i][1]) === barcode) return respond_(false, 'Barcode sudah dipakai oleh SKU: ' + str_(rows[i][0]));
+      if (str_(rows[i][0]).toLowerCase() === sku.toLowerCase()) return respond_(false, 'SKU sudah terdaftar.');
     }
   }
 
   var rowIdx = last + 1;
   try {
-    var range = shMaster.getRange(rowIdx, 1, 1, 4);
-    // Format teks agar barcode tidak berubah jadi angka dan isi yang diawali "=" tidak dianggap rumus
-    range.setNumberFormats([['@', '@', '@', 'General']]);
-    range.setValues([[sku, barcode, nama, true]]);
-    shLog.appendRow([new Date(), trxId, 'ProdukBaru', sku, '', '', 0, 'SUCCESS']);
+    shMaster.getRange(rowIdx, 1, 1, 4).setNumberFormats([['@', '@', '@', 'General']]).setValues([[sku, barcode, nama, true]]);
+    if(qty >= 0) shStok.appendRow([sku, locTo, qty]);
+    shLog.appendRow([new Date(), trxId, 'ProdukBaru', sku, '', locTo, qty, 'SUCCESS']);
     SpreadsheetApp.flush();
   } catch (err) {
-    // Batalkan baris produk bila pencatatan log gagal
     try { if (shMaster.getLastRow() >= rowIdx) shMaster.deleteRow(rowIdx); } catch (e) {}
     throw err;
   }
-
-  return respond_(true, 'Produk baru terdaftar: ' + sku + ' - ' + nama + '.', {
-    transaction_id: trxId, sku: sku, barcode: barcode, nama: nama
-  });
+  return respond_(true, 'Produk berhasil didaftarkan.', { sku: sku, nama: nama });
 }
 
-// ===================== HELPER =====================
-function str_(v) {
-  return (v === null || v === undefined) ? '' : String(v).trim();
-}
-
+function doGet() { return respond_(true, 'API Aktif.'); }
+function str_(v) { return (v === null || v === undefined) ? '' : String(v).trim(); }
 function respond_(success, message, data) {
   var out = { success: success, message: message };
   if (data) out.data = data;
-  return ContentService
-    .createTextOutput(JSON.stringify(out))
-    .setMimeType(ContentService.MimeType.JSON);
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
 }
-
 function trxExists_(shLog, trxId) {
   var last = shLog.getLastRow();
   if (last < 2) return false;
   var ids = shLog.getRange(2, 2, last - 1, 1).getValues();
-  for (var i = 0; i < ids.length; i++) {
-    if (str_(ids[i][0]) === trxId) return true;
-  }
+  for (var i = 0; i < ids.length; i++) { if (str_(ids[i][0]) === trxId) return true; }
   return false;
 }
-
 function findProductByBarcode_(shMaster, barcode) {
   var last = shMaster.getLastRow();
   if (last < 2) return null;
-  var rows = shMaster.getRange(2, 1, last - 1, 4).getValues(); // SKU, Barcode, Nama, Status_Aktif
+  var rows = shMaster.getRange(2, 1, last - 1, 4).getValues();
   for (var i = 0; i < rows.length; i++) {
     if (str_(rows[i][1]) === barcode) {
-      var status = rows[i][3];
-      var aktif = (status === true) || (str_(status).toUpperCase() === 'TRUE');
-      return { sku: str_(rows[i][0]), nama: str_(rows[i][2]), aktif: aktif };
+      return { sku: str_(rows[i][0]), nama: str_(rows[i][2]), aktif: (str_(rows[i][3]).toUpperCase() === 'TRUE' || rows[i][3] === true) };
     }
   }
   return null;
 }
-
 function readStok_(shStok) {
   var last = shStok.getLastRow();
   if (last < 2) return [];
-  var rows = shStok.getRange(2, 1, last - 1, 3).getValues();
-  return rows.map(function (r, i) {
+  return shStok.getRange(2, 1, last - 1, 3).getValues().map(function (r, i) {
     return { row: i + 2, sku: str_(r[0]), lokasi: str_(r[1]), qty: Number(r[2]) || 0 };
   });
 }
-
 function findStokRow_(stokData, sku, lokasi) {
-  for (var i = 0; i < stokData.length; i++) {
-    if (stokData[i].sku === sku && stokData[i].lokasi === lokasi) return stokData[i];
-  }
+  for (var i = 0; i < stokData.length; i++) { if (stokData[i].sku === sku && stokData[i].lokasi === lokasi) return stokData[i]; }
   return null;
 }
