@@ -205,7 +205,7 @@
             </button>
             <div>
               <h2 id="scan-title" class="text-base font-bold text-slate-800"></h2>
-              <p class="text-xs text-slate-400">Arahkan kamera ke barcode</p>
+              <p class="text-xs text-slate-400">Arahkan kamera ke QR Code</p>
             </div>
           </div>
           <button id="btn-torch" type="button"
@@ -219,25 +219,26 @@
 
         <div class="relative overflow-hidden rounded-2xl bg-black shadow-xl">
           <div id="reader" class="min-h-[300px] w-full"></div>
+          <!-- Bingkai kotak persegi untuk QR Code -->
           <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <div class="relative h-28 w-64 sm:w-72">
+            <div class="relative h-56 w-56 sm:h-64 sm:w-64">
               <span
-                class="absolute left-0 top-0 h-5 w-5 border-l-4 border-t-4 border-indigo-400 rounded-tl-lg shadow-sm"></span>
+                class="absolute left-0 top-0 h-8 w-8 border-l-4 border-t-4 border-indigo-400 rounded-tl-xl shadow-sm"></span>
               <span
-                class="absolute right-0 top-0 h-5 w-5 border-r-4 border-t-4 border-indigo-400 rounded-tr-lg shadow-sm"></span>
+                class="absolute right-0 top-0 h-8 w-8 border-r-4 border-t-4 border-indigo-400 rounded-tr-xl shadow-sm"></span>
               <span
-                class="absolute bottom-0 left-0 h-5 w-5 border-b-4 border-l-4 border-indigo-400 rounded-bl-lg shadow-sm"></span>
+                class="absolute bottom-0 left-0 h-8 w-8 border-b-4 border-l-4 border-indigo-400 rounded-bl-xl shadow-sm"></span>
               <span
-                class="absolute bottom-0 right-0 h-5 w-5 border-b-4 border-r-4 border-indigo-400 rounded-br-lg shadow-sm"></span>
+                class="absolute bottom-0 right-0 h-8 w-8 border-b-4 border-r-4 border-indigo-400 rounded-br-xl shadow-sm"></span>
               <div
-                class="absolute inset-x-2 top-1/2 -translate-y-1/2 border-b-2 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)]">
+                class="absolute inset-x-2 top-1/2 -translate-y-1/2 border-b-2 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)] opacity-60">
               </div>
             </div>
           </div>
         </div>
 
         <p class="mt-2.5 text-center text-xs text-slate-500">
-          💡 Jaga jarak <strong>15–20 cm</strong> dari produk agar lensa dapat fokus sempurna.
+          💡 Mode <strong>QR Code Scanner</strong>. Arahkan kode tepat ke dalam kotak.
         </p>
 
         <div class="mt-3">
@@ -247,10 +248,10 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Ketik barcode manual
+            Ketik kode manual
           </button>
           <form id="manual-form" class="mt-2.5 hidden flex gap-2">
-            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan angka barcode..."
+            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan kode manual..."
               class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:ring-0">
             <button type="submit"
               class="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white active:bg-slate-700">OK</button>
@@ -282,7 +283,7 @@
               </svg>
             </div>
             <div class="min-w-0 flex-1">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode · Kode Produk</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">QR Code · Kode Produk</p>
               <input id="f-barcode" type="text" readonly
                 class="w-full bg-transparent font-mono text-sm font-semibold text-slate-700">
             </div>
@@ -529,11 +530,11 @@
           el.classList.add('screen-enter');
         }
       });
-      const labels = { home: 'Pilih aktivitas hari ini', scan: 'Scan barcode produk', form: 'Input transaksi' };
+      const labels = { home: 'Pilih aktivitas hari ini', scan: 'Scan QR Code produk', form: 'Input transaksi' };
       $('header-label').textContent = labels[id] || '';
     }
 
-    // --- FIX KAMERA STUCK: AMAN & FLEKSIBEL UNTUK SEMUA HP ---
+    // --- PEMBARUAN: FOKUS QR CODE (QRIS STYLE) DENGAN FRAME KOTAK DAN HD CAMERA ---
     async function startScan(key) {
       state = { key, trxId: null };
       $('scan-title').textContent = ACTIVITIES[key].label;
@@ -545,19 +546,24 @@
         try { await scanner.stop(); } catch (e) { }
       }
 
-      scanner = new Html5Qrcode('reader');
+      // Membatasi decoder HANYA untuk QR Code.
+      // Ini akan mempercepat kinerja karena HP tidak perlu menganalisa garis barcode 1D.
+      scanner = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] });
+
       const torchBtn = $('btn-torch');
       torchOn = false;
       torchBtn.classList.add('hidden');
 
       try {
         await scanner.start(
-          { facingMode: 'environment' }, // Disesuaikan tanpa batas min resolusi liar agar tidak menolak kamera HP
+          // Meminta resolusi HD yang fleksibel agar stabil di berbagai HP
+          { facingMode: 'environment', width: { ideal: 1920, min: 1280 }, height: { ideal: 1080, min: 720 } },
           {
-            fps: 15,
+            fps: 20, // Frame rate dinaikkan agar cepat menangkap QR Code saat HP bergerak
             qrbox: function (viewfinderWidth, viewfinderHeight) {
-              let boxWidth = Math.min(viewfinderWidth * 0.85, 290);
-              return { width: boxWidth, height: 120 };
+              // Ukuran kotak pindai diubah menjadi KOTAK PERSEGI (Square) yang proporsional
+              let boxSize = Math.min(viewfinderWidth * 0.75, viewfinderHeight * 0.75, 250);
+              return { width: boxSize, height: boxSize };
             }
           },
           (text) => {
@@ -585,8 +591,18 @@
 
       } catch (e) {
         console.error("Camera start error:", e);
-        $('manual-form').classList.remove('hidden');
-        $('manual-form').classList.add('flex');
+        // Jika resolusi tinggi (1280p) tetap ditolak HP (stuck), fallback ke kamera default tanpa aturan resolusi
+        try {
+          await scanner.start(
+            { facingMode: 'environment' },
+            { fps: 15, qrbox: 250 },
+            (text) => { playBeep(); scanner.stop(); openForm(text); },
+            (err) => { }
+          );
+        } catch (fallbackError) {
+          $('manual-form').classList.remove('hidden');
+          $('manual-form').classList.add('flex');
+        }
       }
     }
 
@@ -622,7 +638,7 @@
       if (a.isProd) {
         const nama = $('f-nama').value.trim();
         const statusAktif = $('f-status-aktif').value === 'true';
-        if (!state.barcode || !nama || !to) return toast('Barcode, Nama, dan Lokasi wajib diisi!', 'error');
+        if (!state.barcode || !nama || !to) return toast('QR Code, Nama, dan Lokasi wajib diisi!', 'error');
         if ($('f-qty').value === '' || qty < 0) return toast('Isi stok awal (min 0)', 'error');
         state.trxId = state.trxId || `TRX-${Date.now()}`;
         return kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, nama, location_to: to, qty, status_aktif: statusAktif });
