@@ -38,7 +38,6 @@
       }
     }
 
-    /* slide-up screen transition */
     .screen-enter {
       animation: slideUp 0.22s cubic-bezier(.25, .46, .45, .94) forwards;
     }
@@ -55,7 +54,6 @@
       }
     }
 
-    /* Activity card press effect */
     .activity-card {
       transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
@@ -64,12 +62,10 @@
       transform: scale(0.96);
     }
 
-    /* Gradient header */
     .app-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     }
 
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
       width: 4px;
     }
@@ -83,7 +79,6 @@
       border-radius: 4px;
     }
 
-    /* Input focus glow */
     input:focus {
       outline: none;
     }
@@ -97,7 +92,6 @@
       box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
     }
 
-    /* Dropdown menu */
     .dd-menu {
       transition: opacity 0.12s ease, transform 0.12s ease;
     }
@@ -114,7 +108,6 @@
       pointer-events: none;
     }
 
-    /* Badge pill */
     .badge {
       display: inline-flex;
       align-items: center;
@@ -126,7 +119,6 @@
       border-radius: 999px;
     }
 
-    /* Toast */
     .toast-item {
       animation: toastIn 0.25s cubic-bezier(.25, .46, .45, .94);
     }
@@ -169,7 +161,6 @@
           Install
         </button>
       </div>
-      <!-- Sub-label screen title area -->
       <div id="header-sub" class="mt-4">
         <div class="flex items-center gap-2">
           <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
@@ -189,7 +180,6 @@
         </div>
         <div id="activity-list" class="grid grid-cols-2 gap-3"></div>
 
-        <!-- iOS hint -->
         <p id="ios-hint"
           class="mt-5 hidden rounded-2xl border border-slate-200 bg-white p-4 text-xs leading-relaxed text-slate-500 shadow-sm">
           <span class="mb-1 flex items-center gap-1.5 font-semibold text-slate-700">
@@ -205,7 +195,6 @@
 
       <!-- ===================== SCANNER ===================== -->
       <section id="screen-scan" class="hidden">
-        <!-- Section header -->
         <div class="mb-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <button id="btn-cancel-scan" type="button"
@@ -228,10 +217,8 @@
           </button>
         </div>
 
-        <!-- Camera viewfinder -->
         <div class="relative overflow-hidden rounded-2xl bg-black shadow-xl">
           <div id="reader" class="min-h-[300px] w-full"></div>
-          <!-- Barcode horizontal frame guide -->
           <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
             <div class="relative h-28 w-64 sm:w-72">
               <span
@@ -242,7 +229,6 @@
                 class="absolute bottom-0 left-0 h-5 w-5 border-b-4 border-l-4 border-indigo-400 rounded-bl-lg shadow-sm"></span>
               <span
                 class="absolute bottom-0 right-0 h-5 w-5 border-b-4 border-r-4 border-indigo-400 rounded-br-lg shadow-sm"></span>
-              <!-- Red scanning laser guide line -->
               <div
                 class="absolute inset-x-2 top-1/2 -translate-y-1/2 border-b-2 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)]">
               </div>
@@ -250,13 +236,10 @@
           </div>
         </div>
 
-        <!-- Hint for iPhone / Focus distance -->
         <p class="mt-2.5 text-center text-xs text-slate-500">
-          💡 <span class="font-semibold text-slate-700">Tips iPhone:</span> Jaga jarak <strong>15–20 cm</strong> agar
-          kamera fokus (jangan terlalu dekat).
+          💡 Kamera berjalan pada mode Resolusi Tinggi (HD). Jaga kestabilan tangan Anda.
         </p>
 
-        <!-- Manual input -->
         <div class="mt-3">
           <button id="btn-manual-toggle" type="button"
             class="mx-auto flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
@@ -277,7 +260,6 @@
 
       <!-- ===================== FORM TRANSAKSI ===================== -->
       <section id="screen-form" class="hidden">
-        <!-- Section header -->
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back" type="button"
             class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
@@ -292,8 +274,6 @@
         </div>
 
         <form id="trx-form" class="space-y-3" novalidate>
-
-          <!-- Barcode chip -->
           <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
             <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100">
               <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,13 +285,10 @@
               <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode · Kode Produk</p>
               <input id="f-barcode" type="text" readonly
                 class="w-full bg-transparent font-mono text-sm font-semibold text-slate-700">
-              <p class="mt-1 text-[10px] text-slate-400">Kode hasil scan ini otomatis menjadi identitas produk.</p>
             </div>
           </div>
 
-          <!-- Card wrapper for fields -->
           <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <!-- Nama Produk -->
             <div id="row-nama" class="hidden border-b border-slate-100 px-4 py-3.5">
               <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama
                 Produk</label>
@@ -319,26 +296,22 @@
                 class="input-field w-full bg-transparent text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:ring-0 border-0">
             </div>
 
-            <!-- Status Aktif (hanya tampil saat Produk Baru) -->
             <div id="row-status" class="hidden border-b border-slate-100 px-4 py-3.5">
               <label class="mb-2.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Status
                 Produk</label>
               <div class="flex gap-2">
                 <button type="button" id="status-aktif-btn" data-value="true" onclick="setStatusAktif(true)"
                   class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all">
-                  <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                  Aktif
+                  <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Aktif
                 </button>
                 <button type="button" id="status-nonaktif-btn" data-value="false" onclick="setStatusAktif(false)"
                   class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all">
-                  <span class="h-2 w-2 rounded-full bg-slate-300"></span>
-                  Nonaktif
+                  <span class="h-2 w-2 rounded-full bg-slate-300"></span> Nonaktif
                 </button>
               </div>
               <input type="hidden" id="f-status-aktif" value="true">
             </div>
 
-            <!-- Lokasi Asal -->
             <div id="row-from" class="border-b border-slate-100 px-4 py-3.5">
               <label id="label-from"
                 class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
@@ -346,7 +319,6 @@
               <div id="dd-from" class="relative"></div>
             </div>
 
-            <!-- Lokasi Tujuan -->
             <div id="row-to" class="border-b border-slate-100 px-4 py-3.5">
               <label id="label-to"
                 class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
@@ -354,7 +326,6 @@
               <div id="dd-to" class="relative"></div>
             </div>
 
-            <!-- Kuantitas -->
             <div id="row-qty" class="px-4 py-3.5">
               <label id="label-qty"
                 class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
@@ -363,7 +334,6 @@
             </div>
           </div>
 
-          <!-- Submit -->
           <button id="btn-submit" type="submit"
             class="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -377,7 +347,6 @@
     </main>
   </div>
 
-  <!-- TOAST -->
   <div id="toast-root" class="fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4 pointer-events-none"
     aria-live="polite"></div>
 
@@ -457,21 +426,16 @@
       const root = $(rootId);
       let value = ''; let excluded = '';
       root.style.position = 'relative';
-
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'flex w-full items-center justify-between gap-2 py-1 text-left focus:outline-none';
-
       const labelSpan = document.createElement('span');
       labelSpan.className = 'text-sm font-medium text-slate-300';
-
       const chevron = document.createElement('span');
       chevron.innerHTML = `<svg class="h-4 w-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
       btn.append(labelSpan, chevron);
-
       const menu = document.createElement('ul');
       menu.className = 'dd-menu closed absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl';
-
       const items = [];
       let isOpen = false;
 
@@ -512,7 +476,6 @@
         menu.appendChild(li);
         items.push({ li, val: loc.value });
       });
-
       btn.onclick = () => setOpen(!isOpen);
       document.addEventListener('click', e => { if (!root.contains(e.target)) setOpen(false); });
       root.append(btn, menu);
@@ -570,7 +533,7 @@
       $('header-label').textContent = labels[id] || '';
     }
 
-    // --- Perubahan 1: Mengatur ukuran scanning box (Persegi Panjang) ---
+    // --- REVISI EKSTREM: RESOLUSI 4K/1080p + DECODER FOKUS CODE_128 ---
     async function startScan(key) {
       state = { key, trxId: null };
       $('scan-title').textContent = ACTIVITIES[key].label;
@@ -578,28 +541,35 @@
       $('manual-barcode').value = '';
       show('scan');
 
-      scanner = new Html5Qrcode('reader');
+      // Menginisiasi pemindai HTML5 dengan pengaturan format spesifik (hanya fokus di Code 128 dan Code 39)
+      // Ini akan membuat pemindai jauh lebih sensitif membaca barcode yang gepeng.
+      scanner = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39] });
+
       const torchBtn = $('btn-torch');
       torchOn = false;
-      torchBtn.classList.add('hidden'); // Sembunyikan sampai kamera siap
+      torchBtn.classList.add('hidden');
 
       try {
         await scanner.start(
-          { facingMode: 'environment' },
+          // Memaksa resolusi paling tinggi (4K/1080p).
+          // Jika HP tidak mendukung 4K, browser akan secara otomatis turun ke resolusi 1080p atau 720p yang masih sangat tajam.
+          { facingMode: 'environment', width: { ideal: 3840, min: 1920 }, height: { ideal: 2160, min: 1080 } },
           {
-            fps: 10,
-            // Ukuran kotak pindai sekarang berupa persegi panjang (lebar 250px, tinggi 120px)
-            qrbox: { width: 250, height: 120 }
+            fps: 20, // Frame rate dinaikkan untuk pemindaian gambar yang lebih halus
+            qrbox: function (viewfinderWidth, viewfinderHeight) {
+              // Menyediakan bidang pemindaian yang panjang dan menyempit
+              let boxWidth = Math.min(viewfinderWidth * 0.90, 350);
+              return { width: boxWidth, height: 100 };
+            }
           },
           (text) => {
             playBeep();
             scanner.stop();
             openForm(text);
           },
-          () => { }
+          (errorMessage) => { }
         );
 
-        // --- Perubahan 2: Tombol kontrol Senter (Torch) ---
         const capabilities = scanner.getRunningTrackCameraCapabilities();
         if (capabilities && capabilities.torchFeature().isSupported()) {
           torchBtn.classList.remove('hidden');
