@@ -237,7 +237,7 @@
         </div>
 
         <p class="mt-2.5 text-center text-xs text-slate-500">
-          💡 Kamera berjalan pada mode Resolusi Tinggi (HD). Jaga kestabilan tangan Anda.
+          💡 Jaga jarak <strong>15–20 cm</strong> dari produk agar lensa dapat fokus sempurna.
         </p>
 
         <div class="mt-3">
@@ -533,7 +533,7 @@
       $('header-label').textContent = labels[id] || '';
     }
 
-    // --- REVISI EKSTREM: RESOLUSI 4K/1080p + DECODER FOKUS CODE_128 ---
+    // --- FIX KAMERA STUCK: AMAN & FLEKSIBEL UNTUK SEMUA HP ---
     async function startScan(key) {
       state = { key, trxId: null };
       $('scan-title').textContent = ACTIVITIES[key].label;
@@ -541,25 +541,23 @@
       $('manual-barcode').value = '';
       show('scan');
 
-      // Menginisiasi pemindai HTML5 dengan pengaturan format spesifik (hanya fokus di Code 128 dan Code 39)
-      // Ini akan membuat pemindai jauh lebih sensitif membaca barcode yang gepeng.
-      scanner = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39] });
+      if (scanner) {
+        try { await scanner.stop(); } catch (e) { }
+      }
 
+      scanner = new Html5Qrcode('reader');
       const torchBtn = $('btn-torch');
       torchOn = false;
       torchBtn.classList.add('hidden');
 
       try {
         await scanner.start(
-          // Memaksa resolusi paling tinggi (4K/1080p).
-          // Jika HP tidak mendukung 4K, browser akan secara otomatis turun ke resolusi 1080p atau 720p yang masih sangat tajam.
-          { facingMode: 'environment', width: { ideal: 3840, min: 1920 }, height: { ideal: 2160, min: 1080 } },
+          { facingMode: 'environment' }, // Disesuaikan tanpa batas min resolusi liar agar tidak menolak kamera HP
           {
-            fps: 20, // Frame rate dinaikkan untuk pemindaian gambar yang lebih halus
+            fps: 15,
             qrbox: function (viewfinderWidth, viewfinderHeight) {
-              // Menyediakan bidang pemindaian yang panjang dan menyempit
-              let boxWidth = Math.min(viewfinderWidth * 0.90, 350);
-              return { width: boxWidth, height: 100 };
+              let boxWidth = Math.min(viewfinderWidth * 0.85, 290);
+              return { width: boxWidth, height: 120 };
             }
           },
           (text) => {
@@ -570,19 +568,23 @@
           (errorMessage) => { }
         );
 
-        const capabilities = scanner.getRunningTrackCameraCapabilities();
-        if (capabilities && capabilities.torchFeature().isSupported()) {
-          torchBtn.classList.remove('hidden');
-          torchBtn.classList.add('flex');
-          torchBtn.onclick = () => {
-            torchOn = !torchOn;
-            scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
-            torchBtn.innerHTML = torchOn
-              ? `<svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`
-              : `<svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
-          };
-        }
+        try {
+          const capabilities = scanner.getRunningTrackCameraCapabilities();
+          if (capabilities && capabilities.torchFeature && capabilities.torchFeature().isSupported()) {
+            torchBtn.classList.remove('hidden');
+            torchBtn.classList.add('flex');
+            torchBtn.onclick = () => {
+              torchOn = !torchOn;
+              scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+              torchBtn.innerHTML = torchOn
+                ? `<svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`
+                : `<svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
+            };
+          }
+        } catch (e) { }
+
       } catch (e) {
+        console.error("Camera start error:", e);
         $('manual-form').classList.remove('hidden');
         $('manual-form').classList.add('flex');
       }
