@@ -238,7 +238,7 @@
         </div>
 
         <p class="mt-2.5 text-center text-xs text-slate-500">
-          💡 Mode <strong>QR Code Scanner</strong>. Arahkan kode tepat ke dalam kotak.
+          💡 Mode <strong>QR Code Scanner</strong> aktif.
         </p>
 
         <div class="mt-3">
@@ -534,7 +534,7 @@
       $('header-label').textContent = labels[id] || '';
     }
 
-    // --- PEMBARUAN: FOKUS QR CODE (QRIS STYLE) DENGAN FRAME KOTAK DAN HD CAMERA ---
+    // --- PEMBARUAN AMAN: FOKUS QR CODE TANPA BATAS RESOLUSI MINIMAL ---
     async function startScan(key) {
       state = { key, trxId: null };
       $('scan-title').textContent = ACTIVITIES[key].label;
@@ -546,8 +546,7 @@
         try { await scanner.stop(); } catch (e) { }
       }
 
-      // Membatasi decoder HANYA untuk QR Code.
-      // Ini akan mempercepat kinerja karena HP tidak perlu menganalisa garis barcode 1D.
+      // Membatasi decoder HANYA untuk QR Code agar kerja memori lebih ringan dan gesit
       scanner = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] });
 
       const torchBtn = $('btn-torch');
@@ -556,10 +555,11 @@
 
       try {
         await scanner.start(
-          // Meminta resolusi HD yang fleksibel agar stabil di berbagai HP
-          { facingMode: 'environment', width: { ideal: 1920, min: 1280 }, height: { ideal: 1080, min: 720 } },
+          // CONSTRAINT AMAN: Tidak ada batas min, biarkan HP menggunakan resolusi terbaiknya sendiri.
+          // QR Code sangat mudah dibaca sehingga tidak butuh pemaksaan resolusi khusus.
+          { facingMode: 'environment' },
           {
-            fps: 20, // Frame rate dinaikkan agar cepat menangkap QR Code saat HP bergerak
+            fps: 15,
             qrbox: function (viewfinderWidth, viewfinderHeight) {
               // Ukuran kotak pindai diubah menjadi KOTAK PERSEGI (Square) yang proporsional
               let boxSize = Math.min(viewfinderWidth * 0.75, viewfinderHeight * 0.75, 250);
@@ -591,18 +591,8 @@
 
       } catch (e) {
         console.error("Camera start error:", e);
-        // Jika resolusi tinggi (1280p) tetap ditolak HP (stuck), fallback ke kamera default tanpa aturan resolusi
-        try {
-          await scanner.start(
-            { facingMode: 'environment' },
-            { fps: 15, qrbox: 250 },
-            (text) => { playBeep(); scanner.stop(); openForm(text); },
-            (err) => { }
-          );
-        } catch (fallbackError) {
-          $('manual-form').classList.remove('hidden');
-          $('manual-form').classList.add('flex');
-        }
+        $('manual-form').classList.remove('hidden');
+        $('manual-form').classList.add('flex');
       }
     }
 
