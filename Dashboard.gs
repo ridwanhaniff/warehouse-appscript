@@ -82,7 +82,9 @@ function spark_(valueCol, r, first, last, color) {
 }
 
 function nameLookup_(barcodeCell, notFound) {
-  return '=IF(' + barcodeCell + '="","",IFERROR(VLOOKUP(' + barcodeCell + ',MASTER_PRODUK!$A$2:$B,2,FALSE),"' + notFound + '"))';
+  // MITIGASI KETAT: Membungkus barcode dengan fungsi TO_TEXT()
+  // Ini memaksa Google Sheets mencocokkan Angka dan Teks dengan sempurna
+  return '=IF(' + barcodeCell + '="","",IFERROR(VLOOKUP(TO_TEXT(' + barcodeCell + '),MASTER_PRODUK!$A$2:$B,2,FALSE),"' + notFound + '"))';
 }
 
 function buildDashboard_(ss) {

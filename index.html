@@ -206,45 +206,68 @@
       <!-- ===================== SCANNER ===================== -->
       <section id="screen-scan" class="hidden">
         <!-- Section header -->
-        <div class="mb-4 flex items-center gap-3">
-          <button id="btn-cancel-scan" type="button"
-            class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+        <div class="mb-4 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button id="btn-cancel-scan" type="button"
+              class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h2 id="scan-title" class="text-base font-bold text-slate-800"></h2>
+              <p class="text-xs text-slate-400">Arahkan kamera ke barcode</p>
+            </div>
+          </div>
+          <button id="btn-torch" type="button"
+            class="hidden h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 active:bg-slate-100"
+            title="Lampu">
+            <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </button>
-          <div>
-            <h2 id="scan-title" class="text-base font-bold text-slate-800"></h2>
-            <p class="text-xs text-slate-400">Arahkan kamera ke barcode produk</p>
-          </div>
         </div>
 
         <!-- Camera viewfinder -->
-        <div class="relative overflow-hidden rounded-2xl bg-slate-900 shadow-xl">
-          <div id="reader" class="min-h-[280px] w-full"></div>
-          <!-- Corner decorators -->
-          <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
-            <div class="relative h-44 w-44">
-              <span class="absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-white/70 rounded-tl-lg"></span>
-              <span class="absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-white/70 rounded-tr-lg"></span>
-              <span class="absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-white/70 rounded-bl-lg"></span>
+        <div class="relative overflow-hidden rounded-2xl bg-black shadow-xl">
+          <div id="reader" class="min-h-[300px] w-full"></div>
+          <!-- Barcode horizontal frame guide -->
+          <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            <div class="relative h-28 w-64 sm:w-72">
               <span
-                class="absolute bottom-0 right-0 h-6 w-6 border-b-2 border-r-2 border-white/70 rounded-br-lg"></span>
+                class="absolute left-0 top-0 h-5 w-5 border-l-4 border-t-4 border-indigo-400 rounded-tl-lg shadow-sm"></span>
+              <span
+                class="absolute right-0 top-0 h-5 w-5 border-r-4 border-t-4 border-indigo-400 rounded-tr-lg shadow-sm"></span>
+              <span
+                class="absolute bottom-0 left-0 h-5 w-5 border-b-4 border-l-4 border-indigo-400 rounded-bl-lg shadow-sm"></span>
+              <span
+                class="absolute bottom-0 right-0 h-5 w-5 border-b-4 border-r-4 border-indigo-400 rounded-br-lg shadow-sm"></span>
+              <!-- Red scanning laser guide line -->
+              <div
+                class="absolute inset-x-2 top-1/2 -translate-y-1/2 border-b-2 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)]">
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- Hint for iPhone / Focus distance -->
+        <p class="mt-2.5 text-center text-xs text-slate-500">
+          💡 <span class="font-semibold text-slate-700">Tips iPhone:</span> Jaga jarak <strong>15–20 cm</strong> agar
+          kamera fokus (jangan terlalu dekat).
+        </p>
+
         <!-- Manual input -->
-        <div class="mt-4">
+        <div class="mt-3">
           <button id="btn-manual-toggle" type="button"
-            class="mx-auto flex items-center gap-1.5 text-sm font-medium text-indigo-600">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m-8-8h16" />
+            class="mx-auto flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
             Ketik barcode manual
           </button>
-          <form id="manual-form" class="mt-3 hidden flex gap-2">
-            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan barcode..."
+          <form id="manual-form" class="mt-2.5 hidden flex gap-2">
+            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan angka barcode..."
               class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:ring-0">
             <button type="submit"
               class="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white active:bg-slate-700">OK</button>
@@ -375,7 +398,6 @@
       produk: { label: 'Produk Baru', value: 'ProdukBaru', color: 'violet', fields: ['to'], labelTo: 'Lokasi Awal', labelQty: 'Stok Awal', min: 0, isProd: true, wide: true }
     };
 
-    // Color map for activity cards
     const COLOR_MAP = {
       emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: 'bg-emerald-500', border: 'border-emerald-100' },
       rose: { bg: 'bg-rose-50', text: 'text-rose-700', icon: 'bg-rose-500', border: 'border-rose-100' },
@@ -384,7 +406,6 @@
       violet: { bg: 'bg-violet-50', text: 'text-violet-700', icon: 'bg-violet-500', border: 'border-violet-100' }
     };
 
-    // Activity icons (heroicons outline paths)
     const ICONS = {
       masuk: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3',
       keluar: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
@@ -396,18 +417,35 @@
     const $ = id => document.getElementById(id);
     let state = { key: null, barcode: '', trxId: null };
     let scanner = null;
+    let torchOn = false;
 
-    // ===================== TOAST =====================
+    function playBeep() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) {
+          const ctx = new AudioCtx();
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.12);
+        }
+      } catch (e) { }
+      if (navigator.vibrate) { try { navigator.vibrate(80); } catch (e) { } }
+    }
+
     function toast(msg, type = 'success') {
       const el = document.createElement('div');
-      el.className = `toast-item pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'
-        }`;
+      el.className = `toast-item pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'}`;
       el.innerHTML = `
         <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-400'}">
           <svg class="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            ${type === 'success'
-          ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>'
-          : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>'}
+            ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>'}
           </svg>
         </span>
         <span class="flex-1">${msg}</span>`;
@@ -415,12 +453,9 @@
       setTimeout(() => el.remove(), 4000);
     }
 
-    // ===================== DROPDOWN =====================
     function createDropdown(rootId) {
       const root = $(rootId);
       let value = ''; let excluded = '';
-
-      // Wrapper
       root.style.position = 'relative';
 
       const btn = document.createElement('button');
@@ -451,22 +486,14 @@
       const api = {
         get value() { return value; },
         set(v) { value = v; render(); },
-        exclude(v) {
-          excluded = v;
-          if (value === v) api.reset();
-          render();
-        },
+        exclude(v) { excluded = v; if (value === v) api.reset(); render(); },
         reset() { value = ''; excluded = ''; render(); setOpen(false); },
         onChange: null
       };
 
       function render() {
-        labelSpan.textContent = value
-          ? LOCATIONS.find(l => l.value === value).label
-          : 'Pilih lokasi...';
-        labelSpan.className = value
-          ? 'text-sm font-semibold text-slate-800'
-          : 'text-sm font-medium text-slate-400';
+        labelSpan.textContent = value ? LOCATIONS.find(l => l.value === value).label : 'Pilih lokasi...';
+        labelSpan.className = value ? 'text-sm font-semibold text-slate-800' : 'text-sm font-medium text-slate-400';
         items.forEach(it => {
           it.li.classList.toggle('hidden', it.val === excluded);
           const dot = it.li.querySelector('[data-dot]');
@@ -481,18 +508,13 @@
           <span data-dot class="h-2 w-2 rounded-full bg-slate-200"></span>
           <span class="flex-1 text-sm font-medium text-slate-700">${loc.label}</span>
           <svg class="h-4 w-4 text-indigo-500 opacity-0 check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
-        li.onclick = () => {
-          api.set(loc.value);
-          setOpen(false);
-          if (api.onChange) api.onChange(loc.value);
-        };
+        li.onclick = () => { api.set(loc.value); setOpen(false); if (api.onChange) api.onChange(loc.value); };
         menu.appendChild(li);
         items.push({ li, val: loc.value });
       });
 
       btn.onclick = () => setOpen(!isOpen);
       document.addEventListener('click', e => { if (!root.contains(e.target)) setOpen(false); });
-
       root.append(btn, menu);
       api.reset();
       return api;
@@ -500,18 +522,12 @@
 
     const ddFrom = createDropdown('dd-from');
     const ddTo = createDropdown('dd-to');
+    ddFrom.onChange = (val) => { if (state.key === 'mutasi') ddTo.exclude(val); };
 
-    ddFrom.onChange = (val) => {
-      if (state.key === 'mutasi') ddTo.exclude(val);
-    };
-
-    // ===================== STATUS AKTIF TOGGLE =====================
     function setStatusAktif(isAktif) {
       $('f-status-aktif').value = isAktif ? 'true' : 'false';
-
       const btnAktif = $('status-aktif-btn');
       const btnNon = $('status-nonaktif-btn');
-
       if (isAktif) {
         btnAktif.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all';
         btnNon.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all';
@@ -525,7 +541,6 @@
       }
     }
 
-    // ===================== RENDER ACTIVITIES =====================
     function renderActivities() {
       Object.entries(ACTIVITIES).forEach(([k, a]) => {
         const c = COLOR_MAP[a.color];
@@ -533,23 +548,13 @@
         btn.type = 'button';
         btn.className = `activity-card relative overflow-hidden rounded-2xl border ${c.border} ${c.bg} p-4 text-left shadow-sm ${a.wide ? 'col-span-2 flex items-center gap-4' : 'flex flex-col gap-3'}`;
         btn.innerHTML = a.wide
-          ? `<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${c.icon}">
-               <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg>
-             </span>
-             <div>
-               <p class="text-xs font-semibold uppercase tracking-wider ${c.text} opacity-70">Daftarkan</p>
-               <p class="text-sm font-bold ${c.text}">${a.label}</p>
-             </div>`
-          : `<span class="flex h-10 w-10 items-center justify-center rounded-xl ${c.icon}">
-               <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg>
-             </span>
-             <p class="text-sm font-bold leading-snug ${c.text}">${a.label}</p>`;
+          ? `<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${c.icon}"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg></span><div><p class="text-xs font-semibold uppercase tracking-wider ${c.text} opacity-70">Daftarkan</p><p class="text-sm font-bold ${c.text}">${a.label}</p></div>`
+          : `<span class="flex h-10 w-10 items-center justify-center rounded-xl ${c.icon}"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg></span><p class="text-sm font-bold leading-snug ${c.text}">${a.label}</p>`;
         btn.onclick = () => startScan(k);
         $('activity-list').appendChild(btn);
       });
     }
 
-    // ===================== SCREEN =====================
     function show(id) {
       ['home', 'scan', 'form'].forEach(x => {
         const el = $(`screen-${x}`);
@@ -557,21 +562,15 @@
         el.classList.toggle('hidden', !isActive);
         if (isActive) {
           el.classList.remove('screen-enter');
-          void el.offsetWidth; // reflow
+          void el.offsetWidth;
           el.classList.add('screen-enter');
         }
       });
-
-      // Update header sub-label
-      const labels = {
-        home: 'Pilih aktivitas hari ini',
-        scan: 'Scan barcode produk',
-        form: 'Input transaksi'
-      };
+      const labels = { home: 'Pilih aktivitas hari ini', scan: 'Scan barcode produk', form: 'Input transaksi' };
       $('header-label').textContent = labels[id] || '';
     }
 
-    // ===================== SCAN =====================
+    // --- Perubahan 1: Mengatur ukuran scanning box (Persegi Panjang) ---
     async function startScan(key) {
       state = { key, trxId: null };
       $('scan-title').textContent = ACTIVITIES[key].label;
@@ -580,17 +579,45 @@
       show('scan');
 
       scanner = new Html5Qrcode('reader');
+      const torchBtn = $('btn-torch');
+      torchOn = false;
+      torchBtn.classList.add('hidden'); // Sembunyikan sampai kamera siap
+
       try {
-        await scanner.start({ facingMode: 'environment' }, { fps: 10, qrbox: 220 }, (text) => {
-          scanner.stop(); openForm(text);
-        }, () => { });
+        await scanner.start(
+          { facingMode: 'environment' },
+          {
+            fps: 10,
+            // Ukuran kotak pindai sekarang berupa persegi panjang (lebar 250px, tinggi 120px)
+            qrbox: { width: 250, height: 120 }
+          },
+          (text) => {
+            playBeep();
+            scanner.stop();
+            openForm(text);
+          },
+          () => { }
+        );
+
+        // --- Perubahan 2: Tombol kontrol Senter (Torch) ---
+        const capabilities = scanner.getRunningTrackCameraCapabilities();
+        if (capabilities && capabilities.torchFeature().isSupported()) {
+          torchBtn.classList.remove('hidden');
+          torchBtn.classList.add('flex');
+          torchBtn.onclick = () => {
+            torchOn = !torchOn;
+            scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
+            torchBtn.innerHTML = torchOn
+              ? `<svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`
+              : `<svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
+          };
+        }
       } catch (e) {
         $('manual-form').classList.remove('hidden');
         $('manual-form').classList.add('flex');
       }
     }
 
-    // ===================== FORM =====================
     function openForm(barcode) {
       const a = ACTIVITIES[state.key];
       state.barcode = barcode;
@@ -598,43 +625,28 @@
       $('f-barcode').value = barcode;
       $('f-nama').value = ''; $('f-qty').value = '';
       ddFrom.reset(); ddTo.reset();
-
       $('row-nama').classList.toggle('hidden', !a.isProd);
       $('row-status').classList.toggle('hidden', !a.isProd);
-      if (a.isProd) setStatusAktif(true); // default Aktif setiap kali form dibuka
-
+      if (a.isProd) setStatusAktif(true);
       const hasFrom = a.fields.includes('from');
       const hasTo = a.fields.includes('to');
       $('row-from').classList.toggle('hidden', !hasFrom);
       $('row-to').classList.toggle('hidden', !hasTo);
-
       if (hasFrom) $('label-from').textContent = a.labelFrom;
       if (hasTo) $('label-to').textContent = a.labelTo;
       $('label-qty').textContent = a.labelQty || 'Kuantitas';
       $('f-qty').placeholder = `Min: ${a.min}`;
-
-      // Submit button color
-      const c = COLOR_MAP[a.color];
-      const submitColors = {
-        emerald: 'bg-emerald-600 shadow-emerald-500/25 active:bg-emerald-700',
-        rose: 'bg-rose-600 shadow-rose-500/25 active:bg-rose-700',
-        sky: 'bg-sky-600 shadow-sky-500/25 active:bg-sky-700',
-        amber: 'bg-amber-500 shadow-amber-500/25 active:bg-amber-600',
-        violet: 'bg-violet-600 shadow-violet-500/25 active:bg-violet-700'
-      };
+      const submitColors = { emerald: 'bg-emerald-600 shadow-emerald-500/25 active:bg-emerald-700', rose: 'bg-rose-600 shadow-rose-500/25 active:bg-rose-700', sky: 'bg-sky-600 shadow-sky-500/25 active:bg-sky-700', amber: 'bg-amber-500 shadow-amber-500/25 active:bg-amber-600', violet: 'bg-violet-600 shadow-violet-500/25 active:bg-violet-700' };
       const btn = $('btn-submit');
       btn.className = btn.className.replace(/bg-\w+-\d+ shadow-\w+-\d+\/\d+ active:bg-\w+-\d+/g, '');
       btn.classList.add(...(submitColors[a.color] || 'bg-indigo-600 shadow-indigo-500/25 active:bg-indigo-700').split(' '));
-
       show('form');
     }
 
-    // ===================== SUBMIT =====================
     $('trx-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const a = ACTIVITIES[state.key];
       const from = ddFrom.value, to = ddTo.value, qty = Number($('f-qty').value);
-
       if (a.isProd) {
         const nama = $('f-nama').value.trim();
         const statusAktif = $('f-status-aktif').value === 'true';
@@ -643,11 +655,9 @@
         state.trxId = state.trxId || `TRX-${Date.now()}`;
         return kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, nama, location_to: to, qty, status_aktif: statusAktif });
       }
-
       if (a.fields.includes('from') && !from) return toast('Pilih Lokasi Asal', 'error');
       if (a.fields.includes('to') && !to) return toast('Pilih Lokasi Tujuan', 'error');
       if ($('f-qty').value === '' || qty < a.min) return toast('Kuantitas tidak valid', 'error');
-
       state.trxId = state.trxId || `TRX-${Date.now()}`;
       kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, location_from: from, location_to: to, qty });
     });
@@ -660,12 +670,8 @@
         const json = await res.json();
         toast(json.message, json.success ? 'success' : 'error');
         if (json.success) { show('home'); }
-      } catch (e) {
-        toast('Gagal koneksi server. Coba simpan lagi.', 'error');
-      } finally {
-        $('btn-submit').disabled = false;
-        $('btn-submit-text').textContent = 'Simpan Data';
-      }
+      } catch (e) { toast('Gagal koneksi server. Coba simpan lagi.', 'error'); }
+      finally { $('btn-submit').disabled = false; $('btn-submit-text').textContent = 'Simpan Data'; }
     }
 
     $('btn-cancel-scan').onclick = () => { if (scanner) scanner.stop(); show('home'); };
@@ -685,40 +691,21 @@
     renderActivities();
     show('home');
 
-    // ===================== PWA & Service Worker =====================
     let deferredInstall = null;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredInstall = e;
-      if (!isStandalone) $('btn-install').classList.remove('hidden');
+      e.preventDefault(); deferredInstall = e; if (!isStandalone) $('btn-install').classList.remove('hidden');
     });
-
     $('btn-install').addEventListener('click', async () => {
-      if (!deferredInstall) return;
-      deferredInstall.prompt();
-      const choice = await deferredInstall.userChoice;
-      if (choice && choice.outcome === 'accepted') {
-        $('btn-install').classList.add('hidden');
-      }
+      if (!deferredInstall) return; deferredInstall.prompt(); const choice = await deferredInstall.userChoice;
+      if (choice && choice.outcome === 'accepted') { $('btn-install').classList.add('hidden'); }
       deferredInstall = null;
     });
-
-    window.addEventListener('appinstalled', () => {
-      $('btn-install').classList.add('hidden');
-      toast('Aplikasi berhasil dipasang.');
-    });
-
-    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !isStandalone) {
-      $('ios-hint').classList.remove('hidden');
-    }
-
+    window.addEventListener('appinstalled', () => { $('btn-install').classList.add('hidden'); toast('Aplikasi berhasil dipasang.'); });
+    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !isStandalone) { $('ios-hint').classList.remove('hidden'); }
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then((reg) => console.log('Service Worker terdaftar:', reg.scope))
-          .catch((err) => console.error('Service Worker gagal:', err));
+        navigator.serviceWorker.register('sw.js').then((reg) => console.log('Service Worker terdaftar:', reg.scope)).catch((err) => console.error('Service Worker gagal:', err));
       });
     }
   </script>
