@@ -222,7 +222,7 @@
             </svg>
             Ketik kode manual
           </button>
-          <form id="manual-form" class="mt-2.5 hidden flex gap-2">
+          <form id="manual-form" class="mt-2.5 hidden gap-2">
             <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan kode manual..."
               class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:ring-0">
             <button type="submit"
@@ -504,7 +504,9 @@
       });
     }
 
-    // MANAJEMEN TOMBOL KEMBALI HP (HISTORY API)
+    // ==========================================
+    // MANAJEMEN TOMBOL KEMBALI HP (HISTORY API) DIPERBAIKI
+    // ==========================================
     function show(id, pushHistory = true) {
       ['home', 'scan', 'form'].forEach(x => {
         const el = $(`screen-${x}`);
@@ -525,25 +527,45 @@
     }
 
     window.addEventListener('popstate', (event) => {
-      if (scanner && $('screen-scan').classList.contains('hidden') === false) {
+      if (scanner && !$('screen-scan').classList.contains('hidden')) {
         scanner.stop().catch(() => { });
       }
       if (event.state && event.state.screen) {
-        show(event.state.screen, false);
+        const targetScreen = event.state.screen;
+        // FIX: Jika HP mundur ke halaman 'scan', kita hidupkan ulang kameranya
+        if (targetScreen === 'scan' && state.key) {
+          startScan(state.key, false);
+        } else {
+          show(targetScreen, false);
+        }
       } else {
         show('home', false);
       }
     });
 
     history.replaceState({ screen: 'home' }, '', '#home');
-    // ==========================================
 
-    async function startScan(key) {
-      state = { key, trxId: null };
+    // ==========================================
+    // LOGIKA SCANNER & VALIDASI DIPERBAIKI
+    // ==========================================
+    async function startScan(key, pushHistory = true) {
+      state.key = key;
+      state.trxId = null;
       $('scan-title').textContent = ACTIVITIES[key].label;
-      $('manual-form').classList.add('hidden');
+
+      // Reset area input manual ke state awal
+      const manualForm = $('manual-form');
+      manualForm.classList.add('hidden');
+      manualForm.classList.remove('flex');
       $('manual-barcode').value = '';
-      show('scan');
+
+      const btnOk = manualForm.querySelector('button[type="submit"]');
+      if (btnOk) {
+        btnOk.disabled = false;
+        btnOk.textContent = 'OK';
+      }
+
+      show('scan', pushHistory);
 
       if (scanner) { try { await scanner.stop(); } catch (e) { } }
 
@@ -551,6 +573,7 @@
       const torchBtn = $('btn-torch');
       torchOn = false;
       torchBtn.classList.add('hidden');
+      torchBtn.classList.remove('flex');
 
       try {
         await scanner.start(
@@ -564,7 +587,7 @@
           },
           (text) => {
             playBeep();
-            scanner.stop();
+            scanner.stop().catch(() => { });
             processScannedBarcode(text);
           },
           (errorMessage) => { }
@@ -586,14 +609,22 @@
         } catch (e) { }
       } catch (e) {
         console.error("Camera start error:", e);
-        $('manual-form').classList.remove('hidden');
-        $('manual-form').classList.add('flex');
+        manualForm.classList.remove('hidden');
+        manualForm.classList.add('flex');
       }
     }
 
     async function processScannedBarcode(barcode) {
       if (state.key === 'kelola') {
         $('scan-title').textContent = 'Mencari data...';
+
+        // Disable form input manual selama proses cek (loading)
+        const btnOk = $('manual-form').querySelector('button[type="submit"]');
+        if (btnOk) {
+          btnOk.disabled = true;
+          btnOk.textContent = '...';
+        }
+
         toast('Mencari data di database...', 'success');
         try {
           const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ activity: 'CekProduk', barcode: barcode }) });
@@ -602,11 +633,13 @@
             openForm(barcode, json.data);
           } else {
             toast(json.message, 'error');
-            history.back(); // kembali ke home via history
+            // FIX: Kita hidupkan ulang mode scan di halaman yang sama, BUKAN memanggil history.back()
+            startScan(state.key, false);
           }
         } catch (e) {
           toast('Gagal menghubungi server.', 'error');
-          history.back();
+          // FIX: Kembalikan layar scan jika gagal terhubung
+          startScan(state.key, false);
         }
       } else {
         openForm(barcode);
@@ -715,9 +748,14 @@
       }
     }
 
-    // UI Back buttons
-    $('btn-cancel-scan').onclick = () => { if (scanner) scanner.stop(); history.back(); };
-    $('btn-back').onclick = () => history.back();
+    // FIX UI Back buttons
+    $('btn-cancel-scan').onclick = () => {
+      if (scanner) scanner.stop().catch(() => { });
+      history.back();
+    };
+    $('btn-back').onclick = () => {
+      history.back();
+    };
 
     $('btn-manual-toggle').onclick = () => {
       const f = $('manual-form');
@@ -727,12 +765,14 @@
     };
     $('manual-form').onsubmit = (e) => {
       e.preventDefault();
-      if (scanner) scanner.stop();
-      processScannedBarcode($('manual-barcode').value);
+      const val = $('manual-barcode').value.trim();
+      if (!val) return;
+      if (scanner) scanner.stop().catch(() => { });
+      processScannedBarcode(val);
     };
 
     renderActivities();
-    show('home', false); // Render awal jangan di-push ke history
+    show('home', false);
 
     // PWA Auto Update Trigger Listener
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
@@ -742,7 +782,6 @@
             const newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => {
               if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // Notifikasi pembaruan aplikasi
                 toast('Versi terbaru diunduh. Memuat ulang aplikasi...', 'success');
                 setTimeout(() => window.location.reload(), 2000);
               }
