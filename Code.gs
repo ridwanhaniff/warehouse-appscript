@@ -1,5 +1,5 @@
 /**
- * INA BASIC STORE WAREHOUSE - Backend (Dengan Mitigasi Ketat)
+ * INA BASIC STORE WAREHOUSE - Backend (Dengan Kelola Produk)
  */
 
 var SHEET_MASTER = 'MASTER_PRODUK';
@@ -13,7 +13,12 @@ var HEADERS = {
 };
 
 var LOCK_TIMEOUT_MS = 10000;
-var ACTIVITIES = { 'masuk': 'Masuk', 'keluar': 'Keluar', 'mutasi': 'Mutasi', 'opname': 'Opname', 'produkbaru': 'ProdukBaru' };
+// DITAMBAHKAN: Aktivitas Kelola (Cek, Edit, Hapus)
+var ACTIVITIES = { 
+  'masuk': 'Masuk', 'keluar': 'Keluar', 'mutasi': 'Mutasi', 
+  'opname': 'Opname', 'produkbaru': 'ProdukBaru',
+  'cekproduk': 'CekProduk', 'editproduk': 'EditProduk', 'hapusproduk': 'HapusProduk' 
+};
 
 function setup() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -30,42 +35,7 @@ function setup() {
   var shMaster = ss.getSheetByName(SHEET_MASTER);
   var shStok = ss.getSheetByName(SHEET_STOK);
   var shLog = ss.getSheetByName(SHEET_LOG);
-  var codeMap = {};
-
-  if (shMaster.getLastRow() >= 1) {
-    var oldHeader = shMaster.getRange(1, 1, 1, Math.max(3, shMaster.getLastColumn())).getDisplayValues()[0];
-    var isLegacyMaster = str_(oldHeader[0]).toUpperCase() === 'SKU' && str_(oldHeader[1]).toUpperCase() === 'BARCODE';
-
-    if (isLegacyMaster) {
-      shMaster.getRange(1, 3, shMaster.getMaxRows(), 1).clearDataValidations();
-      var oldLast = shMaster.getLastRow();
-      var oldRows = oldLast >= 2 ? shMaster.getRange(2, 1, oldLast - 1, 4).getValues() : [];
-      var newRows = [];
-
-      oldRows.forEach(function (row) {
-        var oldSku = str_(row[0]), oldBarcode = str_(row[1]);
-        var barcode = oldBarcode || oldSku;
-        if (!barcode) return;
-        var nama = str_(row[2]), aktif = toBoolean_(row[3], false);
-        if (oldSku) codeMap[oldSku] = barcode;
-        if (oldBarcode) codeMap[oldBarcode] = barcode;
-        newRows.push([barcode, nama, aktif]);
-      });
-
-      shMaster.clearContents();
-      shMaster.getRange(1, 1, 1, 3).setValues([HEADERS.MASTER_PRODUK]);
-      if (newRows.length) shMaster.getRange(2, 1, newRows.length, 3).setValues(newRows);
-    }
-  }
-
-  if (Object.keys(codeMap).length) {
-    remapIdentifierColumn_(shStok, 1, codeMap);
-    remapIdentifierColumn_(shLog, 4, codeMap);
-  }
-
-  if (shStok.getLastRow() >= 1 && str_(shStok.getRange(1, 1).getDisplayValue()).toUpperCase() === 'SKU') shStok.getRange(1, 1).setValue('Barcode');
-  if (shLog.getLastRow() >= 1 && str_(shLog.getRange(1, 4).getDisplayValue()).toUpperCase() === 'SKU') shLog.getRange(1, 4).setValue('Barcode');
-
+  
   shMaster.getRange('A:A').setNumberFormat('@');
   shStok.getRange('A:B').setNumberFormat('@');
   shLog.getRange('B:B').setNumberFormat('@');
@@ -75,31 +45,12 @@ function setup() {
   if (shMaster.getMaxRows() < 2) shMaster.insertRowsAfter(1, 1);
   var statusColumnRange = shMaster.getRange(2, 3, shMaster.getMaxRows() - 1, 1);
   statusColumnRange.clearDataValidations();
-
-  if (masterLast >= 2) {
-    var statusDataRange = shMaster.getRange(2, 3, masterLast - 1, 1);
-    statusDataRange.setValues(statusDataRange.getValues().map(function (r) { return [toBoolean_(r[0], false)]; }));
-  }
   statusColumnRange.setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(false).build());
 
   [shMaster, shStok, shLog].forEach(function (sh) {
     sh.getRange(1, 1, 1, sh.getLastColumn()).setFontWeight('bold').setBackground('#d9eaf7');
     sh.setFrozenRows(1);
   });
-}
-
-function remapIdentifierColumn_(sheet, col, map) {
-  var last = sheet.getLastRow();
-  if (last < 2) return;
-  var range = sheet.getRange(2, col, last - 1, 1);
-  var values = range.getValues();
-  var changed = false;
-  values = values.map(function (row) {
-    var oldCode = str_(row[0]);
-    if (oldCode && map[oldCode]) { changed = true; return [map[oldCode]]; }
-    return row;
-  });
-  if (changed) range.setValues(values);
 }
 
 function doPost(e) {
@@ -111,15 +62,64 @@ function doPost(e) {
     var p;
     try { p = JSON.parse(e.postData.contents); } catch (err) { return respond_(false, 'Format JSON salah.'); }
 
+    var activityRaw = str_(p.activity).toLowerCase();
     var trxId = str_(p.transaction_id);
-    var activity = ACTIVITIES[str_(p.activity).toLowerCase()];
+    var activity = ACTIVITIES[activityRaw];
     var barcode = str_(p.barcode);
     var from = str_(p.location_from);
     var to = str_(p.location_to);
     var qty = Number(p.qty);
 
-    if (!trxId || !activity || !barcode) return respond_(false, 'Data transaksi tidak lengkap.');
+    if (!activity || !barcode) return respond_(false, 'Data transaksi tidak lengkap.');
 
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var shMaster = ss.getSheetByName(SHEET_MASTER);
+    var shStok = ss.getSheetByName(SHEET_STOK);
+    var shLog = ss.getSheetByName(SHEET_LOG);
+
+    // ==========================================
+    // FITUR KELOLA: CEK, EDIT, HAPUS PRODUK
+    // ==========================================
+    if (activity === 'CekProduk') {
+      var produkCek = findProductByBarcode_(shMaster, barcode);
+      if (!produkCek) return respond_(false, 'Produk tidak ditemukan di database.');
+      return respond_(true, 'Data ditemukan', produkCek);
+    }
+
+    if (activity === 'EditProduk') {
+      var produkEdit = findProductByBarcode_(shMaster, barcode);
+      if (!produkEdit) return respond_(false, 'Produk tidak ditemukan.');
+      var newNama = str_(p.nama);
+      var newStatus = toBoolean_(p.status_aktif, true);
+      
+      shMaster.getRange(produkEdit.row, 2).setValue(newNama);
+      shMaster.getRange(produkEdit.row, 3).setValue(newStatus);
+      shLog.appendRow([new Date(), trxId, 'EditProduk', "'" + barcode, '', '', 0, 'SUCCESS']);
+      SpreadsheetApp.flush();
+      return respond_(true, 'Perubahan produk berhasil disimpan.');
+    }
+
+    if (activity === 'HapusProduk') {
+      var produkHapus = findProductByBarcode_(shMaster, barcode);
+      if (!produkHapus) return respond_(false, 'Produk tidak ditemukan.');
+      
+      // Hapus dari Master
+      shMaster.deleteRow(produkHapus.row);
+      
+      // Hapus semua riwayat stok lokasi terkait produk ini
+      var stokDataRaw = readStok_(shStok);
+      for (var i = stokDataRaw.length - 1; i >= 0; i--) {
+        if (stokDataRaw[i].barcode === barcode) {
+          shStok.deleteRow(stokDataRaw[i].row);
+        }
+      }
+      shLog.appendRow([new Date(), trxId, 'HapusProduk', "'" + barcode, '', '', 0, 'SUCCESS']);
+      SpreadsheetApp.flush();
+      return respond_(true, 'Produk dan stok terkait berhasil dihapus permanen.');
+    }
+    // ==========================================
+
+    if (!trxId) return respond_(false, 'ID Transaksi wajib diisi.');
     if (activity === 'ProdukBaru') return registerProduct_(p, trxId, barcode, to, qty);
 
     if (str_(p.qty) === '') return respond_(false, 'Kuantitas wajib diisi.');
@@ -129,11 +129,6 @@ function doPost(e) {
     if ((activity === 'Keluar' || activity === 'Mutasi') && !from) return respond_(false, 'Lokasi asal wajib diisi.');
     if ((activity === 'Masuk' || activity === 'Mutasi' || activity === 'Opname') && !to) return respond_(false, 'Lokasi tujuan wajib diisi.');
     if (activity === 'Mutasi' && from === to) return respond_(false, 'Lokasi asal dan tujuan tidak boleh sama.');
-
-    var ss = SpreadsheetApp.getActiveSpreadsheet();
-    var shMaster = ss.getSheetByName(SHEET_MASTER);
-    var shStok = ss.getSheetByName(SHEET_STOK);
-    var shLog = ss.getSheetByName(SHEET_LOG);
 
     if (trxExists_(shLog, trxId)) return respond_(false, 'Transaksi sudah pernah diproses.');
 
@@ -161,7 +156,7 @@ function doPost(e) {
         undo.push({ type: 'set', row: stokTujuan.row, old: stokTujuan.qty });
         shStok.getRange(stokTujuan.row, 3).setValue(stokTujuan.qty + qty);
       } else {
-        shStok.appendRow(["'" + barcode, to, qty]); // MITIGASI: Paksa format teks dengan kutip tunggal
+        shStok.appendRow(["'" + barcode, to, qty]); 
         undo.push({ type: 'append', row: shStok.getLastRow() });
       }
     }
@@ -173,13 +168,12 @@ function doPost(e) {
         undo.push({ type: 'set', row: stokOp.row, old: stokOp.qty });
         shStok.getRange(stokOp.row, 3).setValue(qty);
       } else if (qty > 0) {
-        shStok.appendRow(["'" + barcode, to, qty]); // MITIGASI
+        shStok.appendRow(["'" + barcode, to, qty]); 
         undo.push({ type: 'append', row: shStok.getLastRow() });
       }
       logStatus = 'SUCCESS (Hitung fisik: ' + qty + ')';
     }
 
-    // MITIGASI: Paksa Barcode Teks Absolut saat mencatat log
     shLog.appendRow([new Date(), trxId, activity, "'" + barcode, from, to, qty, logStatus]);
     SpreadsheetApp.flush();
     return respond_(true, 'Transaksi berhasil disimpan.', { barcode: barcode, nama: produk.nama });
@@ -201,7 +195,6 @@ function registerProduct_(p, trxId, barcode, locTo, qty) {
   var nama = str_(p.nama);
   var statusAktif = toBoolean_(p.status_aktif, true);
 
-  // MITIGASI 1: Cegah Bypass input kosong (Backend Level)
   if (!barcode) return respond_(false, 'Barcode wajib diisi.');
   if (!nama || nama.length < 2) return respond_(false, 'Nama produk wajib diisi dengan benar.');
   if (!locTo) return respond_(false, 'Lokasi awal wajib dipilih.');
@@ -212,24 +205,12 @@ function registerProduct_(p, trxId, barcode, locTo, qty) {
   var shStok = ss.getSheetByName(SHEET_STOK);
   var shLog = ss.getSheetByName(SHEET_LOG);
 
-  // MITIGASI 2: Cek Struktur Kolom Master Produk
-  var mHeader = shMaster.getRange(1, 1, 1, 3).getDisplayValues()[0];
-  if (str_(mHeader[0]).toUpperCase() !== 'BARCODE' || str_(mHeader[1]).toUpperCase() !== 'NAMA') {
-    return respond_(false, 'Sistem dicegah! Struktur kolom Master Produk tidak valid. Buka Google Sheets Anda dan klik menu "Ina Warehouse > Bangun / Perbarui Dashboard" terlebih dahulu.');
-  }
-
   if (trxExists_(shLog, trxId)) return respond_(false, 'Transaksi terdeteksi duplikat.');
 
-  var last = shMaster.getLastRow();
-  if (last >= 2) {
-    var existing = shMaster.getRange(2, 1, last - 1, 1).getDisplayValues();
-    for (var i = 0; i < existing.length; i++) {
-      if (str_(existing[i][0]).toUpperCase() === barcode.toUpperCase()) {
-        return respond_(false, 'Barcode sudah terdaftar sebelumnya.');
-      }
-    }
-  }
+  var produk = findProductByBarcode_(shMaster, barcode);
+  if (produk) return respond_(false, 'Barcode sudah terdaftar sebelumnya.');
 
+  var last = shMaster.getLastRow();
   var masterRow = last + 1;
   if (masterRow > shMaster.getMaxRows()) shMaster.insertRowsAfter(shMaster.getMaxRows(), masterRow - shMaster.getMaxRows());
   
@@ -239,7 +220,6 @@ function registerProduct_(p, trxId, barcode, locTo, qty) {
     statusCell.clearDataValidations();
     statusCell.setDataValidation(SpreadsheetApp.newDataValidation().requireCheckbox().setAllowInvalid(false).build());
     
-    // MITIGASI 3: Force Format
     shMaster.getRange(masterRow, 1, 1, 2).setNumberFormat('@').setValues([["'" + barcode, nama]]);
     statusCell.setValue(statusAktif);
 
@@ -287,7 +267,8 @@ function findProductByBarcode_(shMaster, barcode) {
   var rows = shMaster.getRange(2, 1, last - 1, 3).getValues();
   for (var i = 0; i < rows.length; i++) {
     if (str_(rows[i][0]).toUpperCase() === barcode.toUpperCase()) {
-      return { barcode: str_(rows[i][0]), nama: str_(rows[i][1]), aktif: toBoolean_(rows[i][2], false) };
+      // DITAMBAHKAN: Return 'row' agar data dapat dihapus/diedit pada index yang tepat
+      return { row: i + 2, barcode: str_(rows[i][0]), nama: str_(rows[i][1]), aktif: toBoolean_(rows[i][2], false) };
     }
   }
   return null;
