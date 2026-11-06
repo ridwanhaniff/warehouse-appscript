@@ -20,6 +20,10 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    body {
+      overscroll-behavior-y: contain;
+    }
+
     #reader {
       border: 0 !important;
     }
@@ -29,13 +33,13 @@
     }
 
     .screen-enter {
-      animation: slideUp 0.22s cubic-bezier(.25, .46, .45, .94) forwards;
+      animation: slideUp .18s ease-out both;
     }
 
     @keyframes slideUp {
       from {
         opacity: 0;
-        transform: translateY(18px);
+        transform: translateY(10px);
       }
 
       to {
@@ -44,79 +48,14 @@
       }
     }
 
-    .activity-card {
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
-    }
-
-    .activity-card:active {
-      transform: scale(0.96);
-    }
-
-    .app-header {
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-    }
-
-    ::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 4px;
-    }
-
-    input:focus {
-      outline: none;
-    }
-
-    .input-field {
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .input-field:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
-    }
-
-    .dd-menu {
-      transition: opacity 0.12s ease, transform 0.12s ease;
-    }
-
-    .dd-menu.open {
-      opacity: 1;
-      transform: translateY(0);
-      pointer-events: auto;
-    }
-
-    .dd-menu.closed {
-      opacity: 0;
-      transform: translateY(-6px);
-      pointer-events: none;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      font-size: 0.65rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 999px;
-    }
-
     .toast-item {
-      animation: toastIn 0.25s cubic-bezier(.25, .46, .45, .94);
+      animation: toastIn .2s ease-out both;
     }
 
     @keyframes toastIn {
       from {
         opacity: 0;
-        transform: translateY(-12px) scale(0.95);
+        transform: translateY(-8px) scale(.98);
       }
 
       to {
@@ -124,692 +63,756 @@
         transform: translateY(0) scale(1);
       }
     }
+
+    .app-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+    }
+
+    .choice-btn {
+      transition: border-color .12s ease, background .12s ease, transform .12s ease;
+    }
+
+    .choice-btn:active {
+      transform: scale(.98);
+    }
+
+    .choice-btn.selected {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .choice-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .muted-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .muted-scroll::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 8px;
+    }
+
+    .safe-bottom {
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
   </style>
 </head>
 
-<body class="bg-slate-100 text-slate-800 antialiased">
-  <div class="mx-auto flex min-h-screen max-w-md flex-col">
-
-    <!-- HEADER -->
-    <header class="app-header px-5 pb-5 pt-12 text-white" style="padding-top: max(3rem, env(safe-area-inset-top));">
+<body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
+  <div class="mx-auto flex min-h-screen max-w-md flex-col bg-slate-100">
+    <header class="app-header px-5 pb-5 pt-12 text-white" style="padding-top:max(3rem,env(safe-area-inset-top));">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <div
-            class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20 backdrop-blur">
-            <img src="logo.png" alt="Logo" class="h-7 w-7 rounded-lg object-contain">
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+            <img src="logo.png" alt="Ina Basic Store" class="h-7 w-7 rounded-lg object-contain"
+              onerror="this.style.display='none'">
           </div>
           <div>
-            <p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Ina Basic Store</p>
-            <h1 class="text-base font-bold leading-tight text-white">Warehouse Manager</h1>
+            <p class="text-[10px] font-semibold uppercase tracking-[.18em] text-slate-400">Ina Basic Store</p>
+            <h1 class="text-base font-bold leading-tight">Warehouse Manager</h1>
           </div>
         </div>
-        <button id="btn-install" type="button"
-          class="hidden items-center gap-1.5 rounded-full bg-indigo-500 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-indigo-500/30 active:bg-indigo-600">
-          <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m-8-8h16" />
-          </svg>
-          Install
-        </button>
+        <button id="btn-install"
+          class="hidden items-center gap-1.5 rounded-full bg-indigo-500 px-3.5 py-2 text-xs font-semibold text-white shadow-lg">Install</button>
       </div>
-      <div id="header-sub" class="mt-4">
-        <div class="flex items-center gap-2">
-          <div class="h-1.5 w-1.5 rounded-full bg-emerald-400"></div>
-          <span class="text-xs font-medium text-slate-400" id="header-label">Pilih aktivitas hari ini</span>
-        </div>
+      <div class="mt-4 flex items-center gap-2">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+        <span id="header-label" class="text-xs font-medium text-slate-400">Pilih aktivitas hari ini</span>
       </div>
     </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="flex-1 px-4 py-5">
-      <!-- ===================== HOME ===================== -->
+    <main class="flex-1 px-4 py-5 safe-bottom">
+      <!-- HOME -->
       <section id="screen-home" class="screen-enter">
         <div class="mb-5 flex items-center justify-between">
-          <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Aktivitas</h2>
-          <span class="badge bg-slate-200 text-slate-500">6 menu</span>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Aktivitas</h2>
+          <span class="rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold text-slate-500">6 MENU</span>
         </div>
         <div id="activity-list" class="grid grid-cols-2 gap-3"></div>
-      </section>
-
-      <!-- ===================== SCANNER ===================== -->
-      <section id="screen-scan" class="hidden">
-        <div class="mb-4 flex items-center justify-between">
-          <div class="flex items-center gap-3">
-            <button id="btn-cancel-scan" type="button"
-              class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
+        <div class="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
+          <div class="flex items-start gap-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600"><svg
+                class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 8v4l3 2" />
+                <circle cx="12" cy="12" r="9" />
+              </svg></span>
             <div>
-              <h2 id="scan-title" class="text-base font-bold text-slate-800"></h2>
-              <p class="text-xs text-slate-400">Arahkan kamera ke QR Code</p>
+              <p class="text-sm font-semibold">Sistem variasi aktif</p>
+              <p class="mt-1 text-xs leading-relaxed text-slate-500">Satu barcode dapat memiliki banyak kombinasi
+                atribut. Stok dihitung berdasarkan variasi dan lokasi.</p>
             </div>
           </div>
-          <button id="btn-torch" type="button"
-            class="hidden h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 active:bg-slate-100"
-            title="Lampu">
-            <svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </div>
+      </section>
+
+      <!-- SCAN -->
+      <section id="screen-scan" class="hidden">
+        <div class="mb-4 flex items-center gap-3">
+          <button id="btn-cancel-scan"
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200"
+            aria-label="Kembali">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="m15 18-6-6 6-6" />
             </svg>
           </button>
+          <div class="min-w-0 flex-1">
+            <h2 id="scan-title" class="text-base font-bold"></h2>
+            <p id="scan-subtitle" class="text-xs text-slate-400">Arahkan kamera ke QR/barcode produk</p>
+          </div>
+          <button id="btn-torch"
+            class="hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-amber-500 shadow-sm ring-1 ring-slate-200"
+            title="Lampu"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 3 4 14h7l-1 7 10-12h-7z" />
+            </svg></button>
         </div>
-
         <div class="relative overflow-hidden rounded-2xl bg-black shadow-xl">
           <div id="reader" class="min-h-[300px] w-full"></div>
-          <div class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <div class="relative h-56 w-56 sm:h-64 sm:w-64">
-              <span
-                class="absolute left-0 top-0 h-8 w-8 border-l-4 border-t-4 border-indigo-400 rounded-tl-xl shadow-sm"></span>
-              <span
-                class="absolute right-0 top-0 h-8 w-8 border-r-4 border-t-4 border-indigo-400 rounded-tr-xl shadow-sm"></span>
-              <span
-                class="absolute bottom-0 left-0 h-8 w-8 border-b-4 border-l-4 border-indigo-400 rounded-bl-xl shadow-sm"></span>
-              <span
-                class="absolute bottom-0 right-0 h-8 w-8 border-b-4 border-r-4 border-indigo-400 rounded-br-xl shadow-sm"></span>
-              <div
-                class="absolute inset-x-2 top-1/2 -translate-y-1/2 border-b-2 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.9)] opacity-60">
-              </div>
-            </div>
+          <div class="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div class="relative h-56 w-56"><span
+                class="absolute left-0 top-0 h-8 w-8 rounded-tl-lg border-l-4 border-t-4 border-indigo-400"></span><span
+                class="absolute right-0 top-0 h-8 w-8 rounded-tr-lg border-r-4 border-t-4 border-indigo-400"></span><span
+                class="absolute bottom-0 left-0 h-8 w-8 rounded-bl-lg border-b-4 border-l-4 border-indigo-400"></span><span
+                class="absolute bottom-0 right-0 h-8 w-8 rounded-br-lg border-b-4 border-r-4 border-indigo-400"></span><span
+                class="absolute inset-x-2 top-1/2 border-t-2 border-red-400/70"></span></div>
           </div>
         </div>
-
-        <div class="mt-3">
-          <button id="btn-manual-toggle" type="button"
-            class="mx-auto flex items-center gap-1.5 text-xs font-semibold text-indigo-600">
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
-            Ketik kode manual
-          </button>
-          <form id="manual-form" class="mt-2.5 hidden gap-2">
-            <input id="manual-barcode" type="text" inputmode="text" placeholder="Masukkan kode manual..."
-              class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm focus:ring-0">
-            <button type="submit"
-              class="rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white active:bg-slate-700">OK</button>
-          </form>
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-3">
+          <button id="btn-manual-toggle"
+            class="mx-auto flex items-center gap-2 text-xs font-semibold text-indigo-600"><svg class="h-4 w-4"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+            </svg>Ketik kode secara manual</button>
+          <form id="manual-form" class="mt-3 hidden gap-2"><input id="manual-barcode"
+              class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-3 text-sm"
+              placeholder="Masukkan barcode..." autocomplete="off"><button
+              class="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white">Cari</button></form>
         </div>
       </section>
 
-      <!-- ===================== FORM TRANSAKSI ===================== -->
+      <!-- FORM / PRODUCT DETAIL -->
       <section id="screen-form" class="hidden">
         <div class="mb-4 flex items-center gap-3">
-          <button id="btn-back" type="button"
-            class="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-500 shadow-sm ring-1 ring-slate-200 active:bg-slate-50">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" />
-            </svg>
-          </button>
-          <div>
-            <h2 id="form-title" class="text-base font-bold text-slate-800"></h2>
-            <p class="text-xs text-slate-400">Isi detail transaksi</p>
+          <button id="btn-back"
+            class="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200"
+            aria-label="Kembali"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5">
+              <path d="m15 18-6-6 6-6" />
+            </svg></button>
+          <div class="min-w-0 flex-1">
+            <h2 id="form-title" class="text-base font-bold"></h2>
+            <p id="form-subtitle" class="text-xs text-slate-400">Pilih detail produk</p>
           </div>
         </div>
-
-        <form id="trx-form" class="space-y-3" novalidate>
-          <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100">
-              <svg class="h-4 w-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-              </svg>
+        <form id="main-form" class="space-y-3" novalidate>
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between gap-2">
+              <div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode induk</p>
+                <p id="form-barcode" class="mt-1 font-mono text-sm font-bold"></p>
+              </div><span id="product-status-pill"
+                class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">AKTIF</span>
             </div>
-            <div class="min-w-0 flex-1">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">QR Code · Kode Produk</p>
-              <input id="f-barcode" type="text" readonly
-                class="w-full bg-transparent font-mono text-sm font-semibold text-slate-700">
+            <div id="product-fields" class="mt-4 hidden border-t border-slate-100 pt-3">
+              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama produk
+                induk</label>
+              <input id="product-name" class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm"
+                placeholder="Contoh: Kaos Polos">
+              <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"><input id="product-active"
+                  type="checkbox" class="h-4 w-4 accent-indigo-600" checked> Produk aktif</label>
             </div>
           </div>
 
-          <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-            <div id="row-nama" class="hidden border-b border-slate-100 px-4 py-3.5">
-              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama
-                Produk</label>
-              <input id="f-nama" type="text" placeholder="mis. Kaos Polos Hitam"
-                class="input-field w-full bg-transparent text-sm font-medium text-slate-700 placeholder:text-slate-300 focus:ring-0 border-0">
+          <!-- Transaction variant picker -->
+          <div id="variant-select-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="mb-3">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih variasi barang</p>
+              <h3 id="variant-product-name" class="mt-1 text-base font-bold"></h3>
+              <p class="mt-1 text-xs text-slate-400">Pilihan diambil dari variasi aktif produk ini.</p>
             </div>
+            <div id="variant-selectors" class="space-y-4"></div>
+            <div id="variant-selected-summary"
+              class="mt-4 hidden rounded-xl bg-indigo-50 px-3 py-3 text-sm text-indigo-900">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">Variasi terpilih</p>
+              <p id="variant-selected-label" class="mt-1 font-bold"></p>
+              <p id="variant-stock-summary" class="mt-1 text-xs text-indigo-700"></p>
+            </div>
+          </div>
 
-            <div id="row-status" class="hidden border-b border-slate-100 px-4 py-3.5">
-              <label class="mb-2.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Status
-                Produk</label>
-              <div class="flex gap-2">
-                <button type="button" id="status-aktif-btn" data-value="true" onclick="setStatusAktif(true)"
-                  class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all">
-                  <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Aktif
-                </button>
-                <button type="button" id="status-nonaktif-btn" data-value="false" onclick="setStatusAktif(false)"
-                  class="flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all">
-                  <span class="h-2 w-2 rounded-full bg-slate-300"></span> Nonaktif
-                </button>
+          <!-- Variant management -->
+          <div id="variant-manage-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Daftar variasi</p>
+                <h3 class="mt-1 text-sm font-bold">Kelola kombinasi</h3>
+              </div><span id="variant-count"
+                class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-500"></span>
+            </div>
+            <div id="variant-manage-list" class="mt-3 space-y-2"></div>
+            <button id="btn-open-add-variants" type="button"
+              class="mt-3 w-full rounded-xl border border-dashed border-indigo-300 px-3 py-3 text-sm font-semibold text-indigo-600">+
+              Tambah kombinasi variasi</button>
+          </div>
+
+          <!-- Dynamic attribute builder -->
+          <div id="attribute-builder-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Atribut produk</p>
+                <h3 class="mt-1 text-sm font-bold">Atur pilihan variasi</h3>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">Tambahkan atribut sesuai produk. Nilai tiap
+                  atribut dipisahkan koma.</p>
+              </div><span class="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">DINAMIS</span>
+            </div>
+            <label class="mt-3 flex items-center gap-2 text-xs text-slate-600"><input id="simple-product"
+                type="checkbox" class="h-4 w-4 accent-indigo-600"> Produk tanpa pilihan variasi (Standar)</label>
+            <div id="attribute-list" class="mt-3 space-y-3"></div>
+            <button id="btn-add-attribute" type="button"
+              class="mt-3 w-full rounded-xl border border-dashed border-slate-300 px-3 py-2.5 text-sm font-semibold text-slate-600">+
+              Tambah atribut</button>
+            <div id="matrix-wrap" class="mt-4 hidden border-t border-slate-100 pt-3">
+              <div class="mb-2 flex items-center justify-between">
+                <div>
+                  <p class="text-xs font-bold">Preview kombinasi</p>
+                  <p class="text-[11px] text-slate-400">Hilangkan centang untuk kombinasi yang tidak tersedia.</p>
+                </div><span id="matrix-count"
+                  class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600"></span>
               </div>
-              <input type="hidden" id="f-status-aktif" value="true">
+              <div id="matrix-list" class="max-h-64 space-y-2 overflow-y-auto muted-scroll"></div>
             </div>
+          </div>
 
-            <div id="row-from" class="border-b border-slate-100 px-4 py-3.5">
-              <label id="label-from"
-                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
-                Asal</label>
-              <div id="dd-from" class="relative"></div>
+          <!-- Location selectors -->
+          <div id="location-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div id="location-from-wrap" class="hidden">
+              <p id="location-from-label"
+                class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi asal</p>
+              <div id="location-from-options" class="grid grid-cols-1 gap-2"></div>
             </div>
+            <div id="location-to-wrap" class="hidden">
+              <p id="location-to-label" class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+                Lokasi tujuan</p>
+              <div id="location-to-options" class="grid grid-cols-1 gap-2"></div>
+            </div>
+          </div>
 
-            <div id="row-to" class="border-b border-slate-100 px-4 py-3.5">
-              <label id="label-to"
-                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi
-                Tujuan</label>
-              <div id="dd-to" class="relative"></div>
-            </div>
-
-            <div id="row-qty" class="px-4 py-3.5">
-              <label id="label-qty"
-                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
-              <input id="f-qty" type="number" inputmode="numeric" placeholder="0"
-                class="input-field w-full bg-transparent text-3xl font-bold text-slate-800 placeholder:text-slate-200 focus:ring-0 border-0">
-            </div>
+          <div id="qty-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <label id="qty-label"
+              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
+            <input id="qty-input" type="number" inputmode="numeric" min="0" step="1" placeholder="0"
+              class="input-field w-full border-0 bg-transparent text-3xl font-bold text-slate-800 outline-none">
+            <p id="qty-hint" class="mt-1 text-xs text-slate-400"></p>
           </div>
 
           <button id="btn-submit" type="submit"
-            class="relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 transition active:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
-            <span id="btn-submit-text">Simpan Data</span>
-          </button>
-
-          <div id="btn-hapus-container" class="hidden mt-3">
-            <button type="button" id="btn-hapus"
-              class="flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-rose-100 bg-rose-50 px-4 py-3.5 text-sm font-bold text-rose-600 transition active:bg-rose-100 disabled:opacity-50">
-              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-              Hapus Produk
-            </button>
-          </div>
+            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"><span
+              id="btn-submit-text">Simpan</span><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="2.5">
+              <path d="m5 12 4 4L19 6" />
+            </svg></button>
+          <button id="btn-cancel-add-variants" type="button"
+            class="hidden w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600">Batal
+            tambah variasi</button>
         </form>
       </section>
     </main>
   </div>
 
-  <div id="toast-root" class="fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4 pointer-events-none"
+  <div id="toast-root" class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4"
     aria-live="polite"></div>
 
   <script>
+    // Keep this endpoint equal to the deployed Apps Script Web App URL.
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec';
-
     const LOCATIONS = [
-      { value: 'Rak Utama', label: 'Rak Utama', dot: 'bg-indigo-500' },
-      { value: 'Shopee', label: 'Shopee', dot: 'bg-orange-500' },
-      { value: 'TikTok Shop', label: 'TikTok Shop', dot: 'bg-slate-900' }
+      { value: 'Rak Utama', label: 'Rak Utama', kind: 'warehouse' },
+      { value: 'Shopee', label: 'Shopee', kind: 'shopee' },
+      { value: 'TikTok Shop', label: 'TikTok Shop', kind: 'tiktok' }
     ];
-
     const ACTIVITIES = {
-      masuk: { label: 'Barang Masuk', value: 'Masuk', color: 'emerald', fields: ['to'], labelTo: 'Toko Tujuan', labelQty: 'Stok Masuk', min: 1 },
-      keluar: { label: 'Barang Keluar', value: 'Keluar', color: 'rose', fields: ['from'], labelFrom: 'Toko Asal', labelQty: 'Stok Keluar', min: 1 },
-      mutasi: { label: 'Pindah Lokasi', value: 'Mutasi', color: 'sky', fields: ['from', 'to'], labelFrom: 'Toko Asal', labelTo: 'Toko Tujuan (Selain Asal)', min: 1 },
-      opname: { label: 'Stock Opname', value: 'Opname', color: 'amber', fields: ['to'], labelTo: 'Lokasi Opname', labelQty: 'Hasil Fisik', min: 0 },
-      kelola: { label: 'Kelola Data', value: 'Kelola', color: 'slate', fields: [], isProd: true, noQty: true, wide: true },
-      produk: { label: 'Produk Baru', value: 'ProdukBaru', color: 'violet', fields: ['to'], labelTo: 'Lokasi Awal', labelQty: 'Stok Awal', min: 0, isProd: true, wide: true }
+      masuk: { label: 'Barang Masuk', value: 'Masuk', color: 'emerald', fields: ['to'], labelTo: 'Lokasi tujuan', qty: 'Stok masuk', min: 1 },
+      keluar: { label: 'Barang Keluar', value: 'Keluar', color: 'rose', fields: ['from'], labelFrom: 'Lokasi asal', qty: 'Stok keluar', min: 1 },
+      mutasi: { label: 'Pindah Lokasi', value: 'Mutasi', color: 'sky', fields: ['from', 'to'], labelFrom: 'Lokasi asal', labelTo: 'Lokasi tujuan', qty: 'Jumlah dipindahkan', min: 1 },
+      opname: { label: 'Stock Opname', value: 'Opname', color: 'amber', fields: ['to'], labelTo: 'Lokasi opname', qty: 'Jumlah fisik', min: 0 },
+      kelola: { label: 'Kelola Data', value: 'Kelola', color: 'slate', fields: [] },
+      produk: { label: 'Produk Baru', value: 'ProdukBaru', color: 'violet', fields: [] }
     };
-
-    const COLOR_MAP = {
-      emerald: { bg: 'bg-emerald-50', text: 'text-emerald-700', icon: 'bg-emerald-500', border: 'border-emerald-100' },
-      rose: { bg: 'bg-rose-50', text: 'text-rose-700', icon: 'bg-rose-500', border: 'border-rose-100' },
-      sky: { bg: 'bg-sky-50', text: 'text-sky-700', icon: 'bg-sky-500', border: 'border-sky-100' },
-      amber: { bg: 'bg-amber-50', text: 'text-amber-700', icon: 'bg-amber-500', border: 'border-amber-100' },
-      slate: { bg: 'bg-slate-50', text: 'text-slate-700', icon: 'bg-slate-500', border: 'border-slate-200' },
-      violet: { bg: 'bg-violet-50', text: 'text-violet-700', icon: 'bg-violet-500', border: 'border-violet-100' }
+    const COLOR_STYLE = {
+      emerald: ['bg-emerald-50', 'text-emerald-700', 'bg-emerald-500', 'border-emerald-100'],
+      rose: ['bg-rose-50', 'text-rose-700', 'bg-rose-500', 'border-rose-100'],
+      sky: ['bg-sky-50', 'text-sky-700', 'bg-sky-500', 'border-sky-100'],
+      amber: ['bg-amber-50', 'text-amber-700', 'bg-amber-500', 'border-amber-100'],
+      slate: ['bg-slate-50', 'text-slate-700', 'bg-slate-600', 'border-slate-200'],
+      violet: ['bg-violet-50', 'text-violet-700', 'bg-violet-500', 'border-violet-100']
     };
-
-    const ICONS = {
-      masuk: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3',
-      keluar: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
-      mutasi: 'M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5',
-      opname: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      kelola: 'M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.89 1.12l-2.83.893.893-2.83c.243-.77.63-1.48 1.12-1.89l12.739-12.738zm0 0L19.5 7.125',
-      produk: 'M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z'
+    const ACTIVITY_ICONS = {
+      masuk: '<path d="M12 3v12m-5-5 5 5 5-5"/><path d="M5 18v3h14v-3"/>',
+      keluar: '<path d="M12 21V9m-5 5 5-5 5 5"/><path d="M5 6V3h14v3"/>',
+      mutasi: '<path d="M4 7h15l-3-3m4 13H5l3 3"/>',
+      opname: '<path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/>',
+      kelola: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>',
+      produk: '<path d="M12 5v14m-7-7h14"/><circle cx="12" cy="12" r="9"/>'
     };
-
     const $ = id => document.getElementById(id);
-    let state = { key: null, barcode: '', trxId: null };
-    let scanner = null;
-    let torchOn = false;
+    const state = {
+      key: null, barcode: '', product: null, selectedAttributes: {}, selectedVariant: null,
+      locationFrom: '', locationTo: '', trxId: null, scanner: null, scannerRunning: false, scanLocked: false,
+      formMode: '', matrix: [], addVariantsMode: false
+    };
 
-    function playBeep() {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) {
-          const ctx = new AudioCtx();
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(880, ctx.currentTime);
-          gain.gain.setValueAtTime(0.15, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start();
-          osc.stop(ctx.currentTime + 0.12);
-        }
-      } catch (e) { }
-      if (navigator.vibrate) { try { navigator.vibrate(80); } catch (e) { } }
-    }
-
-    function toast(msg, type = 'success') {
+    function toast(message, type = 'success') {
       const el = document.createElement('div');
-      el.className = `toast-item pointer-events-auto flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'}`;
-      el.innerHTML = `
-        <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-400'}">
-          <svg class="h-3.5 w-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>'}
-          </svg>
-        </span>
-        <span class="flex-1">${msg}</span>`;
-      $('toast-root').appendChild(el);
-      setTimeout(() => el.remove(), 4000);
+      el.className = `toast-item pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'}`;
+      const mark = document.createElement('span');
+      mark.className = `flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-400'}`;
+      mark.textContent = type === 'success' ? '✓' : '×';
+      const text = document.createElement('span'); text.className = 'flex-1'; text.textContent = message;
+      el.append(mark, text); $('toast-root').appendChild(el); setTimeout(() => el.remove(), 3500);
     }
 
-    function createDropdown(rootId) {
-      const root = $(rootId);
-      let value = ''; let excluded = '';
-      root.style.position = 'relative';
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'flex w-full items-center justify-between gap-2 py-1 text-left focus:outline-none';
-      const labelSpan = document.createElement('span');
-      labelSpan.className = 'text-sm font-medium text-slate-300';
-      const chevron = document.createElement('span');
-      chevron.innerHTML = `<svg class="h-4 w-4 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>`;
-      btn.append(labelSpan, chevron);
-      const menu = document.createElement('ul');
-      menu.className = 'dd-menu closed absolute left-0 right-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xl';
-      const items = [];
-      let isOpen = false;
-
-      function setOpen(v) {
-        isOpen = v;
-        menu.classList.toggle('open', v);
-        menu.classList.toggle('closed', !v);
-        const svg = chevron.querySelector('svg');
-        svg.style.transform = v ? 'rotate(180deg)' : '';
-      }
-
-      const api = {
-        get value() { return value; },
-        set(v) { value = v; render(); },
-        exclude(v) { excluded = v; if (value === v) api.reset(); render(); },
-        reset() { value = ''; excluded = ''; render(); setOpen(false); },
-        onChange: null
-      };
-
-      function render() {
-        labelSpan.textContent = value ? LOCATIONS.find(l => l.value === value).label : 'Pilih lokasi...';
-        labelSpan.className = value ? 'text-sm font-semibold text-slate-800' : 'text-sm font-medium text-slate-400';
-        items.forEach(it => {
-          it.li.classList.toggle('hidden', it.val === excluded);
-          const dot = it.li.querySelector('[data-dot]');
-          if (dot) dot.className = `h-2 w-2 rounded-full ${it.val === value ? 'bg-indigo-500' : 'bg-slate-200'}`;
-        });
-      }
-
-      LOCATIONS.forEach(loc => {
-        const li = document.createElement('li');
-        li.className = 'flex cursor-pointer items-center gap-3 border-b border-slate-50 px-4 py-3.5 last:border-0 hover:bg-slate-50 active:bg-slate-100 transition-colors';
-        li.innerHTML = `
-          <span data-dot class="h-2 w-2 rounded-full bg-slate-200"></span>
-          <span class="flex-1 text-sm font-medium text-slate-700">${loc.label}</span>
-          <svg class="h-4 w-4 text-indigo-500 opacity-0 check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>`;
-        li.onclick = () => { api.set(loc.value); setOpen(false); if (api.onChange) api.onChange(loc.value); };
-        menu.appendChild(li);
-        items.push({ li, val: loc.value });
-      });
-      btn.onclick = () => setOpen(!isOpen);
-      document.addEventListener('click', e => { if (!root.contains(e.target)) setOpen(false); });
-      root.append(btn, menu);
-      api.reset();
-      return api;
-    }
-
-    const ddFrom = createDropdown('dd-from');
-    const ddTo = createDropdown('dd-to');
-    ddFrom.onChange = (val) => { if (state.key === 'mutasi') ddTo.exclude(val); };
-
-    function setStatusAktif(isAktif) {
-      $('f-status-aktif').value = isAktif ? 'true' : 'false';
-      const btnAktif = $('status-aktif-btn');
-      const btnNon = $('status-nonaktif-btn');
-      if (isAktif) {
-        btnAktif.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-emerald-500 bg-emerald-50 px-3 py-2.5 text-sm font-semibold text-emerald-700 transition-all';
-        btnNon.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all';
-        btnAktif.querySelector('span').className = 'h-2 w-2 rounded-full bg-emerald-500';
-        btnNon.querySelector('span').className = 'h-2 w-2 rounded-full bg-slate-300';
-      } else {
-        btnNon.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-rose-400 bg-rose-50 px-3 py-2.5 text-sm font-semibold text-rose-600 transition-all';
-        btnAktif.className = 'flex flex-1 items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-400 transition-all';
-        btnNon.querySelector('span').className = 'h-2 w-2 rounded-full bg-rose-500';
-        btnAktif.querySelector('span').className = 'h-2 w-2 rounded-full bg-slate-300';
-      }
+    async function apiPost(payload) {
+      const response = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
+      const json = await response.json();
+      if (!response.ok) throw new Error('Server HTTP ' + response.status);
+      return json;
     }
 
     function renderActivities() {
-      Object.entries(ACTIVITIES).forEach(([k, a]) => {
-        const c = COLOR_MAP[a.color];
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `activity-card relative overflow-hidden rounded-2xl border ${c.border} ${c.bg} p-4 text-left shadow-sm ${a.wide ? 'col-span-2 flex items-center gap-4' : 'flex flex-col gap-3'}`;
-        btn.innerHTML = a.wide
-          ? `<span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${c.icon}"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg></span><div><p class="text-xs font-semibold uppercase tracking-wider ${c.text} opacity-70">${k === 'kelola' ? 'Pengaturan' : 'Daftarkan'}</p><p class="text-sm font-bold ${c.text}">${a.label}</p></div>`
-          : `<span class="flex h-10 w-10 items-center justify-center rounded-xl ${c.icon}"><svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${ICONS[k]}"/></svg></span><p class="text-sm font-bold leading-snug ${c.text}">${a.label}</p>`;
-        btn.onclick = () => startScan(k);
-        $('activity-list').appendChild(btn);
+      Object.entries(ACTIVITIES).forEach(([key, activity]) => {
+        const style = COLOR_STYLE[activity.color];
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `flex ${key === 'kelola' || key === 'produk' ? 'col-span-2 flex-row items-center' : 'flex-col'} gap-3 rounded-2xl border ${style[3]} ${style[0]} p-4 text-left shadow-sm transition active:scale-[.98]`;
+        const icon = document.createElement('span'); icon.className = `flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${style[2]} text-white`;
+        icon.innerHTML = `<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ACTIVITY_ICONS[key]}</svg>`;
+        const label = document.createElement('span'); label.className = `text-sm font-bold ${style[1]}`; label.textContent = activity.label;
+        const desc = document.createElement('span'); desc.className = `text-[11px] ${style[1]} opacity-70`;
+        desc.textContent = key === 'kelola' ? 'Ubah produk dan variasi' : key === 'produk' ? 'Daftarkan barcode baru' : 'Scan dan catat stok';
+        const wrapper = document.createElement('span'); wrapper.className = 'flex flex-col gap-1'; wrapper.append(label, desc);
+        button.append(icon, wrapper); button.addEventListener('click', () => startScan(key, true)); $('activity-list').appendChild(button);
       });
     }
 
-    // ==========================================
-    // MANAJEMEN TOMBOL KEMBALI HP (HISTORY API) DIPERBAIKI
-    // ==========================================
-    function show(id, pushHistory = true) {
-      ['home', 'scan', 'form'].forEach(x => {
-        const el = $(`screen-${x}`);
-        const isActive = x === id;
-        el.classList.toggle('hidden', !isActive);
-        if (isActive) {
-          el.classList.remove('screen-enter');
-          void el.offsetWidth;
-          el.classList.add('screen-enter');
-        }
+    function showScreen(screen, pushHistory = true) {
+      ['home', 'scan', 'form'].forEach(name => {
+        const el = $('screen-' + name); const active = name === screen;
+        el.classList.toggle('hidden', !active);
+        if (active) { el.classList.remove('screen-enter'); void el.offsetWidth; el.classList.add('screen-enter'); }
       });
-      const labels = { home: 'Pilih aktivitas hari ini', scan: 'Scan QR Code produk', form: 'Input transaksi' };
-      $('header-label').textContent = labels[id] || '';
-
-      if (pushHistory) {
-        history.pushState({ screen: id }, '', `#${id}`);
-      }
+      const labels = { home: 'Pilih aktivitas hari ini', scan: 'Scan barcode produk', form: 'Input data gudang' };
+      $('header-label').textContent = labels[screen] || '';
+      if (pushHistory) history.pushState({ app: true, screen }, '', '#' + screen);
     }
 
-    window.addEventListener('popstate', (event) => {
-      if (scanner && !$('screen-scan').classList.contains('hidden')) {
-        scanner.stop().catch(() => { });
-      }
-      if (event.state && event.state.screen) {
-        const targetScreen = event.state.screen;
-        // FIX: Jika HP mundur ke halaman 'scan', kita hidupkan ulang kameranya
-        if (targetScreen === 'scan' && state.key) {
-          startScan(state.key, false);
-        } else {
-          show(targetScreen, false);
-        }
-      } else {
-        show('home', false);
-      }
+    async function navigateBack() {
+      if (history.state && history.state.app && history.state.screen !== 'home') { history.back(); return; }
+      await stopScanner(); showScreen('home', false); history.replaceState({ app: true, screen: 'home' }, '', '#home');
+    }
+
+    window.addEventListener('popstate', async (event) => {
+      const target = event.state && event.state.app ? event.state.screen : 'home';
+      await stopScanner();
+      showScreen(target || 'home', false);
+      if (target === 'scan' && state.key) startCamera();
     });
 
-    history.replaceState({ screen: 'home' }, '', '#home');
-
-    // ==========================================
-    // LOGIKA SCANNER & VALIDASI DIPERBAIKI
-    // ==========================================
-    async function startScan(key, pushHistory = true) {
-      state.key = key;
-      state.trxId = null;
-      $('scan-title').textContent = ACTIVITIES[key].label;
-
-      // Reset area input manual ke state awal
-      const manualForm = $('manual-form');
-      manualForm.classList.add('hidden');
-      manualForm.classList.remove('flex');
-      $('manual-barcode').value = '';
-
-      const btnOk = manualForm.querySelector('button[type="submit"]');
-      if (btnOk) {
-        btnOk.disabled = false;
-        btnOk.textContent = 'OK';
-      }
-
-      show('scan', pushHistory);
-
-      if (scanner) { try { await scanner.stop(); } catch (e) { } }
-
-      scanner = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE] });
-      const torchBtn = $('btn-torch');
-      torchOn = false;
-      torchBtn.classList.add('hidden');
-      torchBtn.classList.remove('flex');
-
+    function playBeep() {
       try {
-        await scanner.start(
-          { facingMode: 'environment' },
-          {
-            fps: 15,
-            qrbox: function (vw, vh) {
-              let boxSize = Math.min(vw * 0.75, vh * 0.75, 250);
-              return { width: boxSize, height: boxSize };
-            }
-          },
-          (text) => {
-            playBeep();
-            scanner.stop().catch(() => { });
-            processScannedBarcode(text);
-          },
-          (errorMessage) => { }
-        );
+        const Ctx = window.AudioContext || window.webkitAudioContext;
+        if (Ctx) { const ctx = new Ctx(); const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.frequency.value = 880; gain.gain.value = .12; gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime + .12); osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + .12); }
+      } catch (e) { }
+      if (navigator.vibrate) { try { navigator.vibrate(70); } catch (e) { } }
+    }
 
+    async function stopScanner() {
+      if (!state.scanner) return;
+      const current = state.scanner; state.scanner = null; state.scanLocked = false;
+      try { if (state.scannerRunning) await current.stop(); } catch (e) { }
+      state.scannerRunning = false;
+      try { await current.clear(); } catch (e) { }
+    }
+
+    async function startScan(key, pushHistory = true) {
+      state.key = key; state.barcode = ''; state.product = null; state.selectedVariant = null; state.selectedAttributes = {}; state.trxId = null; state.addVariantsMode = false;
+      $('scan-title').textContent = ACTIVITIES[key].label;
+      $('scan-subtitle').textContent = key === 'produk' ? 'Scan QR/barcode baru yang belum terdaftar' : 'Arahkan kamera ke QR/barcode produk';
+      $('manual-form').classList.add('hidden'); $('manual-form').classList.remove('flex'); $('manual-barcode').value = '';
+      $('btn-torch').classList.add('hidden');
+      await stopScanner(); showScreen('scan', pushHistory); await startCamera();
+    }
+
+    async function startCamera() {
+      if (!window.Html5Qrcode) { $('manual-form').classList.remove('hidden'); $('manual-form').classList.add('flex'); toast('Scanner tidak tersedia. Gunakan input manual.', 'error'); return; }
+      await stopScanner();
+      try {
+        const instance = new Html5Qrcode('reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE, Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8] });
+        state.scanner = instance;
+        await instance.start({ facingMode: 'environment' }, { fps: 12, qrbox: (w, h) => { const size = Math.min(w * .78, h * .68, 260); return { width: size, height: size }; } }, async decoded => {
+          if (state.scanLocked) return; state.scanLocked = true; playBeep(); await stopScanner(); await processBarcode(decoded.trim());
+        }, () => { });
+        state.scannerRunning = true;
         try {
-          const cap = scanner.getRunningTrackCameraCapabilities();
-          if (cap && cap.torchFeature && cap.torchFeature().isSupported()) {
-            torchBtn.classList.remove('hidden');
-            torchBtn.classList.add('flex');
-            torchBtn.onclick = () => {
-              torchOn = !torchOn;
-              scanner.applyVideoConstraints({ advanced: [{ torch: torchOn }] });
-              torchBtn.innerHTML = torchOn
-                ? `<svg class="h-4 w-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`
-                : `<svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`;
-            };
+          const capabilities = instance.getRunningTrackCameraCapabilities();
+          if (capabilities && capabilities.torchFeature && capabilities.torchFeature().isSupported()) {
+            $('btn-torch').classList.remove('hidden'); $('btn-torch').onclick = async () => { const next = !state.torchOn; state.torchOn = next; try { await instance.applyVideoConstraints({ advanced: [{ torch: next }] }); } catch (e) { toast('Lampu tidak dapat diubah.', 'error'); } };
           }
         } catch (e) { }
-      } catch (e) {
-        console.error("Camera start error:", e);
-        manualForm.classList.remove('hidden');
-        manualForm.classList.add('flex');
+      } catch (error) {
+        console.error(error); $('manual-form').classList.remove('hidden'); $('manual-form').classList.add('flex'); toast('Kamera tidak dapat dibuka. Gunakan input manual.', 'error');
       }
     }
 
-    async function processScannedBarcode(barcode) {
-      if (state.key === 'kelola') {
-        $('scan-title').textContent = 'Mencari data...';
-
-        // Disable form input manual selama proses cek (loading)
-        const btnOk = $('manual-form').querySelector('button[type="submit"]');
-        if (btnOk) {
-          btnOk.disabled = true;
-          btnOk.textContent = '...';
-        }
-
-        toast('Mencari data di database...', 'success');
-        try {
-          const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ activity: 'CekProduk', barcode: barcode }) });
-          const json = await res.json();
-          if (json.success && json.data) {
-            openForm(barcode, json.data);
-          } else {
-            toast(json.message, 'error');
-            // FIX: Kita hidupkan ulang mode scan di halaman yang sama, BUKAN memanggil history.back()
-            startScan(state.key, false);
-          }
-        } catch (e) {
-          toast('Gagal menghubungi server.', 'error');
-          // FIX: Kembalikan layar scan jika gagal terhubung
-          startScan(state.key, false);
-        }
-      } else {
-        openForm(barcode);
-      }
-    }
-
-    function openForm(barcode, prefillData = null) {
-      const a = ACTIVITIES[state.key];
+    async function processBarcode(barcode) {
+      if (!barcode) { toast('Barcode kosong.', 'error'); return startCamera(); }
       state.barcode = barcode;
-      $('form-title').textContent = a.label;
-      $('f-barcode').value = barcode;
-      $('f-nama').value = prefillData ? prefillData.nama : '';
-      $('f-qty').value = '';
-      ddFrom.reset(); ddTo.reset();
-
-      $('row-nama').classList.toggle('hidden', !a.isProd);
-      $('row-status').classList.toggle('hidden', !a.isProd);
-      if (a.isProd) {
-        setStatusAktif(prefillData ? prefillData.aktif : true);
-      }
-
-      const hasFrom = a.fields.includes('from');
-      const hasTo = a.fields.includes('to');
-      $('row-from').classList.toggle('hidden', !hasFrom);
-      $('row-to').classList.toggle('hidden', !hasTo);
-      if (hasFrom) $('label-from').textContent = a.labelFrom;
-      if (hasTo) $('label-to').textContent = a.labelTo;
-
-      $('row-qty').classList.toggle('hidden', !!a.noQty);
-      $('label-qty').textContent = a.labelQty || 'Kuantitas';
-      $('f-qty').placeholder = a.min !== undefined ? `Min: ${a.min}` : '';
-
-      if (state.key === 'kelola') {
-        $('btn-submit-text').textContent = 'Simpan Perubahan';
-        $('btn-hapus-container').classList.remove('hidden');
-      } else {
-        $('btn-submit-text').textContent = 'Simpan Data';
-        $('btn-hapus-container').classList.add('hidden');
-      }
-
-      const submitColors = { emerald: 'bg-emerald-600 shadow-emerald-500/25 active:bg-emerald-700', rose: 'bg-rose-600 shadow-rose-500/25 active:bg-rose-700', sky: 'bg-sky-600 shadow-sky-500/25 active:bg-sky-700', amber: 'bg-amber-500 shadow-amber-500/25 active:bg-amber-600', violet: 'bg-violet-600 shadow-violet-500/25 active:bg-violet-700', slate: 'bg-slate-800 shadow-slate-500/25 active:bg-slate-900' };
-      const btn = $('btn-submit');
-      btn.className = btn.className.replace(/bg-\w+-\d+ shadow-\w+-\d+\/\d+ active:bg-\w+-\d+/g, '');
-      btn.classList.add(...(submitColors[a.color] || 'bg-indigo-600 shadow-indigo-500/25 active:bg-indigo-700').split(' '));
-
-      show('form');
-    }
-
-    $('trx-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const a = ACTIVITIES[state.key];
-      const from = ddFrom.value, to = ddTo.value, qty = Number($('f-qty').value);
-
-      if (state.key === 'kelola') {
-        const nama = $('f-nama').value.trim();
-        const statusAktif = $('f-status-aktif').value === 'true';
-        if (!nama) return toast('Nama produk wajib diisi!', 'error');
-        return kirimData({ transaction_id: `TRX-${Date.now()}`, activity: 'EditProduk', barcode: state.barcode, nama, status_aktif: statusAktif });
-      }
-
-      if (a.isProd) {
-        const nama = $('f-nama').value.trim();
-        const statusAktif = $('f-status-aktif').value === 'true';
-        if (!state.barcode || !nama || !to) return toast('QR Code, Nama, dan Lokasi wajib diisi!', 'error');
-        if ($('f-qty').value === '' || qty < 0) return toast('Isi stok awal (min 0)', 'error');
-        state.trxId = state.trxId || `TRX-${Date.now()}`;
-        return kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, nama, location_to: to, qty, status_aktif: statusAktif });
-      }
-      if (a.fields.includes('from') && !from) return toast('Pilih Lokasi Asal', 'error');
-      if (a.fields.includes('to') && !to) return toast('Pilih Lokasi Tujuan', 'error');
-      if ($('f-qty').value === '' || qty < a.min) return toast('Kuantitas tidak valid', 'error');
-      state.trxId = state.trxId || `TRX-${Date.now()}`;
-      kirimData({ transaction_id: state.trxId, activity: a.value, barcode: state.barcode, location_from: from, location_to: to, qty });
-    });
-
-    $('btn-hapus').addEventListener('click', async () => {
-      if (!confirm('Yakin ingin menghapus produk ini secara PERMANEN? Semua riwayat stok lokasi terkait juga akan terhapus.')) return;
-      $('btn-hapus').disabled = true;
-      $('btn-submit').disabled = true;
       try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify({ transaction_id: `TRX-${Date.now()}`, activity: 'HapusProduk', barcode: state.barcode }) });
-        const json = await res.json();
-        toast(json.message, json.success ? 'success' : 'error');
-        if (json.success) history.back();
-      } catch (e) {
-        toast('Gagal menghubungi server.', 'error');
-      } finally {
-        $('btn-hapus').disabled = false;
-        $('btn-submit').disabled = false;
-      }
-    });
-
-    async function kirimData(payload) {
-      $('btn-submit').disabled = true;
-      $('btn-submit-text').textContent = 'Menyimpan...';
-      try {
-        const res = await fetch(GAS_URL, { method: 'POST', body: JSON.stringify(payload) });
-        const json = await res.json();
-        toast(json.message, json.success ? 'success' : 'error');
-        if (json.success) history.back();
-      } catch (e) {
-        toast('Gagal koneksi server. Coba simpan lagi.', 'error');
-      } finally {
-        $('btn-submit').disabled = false;
-        $('btn-submit-text').textContent = state.key === 'kelola' ? 'Simpan Perubahan' : 'Simpan Data';
+        if (state.key === 'produk') {
+          const check = await apiPost({ action: 'GET_PRODUCT', barcode, include_inactive: true });
+          if (check.success) { toast('Barcode sudah terdaftar. Gunakan Kelola Data.', 'error'); return startCamera(); }
+          openNewProductForm(barcode); return;
+        }
+        const result = await apiPost({ action: 'GET_PRODUCT', barcode, include_inactive: state.key === 'kelola' });
+        if (!result.success) { toast(result.message || 'Produk tidak ditemukan.', 'error'); return startCamera(); }
+        state.product = result.data;
+        if (state.key === 'kelola') openManageProductForm(result.data);
+        else openTransactionForm(result.data);
+      } catch (error) {
+        console.error(error); toast('Tidak dapat menghubungi server. Periksa koneksi.', 'error'); startCamera();
       }
     }
 
-    // FIX UI Back buttons
-    $('btn-cancel-scan').onclick = () => {
-      if (scanner) scanner.stop().catch(() => { });
-      history.back();
-    };
-    $('btn-back').onclick = () => {
-      history.back();
-    };
+    function resetFormVisibility() {
+      ['product-fields', 'variant-select-card', 'variant-manage-card', 'attribute-builder-card', 'location-card', 'qty-card'].forEach(id => $(id).classList.add('hidden'));
+      $('btn-submit').classList.remove('hidden'); $('btn-cancel-add-variants').classList.add('hidden');
+      $('btn-open-add-variants').classList.remove('hidden');
+    }
 
-    $('btn-manual-toggle').onclick = () => {
-      const f = $('manual-form');
-      const isHidden = f.classList.contains('hidden');
-      f.classList.toggle('hidden', !isHidden);
-      f.classList.toggle('flex', isHidden);
-    };
-    $('manual-form').onsubmit = (e) => {
-      e.preventDefault();
-      const val = $('manual-barcode').value.trim();
-      if (!val) return;
-      if (scanner) scanner.stop().catch(() => { });
-      processScannedBarcode(val);
-    };
+    function openTransactionForm(product) {
+      state.formMode = 'transaction'; state.selectedAttributes = {}; state.selectedVariant = null; state.locationFrom = ''; state.locationTo = ''; state.trxId = null;
+      resetFormVisibility(); showScreen('form', true);
+      $('form-title').textContent = ACTIVITIES[state.key].label; $('form-subtitle').textContent = 'Pilih variasi, lokasi, dan kuantitas';
+      $('form-barcode').textContent = product.barcode; $('product-status-pill').classList.remove('hidden'); $('product-status-pill').textContent = 'PRODUK AKTIF';
+      $('variant-select-card').classList.remove('hidden'); $('variant-product-name').textContent = product.nama;
+      renderVariantSelector(product);
+      const activity = ACTIVITIES[state.key];
+      const hasFrom = activity.fields.includes('from'); const hasTo = activity.fields.includes('to');
+      $('location-card').classList.toggle('hidden', !(hasFrom || hasTo));
+      $('location-from-wrap').classList.toggle('hidden', !hasFrom); $('location-to-wrap').classList.toggle('hidden', !hasTo);
+      $('location-from-label').textContent = activity.labelFrom || 'Lokasi asal'; $('location-to-label').textContent = activity.labelTo || 'Lokasi tujuan';
+      if (hasFrom) renderLocationOptions('from'); if (hasTo) renderLocationOptions('to');
+      $('qty-card').classList.remove('hidden'); $('qty-label').textContent = activity.qty; $('qty-input').value = ''; $('qty-input').min = activity.min;
+      $('qty-hint').textContent = state.key === 'opname' ? 'Masukkan jumlah fisik sebenarnya. Isi 0 jika stok habis.' : 'Masukkan jumlah unit yang diproses.';
+      $('btn-submit-text').textContent = 'Simpan transaksi';
+    }
+
+    function renderVariantSelector(product) {
+      const root = $('variant-selectors'); root.innerHTML = '';
+      const activeVariants = (product.variants || []).filter(v => v.active);
+      const definitions = (product.attributes || []).filter(a => (a.values || []).length);
+      if (!activeVariants.length) { root.textContent = 'Tidak ada variasi aktif.'; return; }
+      if (!definitions.length) {
+        state.selectedVariant = activeVariants[0];
+        $('variant-selected-summary').classList.remove('hidden'); $('variant-selected-label').textContent = activeVariants[0].label || 'Standar'; $('variant-stock-summary').textContent = stockSummary(activeVariants[0]);
+        return;
+      }
+      $('variant-selected-summary').classList.add('hidden');
+      definitions.forEach((definition, index) => {
+        const group = document.createElement('div');
+        const label = document.createElement('p'); label.className = 'mb-2 text-xs font-semibold text-slate-500'; label.textContent = 'Pilih ' + definition.name;
+        const options = document.createElement('div'); options.className = 'flex flex-wrap gap-2';
+        const selectedBefore = {};
+        definitions.slice(0, index).forEach(d => { if (state.selectedAttributes[d.name]) selectedBefore[d.name] = state.selectedAttributes[d.name]; });
+        const eligible = activeVariants.filter(v => Object.keys(selectedBefore).every(k => v.attributes[k] === selectedBefore[k]));
+        const values = [];
+        eligible.forEach(v => { const value = v.attributes[definition.name]; if (value !== undefined && !values.some(x => x.value === value)) values.push({ value, hex: (definition.values || []).find(x => x.value === value)?.hex || '' }); });
+        values.forEach(option => {
+          const button = document.createElement('button'); button.type = 'button'; button.className = 'choice-btn flex min-h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold';
+          if (state.selectedAttributes[definition.name] === option.value) button.classList.add('selected');
+          if (definition.type === 'color') { const swatch = document.createElement('span'); swatch.className = 'h-4 w-4 rounded border border-slate-300'; swatch.style.backgroundColor = option.hex || '#cbd5e1'; button.appendChild(swatch); }
+          const text = document.createElement('span'); text.textContent = option.value; button.appendChild(text);
+          button.addEventListener('click', () => {
+            state.selectedAttributes[definition.name] = option.value;
+            definitions.slice(index + 1).forEach(d => delete state.selectedAttributes[d.name]);
+            resolveSelectedVariant(); renderVariantSelector(product);
+          });
+          options.appendChild(button);
+        });
+        group.append(label, options); root.appendChild(group);
+      });
+      resolveSelectedVariant();
+    }
+
+    function resolveSelectedVariant() {
+      const definitions = state.product.attributes || [];
+      const active = (state.product.variants || []).filter(v => v.active);
+      const complete = definitions.every(d => !!state.selectedAttributes[d.name]);
+      state.selectedVariant = complete ? active.find(v => definitions.every(d => v.attributes[d.name] === state.selectedAttributes[d.name])) || null : null;
+      if (state.selectedVariant) {
+        $('variant-selected-summary').classList.remove('hidden'); $('variant-selected-label').textContent = state.selectedVariant.label; $('variant-stock-summary').textContent = stockSummary(state.selectedVariant); updateQtyHint();
+      } else $('variant-selected-summary').classList.add('hidden');
+    }
+
+    function stockSummary(variant) {
+      const stocks = variant.stocks || {};
+      return LOCATIONS.map(l => l.label + ': ' + (stocks[l.value] ?? 0)).join(' · ');
+    }
+
+    function renderLocationOptions(which) {
+      const root = $('location-' + which + '-options'); root.innerHTML = '';
+      LOCATIONS.forEach(location => {
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'choice-btn flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-left';
+        const logo = document.createElement('span'); logo.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-sm font-black';
+        if (location.kind === 'warehouse') { logo.classList.add('bg-slate-100', 'text-slate-700'); logo.textContent = 'R'; }
+        if (location.kind === 'shopee') { logo.style.backgroundColor = '#ee4d2d'; logo.classList.add('text-white'); logo.textContent = 'S'; }
+        if (location.kind === 'tiktok') { logo.style.backgroundColor = '#111111'; logo.classList.add('text-white'); logo.textContent = '♪'; }
+        const name = document.createElement('span'); name.className = 'flex-1 text-sm font-semibold'; name.textContent = location.label;
+        const check = document.createElement('span'); check.className = 'text-indigo-600'; check.textContent = '✓';
+        const value = which === 'from' ? state.locationFrom : state.locationTo;
+        if (value === location.value) { button.classList.add('selected'); button.append(logo, name, check); } else button.append(logo, name);
+        if (which === 'to' && state.key === 'mutasi' && location.value === state.locationFrom) button.disabled = true;
+        button.addEventListener('click', () => {
+          if (which === 'from') { state.locationFrom = location.value; if (state.locationTo === location.value) state.locationTo = ''; }
+          else state.locationTo = location.value;
+          renderLocationOptions('from'); renderLocationOptions('to');
+          updateQtyHint();
+        });
+        root.appendChild(button);
+      });
+    }
+
+    function updateQtyHint() {
+      if (state.key !== 'keluar' || !state.selectedVariant || !state.locationFrom) return;
+      const available = (state.selectedVariant.stocks || {})[state.locationFrom] || 0;
+      $('qty-hint').textContent = 'Stok tersedia: ' + available + ' unit.';
+    }
+
+    function openNewProductForm(barcode) {
+      state.formMode = 'create'; state.product = null; state.matrix = []; state.addVariantsMode = false; resetFormVisibility(); showScreen('form', true);
+      $('form-title').textContent = 'Produk Baru'; $('form-subtitle').textContent = 'Daftarkan produk induk dan variasinya'; $('form-barcode').textContent = barcode;
+      $('product-fields').classList.remove('hidden'); $('product-name').value = ''; $('product-active').checked = true; $('product-status-pill').classList.add('hidden');
+      $('attribute-builder-card').classList.remove('hidden'); $('attribute-list').innerHTML = ''; $('attribute-list').classList.remove('hidden'); $('btn-add-attribute').classList.remove('hidden'); $('simple-product').checked = false; $('simple-product').disabled = false;
+      addAttributeRow({ name: 'Warna', type: 'color', raw: '' });
+      $('btn-add-attribute').classList.remove('hidden'); $('btn-open-add-variants').classList.add('hidden'); $('btn-submit-text').textContent = 'Daftarkan produk'; $('qty-card').classList.add('hidden');
+      buildMatrixPreview(false);
+    }
+
+    function addAttributeRow(data = {}) {
+      const root = $('attribute-list');
+      const row = document.createElement('div'); row.className = 'attribute-row rounded-xl border border-slate-200 p-3';
+      row.innerHTML = `
+        <div class="mb-2 flex items-center justify-between"><span class="text-xs font-bold text-slate-600">Atribut</span><button type="button" data-remove class="text-xs font-semibold text-rose-500">Hapus</button></div>
+        <div class="grid grid-cols-[1fr_105px] gap-2"><input data-name class="input-field min-w-0 rounded-lg border border-slate-200 px-2.5 py-2 text-sm" placeholder="Nama, mis. Warna"><select data-type class="rounded-lg border border-slate-200 bg-white px-2 py-2 text-xs"><option value="text">Teks</option><option value="color">Warna</option></select></div>
+        <label class="mt-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan nilai</label><textarea data-values rows="2" class="input-field mt-1 w-full rounded-lg border border-slate-200 px-2.5 py-2 text-xs" placeholder="Teks: L, XL, XXL. Warna: Hitam:#171717, Putih:#FFFFFF"></textarea>
+        <p class="mt-1 text-[10px] text-slate-400" data-hint>Untuk tipe Warna, tulis setiap nilai dengan format Nama:#RRGGBB.</p>`;
+      row.querySelector('[data-name]').value = data.name || '';
+      row.querySelector('[data-type]').value = data.type || 'text';
+      row.querySelector('[data-values]').value = data.raw || '';
+      row.querySelector('[data-type]').addEventListener('change', () => { row.querySelector('[data-hint]').textContent = row.querySelector('[data-type]').value === 'color' ? 'Format warna: Hitam:#171717, Putih:#FFFFFF.' : 'Pisahkan setiap pilihan dengan koma.'; buildMatrixPreview(state.addVariantsMode); });
+      row.querySelector('[data-remove]').addEventListener('click', () => { row.remove(); buildMatrixPreview(state.addVariantsMode); });
+      row.querySelectorAll('input,textarea').forEach(el => el.addEventListener('input', () => buildMatrixPreview(state.addVariantsMode)));
+      root.appendChild(row);
+    }
+
+    function parseAttributeRows() {
+      const rows = [...$('attribute-list').querySelectorAll('.attribute-row')];
+      const attrs = rows.map(row => {
+        const name = row.querySelector('[data-name]').value.trim();
+        const type = row.querySelector('[data-type]').value;
+        const raw = row.querySelector('[data-values]').value.trim();
+        if (!name || !raw) return null;
+        const tokens = raw.split(',').map(s => s.trim()).filter(Boolean);
+        const values = tokens.map(token => {
+          if (type === 'color') {
+            const parts = token.split(/[:=]/); return { value: (parts[0] || '').trim(), hex: (parts[1] || '').trim() };
+          }
+          return { value: token, hex: '' };
+        });
+        return { name, type, values };
+      });
+      if (attrs.some(a => !a)) throw new Error('Lengkapi nama atribut dan pilihan nilainya, atau hapus atribut yang kosong.');
+      const names = attrs.map(a => a.name.toLowerCase()); if (new Set(names).size !== names.length) throw new Error('Nama atribut tidak boleh sama.');
+      return attrs;
+    }
+
+    function cartesianVariants(attributes) {
+      if (!attributes.length) return [{ attributes: {}, active: true, key: 'Standar' }];
+      return attributes.reduce((result, attr) => {
+        const next = [];
+        result.forEach(base => attr.values.forEach(v => { const values = Object.assign({}, base.attributes, { [attr.name]: v.value }); next.push({ attributes: values, active: true, key: Object.keys(values).map(k => k + '=' + String(values[k]).toLowerCase()).join('|') }); }));
+        return next;
+      }, [{ attributes: {}, active: true, key: '' }]);
+    }
+
+    function buildMatrixPreview(isAddMode) {
+      const wrap = $('matrix-wrap'); const list = $('matrix-list');
+      if ($('simple-product').checked) { wrap.classList.remove('hidden'); list.innerHTML = '<p class="rounded-lg bg-slate-50 p-3 text-xs text-slate-500">Satu variasi Standar akan dibuat.</p>'; state.matrix = [{ attributes: {}, active: true, key: 'Standar' }]; $('matrix-count').textContent = '1 variasi'; return; }
+      let attributes;
+      try { attributes = parseAttributeRows(); } catch (e) { wrap.classList.add('hidden'); state.matrix = []; return; }
+      if (!attributes.length) { wrap.classList.add('hidden'); state.matrix = []; return; }
+      let combos = cartesianVariants(attributes);
+      if (combos.length > 300) { wrap.classList.remove('hidden'); list.innerHTML = '<p class="rounded-lg bg-rose-50 p-3 text-xs text-rose-600">Kombinasi lebih dari 300. Kurangi jumlah pilihan atribut.</p>'; state.matrix = []; $('matrix-count').textContent = 'Melebihi batas'; return; }
+      const existingKeys = new Set((state.product?.variants || []).map(v => variantKeyFromObject(v.attributes, attributes)));
+      const previous = new Map((state.matrix || []).map(v => [v.key, v.active]));
+      combos = combos.map(v => { const exists = existingKeys.has(variantKeyFromObject(v.attributes, attributes)); return Object.assign(v, { active: isAddMode ? (!exists && previous.get(v.key) !== false) : (previous.has(v.key) ? previous.get(v.key) : true), exists }); });
+      state.matrix = combos;
+      wrap.classList.remove('hidden'); list.innerHTML = '';
+      combos.forEach((combo, index) => {
+        const row = document.createElement('label'); row.className = 'flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-2.5';
+        const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = combo.active; cb.disabled = combo.exists; cb.className = 'h-4 w-4 accent-indigo-600';
+        cb.addEventListener('change', () => { state.matrix[index].active = cb.checked; updateMatrixCount(); });
+        const label = document.createElement('span'); label.className = 'min-w-0 flex-1 text-xs font-medium text-slate-700'; label.textContent = comboLabel(combo.attributes, attributes);
+        if (combo.exists) { const badge = document.createElement('span'); badge.className = 'text-[10px] font-semibold text-slate-400'; badge.textContent = 'Sudah ada'; row.append(cb, label, badge); }
+        else row.append(cb, label);
+        list.appendChild(row);
+      });
+      updateMatrixCount();
+    }
+
+    function updateMatrixCount() { const active = state.matrix.filter(v => v.active && !v.exists).length; const total = state.matrix.filter(v => !v.exists).length; $('matrix-count').textContent = active + ' / ' + total + ' dipilih'; }
+    function comboLabel(attrs, definitions) { if (!definitions.length) return 'Standar'; return definitions.map(d => d.name + ': ' + attrs[d.name]).join(' · '); }
+    function variantKeyFromObject(attrs, definitions) { return definitions.map(d => d.name + '=' + String(attrs[d.name] || '').toLowerCase()).join('|'); }
+
+    function openManageProductForm(product) {
+      state.formMode = 'manage'; resetFormVisibility(); showScreen('form', true);
+      $('form-title').textContent = 'Kelola Data'; $('form-subtitle').textContent = 'Perbarui produk dan status variasi'; $('form-barcode').textContent = product.barcode;
+      $('product-status-pill').classList.remove('hidden'); $('product-status-pill').textContent = product.aktif ? 'PRODUK AKTIF' : 'PRODUK NONAKTIF';
+      $('product-fields').classList.remove('hidden'); $('product-name').value = product.nama; $('product-active').checked = !!product.aktif;
+      $('variant-manage-card').classList.remove('hidden'); renderVariantManagement(product);
+      $('btn-submit-text').textContent = 'Simpan data produk'; $('btn-open-add-variants').onclick = openAddVariantsPanel;
+    }
+
+    function renderVariantManagement(product) {
+      const root = $('variant-manage-list'); root.innerHTML = '';
+      $('variant-count').textContent = product.variants.length + ' variasi';
+      product.variants.forEach(v => {
+        const row = document.createElement('div'); row.className = 'flex items-center gap-3 rounded-xl border border-slate-100 px-3 py-3';
+        const main = document.createElement('div'); main.className = 'min-w-0 flex-1';
+        const title = document.createElement('p'); title.className = 'text-xs font-semibold text-slate-800'; title.textContent = v.label || 'Standar';
+        const stock = document.createElement('p'); stock.className = 'mt-1 text-[10px] text-slate-400'; stock.textContent = stockSummary(v);
+        const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = `rounded-full px-3 py-1.5 text-[10px] font-bold ${v.active ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-500'}`; toggle.textContent = v.active ? 'Aktif' : 'Nonaktif';
+        toggle.addEventListener('click', async () => {
+          toggle.disabled = true;
+          try { const res = await apiPost({ action: 'SET_VARIANT_STATUS', barcode: product.barcode, variant_id: v.id, active: !v.active }); if (!res.success) throw new Error(res.message); const refreshed = await apiPost({ action: 'GET_PRODUCT', barcode: product.barcode, include_inactive: true }); state.product = refreshed.data; renderVariantManagement(refreshed.data); toast(res.message); }
+          catch (e) { toast(e.message || 'Gagal mengubah status variasi.', 'error'); toggle.disabled = false; }
+        });
+        main.append(title, stock); row.append(main, toggle); root.appendChild(row);
+      });
+    }
+
+    function openAddVariantsPanel() {
+      state.addVariantsMode = true; state.matrix = []; $('variant-manage-card').classList.add('hidden'); $('attribute-builder-card').classList.remove('hidden'); $('btn-open-add-variants').classList.add('hidden'); $('btn-cancel-add-variants').classList.remove('hidden'); $('btn-submit-text').textContent = 'Simpan variasi baru';
+      $('simple-product').checked = false; $('simple-product').disabled = !!((state.product.attributeDefinitions || []).length || state.product.variants.length); $('attribute-list').innerHTML = ''; $('attribute-list').classList.remove('hidden'); $('btn-add-attribute').classList.remove('hidden');
+      const defs = state.product.attributeDefinitions || [];
+      if (defs.length) defs.forEach(d => {
+        const raw = d.values.map(v => d.type === 'color' ? v.value + ':' + v.hex : v.value).join(', ');
+        addAttributeRow({ name: d.name, type: d.type, raw });
+      });
+      else addAttributeRow({ name: 'Warna', type: 'color', raw: '' });
+      buildMatrixPreview(true);
+    }
+
+    function cancelAddVariants() {
+      state.addVariantsMode = false; $('attribute-builder-card').classList.add('hidden'); $('variant-manage-card').classList.remove('hidden'); $('btn-open-add-variants').classList.remove('hidden'); $('btn-cancel-add-variants').classList.add('hidden'); $('btn-submit-text').textContent = 'Simpan data produk'; $('simple-product').disabled = false;
+    }
+
+    $('main-form').addEventListener('submit', async event => {
+      event.preventDefault();
+      const button = $('btn-submit'); if (button.disabled) return;
+      if (state.formMode === 'create') {
+        try {
+          const attributes = $('simple-product').checked ? [] : parseAttributeRows();
+          const variants = state.matrix.filter(v => v.active && !v.exists).map(v => ({ attributes: v.attributes, active: true }));
+          if (!variants.length) throw new Error('Pilih minimal satu kombinasi variasi.');
+          if (attributes.length === 0 && !$('simple-product').checked) throw new Error('Tambahkan atribut atau pilih Produk tanpa pilihan variasi.');
+          const payload = { action: 'CREATE_PRODUCT', transaction_id: newTransactionId(), barcode: state.barcode, nama: $('product-name').value.trim(), status_aktif: $('product-active').checked, attributes, variants };
+          if (!$('product-name').value.trim()) throw new Error('Nama produk wajib diisi.');
+          await submitPayload(payload, 'scan');
+        } catch (e) { toast(e.message, 'error'); }
+        return;
+      }
+      if (state.formMode === 'manage' && state.addVariantsMode) {
+        try {
+          const attributes = parseAttributeRows();
+          const variants = state.matrix.filter(v => v.active && !v.exists).map(v => ({ attributes: v.attributes, active: true }));
+          if (!variants.length) throw new Error('Pilih minimal satu kombinasi variasi baru.');
+          await submitPayload({ action: 'ADD_VARIANTS', transaction_id: newTransactionId(), barcode: state.barcode, attributes, variants }, 'scan');
+        } catch (e) { toast(e.message, 'error'); }
+        return;
+      }
+      if (state.formMode === 'manage') {
+        const name = $('product-name').value.trim(); if (name.length < 2) return toast('Nama produk minimal 2 karakter.', 'error');
+        await submitPayload({ action: 'UPDATE_PRODUCT', transaction_id: newTransactionId(), barcode: state.barcode, nama: name, status_aktif: $('product-active').checked }, 'scan');
+        return;
+      }
+      const activity = ACTIVITIES[state.key];
+      if (!state.selectedVariant) return toast('Pilih variasi produk terlebih dahulu.', 'error');
+      if (activity.fields.includes('from') && !state.locationFrom) return toast('Pilih lokasi asal.', 'error');
+      if (activity.fields.includes('to') && !state.locationTo) return toast('Pilih lokasi tujuan.', 'error');
+      const qtyRaw = $('qty-input').value; const qty = Number(qtyRaw);
+      if (qtyRaw === '' || !Number.isInteger(qty) || qty < activity.min) return toast('Kuantitas tidak valid.', 'error');
+      await submitPayload({ action: 'SAVE_TRANSACTION', transaction_id: state.trxId || newTransactionId(), activity: activity.value, barcode: state.barcode, variant_id: state.selectedVariant.id, location_from: state.locationFrom, location_to: state.locationTo, qty }, 'scan');
+    });
+
+    async function submitPayload(payload, returnScreen) {
+      const button = $('btn-submit'); button.disabled = true; $('btn-submit-text').textContent = 'Menyimpan...';
+      try {
+        const result = await apiPost(payload);
+        if (!result.success) throw new Error(result.message || 'Data gagal disimpan.');
+        toast(result.message || 'Berhasil disimpan.'); state.trxId = null; await stopScanner(); history.back();
+      } catch (error) {
+        console.error(error); state.trxId = payload.transaction_id; toast(error.message || 'Gagal menghubungi server.', 'error');
+      } finally {
+        button.disabled = false;
+        if (state.formMode === 'create') $('btn-submit-text').textContent = 'Daftarkan produk';
+        else if (state.formMode === 'manage' && state.addVariantsMode) $('btn-submit-text').textContent = 'Simpan variasi baru';
+        else if (state.formMode === 'manage') $('btn-submit-text').textContent = 'Simpan data produk';
+        else $('btn-submit-text').textContent = 'Simpan transaksi';
+      }
+    }
+
+    function newTransactionId() { return 'TRX-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7).toUpperCase(); }
+
+    $('btn-cancel-scan').addEventListener('click', navigateBack);
+    $('btn-back').addEventListener('click', navigateBack);
+    $('btn-manual-toggle').addEventListener('click', () => { const form = $('manual-form'); const open = form.classList.contains('hidden'); form.classList.toggle('hidden', !open); form.classList.toggle('flex', open); if (open) $('manual-barcode').focus(); });
+    $('manual-form').addEventListener('submit', async event => { event.preventDefault(); const value = $('manual-barcode').value.trim(); if (!value) return; await stopScanner(); await processBarcode(value); });
+    $('btn-add-attribute').addEventListener('click', () => addAttributeRow({ name: '', type: 'text', raw: '' }));
+    $('simple-product').addEventListener('change', () => { const simple = $('simple-product').checked; $('attribute-list').classList.toggle('hidden', simple); $('btn-add-attribute').classList.toggle('hidden', simple); buildMatrixPreview(state.addVariantsMode); });
+    $('btn-cancel-add-variants').addEventListener('click', cancelAddVariants);
 
     renderActivities();
-    show('home', false);
+    showScreen('home', false);
+    history.replaceState({ app: true, screen: 'home' }, '', '#home');
 
-    // PWA Auto Update Trigger Listener
+    // PWA update + install controls. Keep service-worker registration from the existing app.
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then((reg) => {
+        navigator.serviceWorker.register('sw.js').then(reg => {
           reg.addEventListener('updatefound', () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                toast('Versi terbaru diunduh. Memuat ulang aplikasi...', 'success');
-                setTimeout(() => window.location.reload(), 2000);
-              }
-            });
+            const worker = reg.installing;
+            if (!worker) return;
+            worker.addEventListener('statechange', () => { if (worker.state === 'installed' && navigator.serviceWorker.controller) { toast('Versi terbaru tersedia. Memuat ulang aplikasi.'); setTimeout(() => location.reload(), 1200); } });
           });
-        });
+        }).catch(err => console.warn('Service worker:', err));
       });
-
-      let refreshing;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-      });
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => { if (refreshing) return; refreshing = true; location.reload(); });
     }
-
     let deferredInstall = null;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredInstall = e; if (!isStandalone) $('btn-install').classList.remove('hidden');
-    });
-    $('btn-install').addEventListener('click', async () => {
-      if (!deferredInstall) return; deferredInstall.prompt(); const choice = await deferredInstall.userChoice;
-      if (choice && choice.outcome === 'accepted') { $('btn-install').classList.add('hidden'); }
-      deferredInstall = null;
-    });
+    const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+    window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); deferredInstall = event; if (!standalone) $('btn-install').classList.remove('hidden'); });
+    $('btn-install').addEventListener('click', async () => { if (!deferredInstall) return; deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; $('btn-install').classList.add('hidden'); });
     window.addEventListener('appinstalled', () => { $('btn-install').classList.add('hidden'); toast('Aplikasi berhasil dipasang.'); });
-    if (/iphone|ipad|ipod/i.test(navigator.userAgent) && !isStandalone) { $('ios-hint').classList.remove('hidden'); }
   </script>
 </body>
 
