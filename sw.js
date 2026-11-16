@@ -1,67 +1,91 @@
-// Naikkan versi ini setiap kali Anda mengubah kode secara besar (contoh: v3, v4)
-const CACHE = 'ina-warehouse-v3';
+// Ina Basic Store - Service Worker
+// Naikkan CACHE_NAME setiap kali file shell berubah.
+const CACHE_NAME = 'ina-warehouse-v6';
+
+// File milik sendiri. Satu file hilang TIDAK boleh menggagalkan instalasi.
 const SHELL = [
-  './',
-  'index.html',
-  'manifest.webmanifest',
-  'logo.png',
-  'logo-192.png',
-  'logo-512.png'
+    './',
+    './index.html',
+    './penjahit.html',
+    './manifest.webmanifest',
+    './manifest-penjahit.webmanifest',
+    './logo.png',
+    './logo-192.png',
+    './logo-512.png'
 ];
 const CDN = [
-  'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
+    'https://cdn.tailwindcss.com',
+    'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
 ];
 
-self.addEventListener('install', (e) => {
-  // PENTING: Langsung paksa service worker baru untuk aktif (skip waiting)
-  self.skipWaiting();
-  e.waitUntil((async () => {
-    const c = await caches.open(CACHE);
-    await Promise.all(SHELL.map((u) => c.add(u).catch((err) => console.warn('Cache warning:', u, err))));
-    await Promise.all(CDN.map((u) =>
-      fetch(u, { mode: 'no-cors' }).then((r) => c.put(u, r)).catch(() => { })
-    ));
-  })());
+self.addEventListener('install', (event) => {
+    // Tidak memanggil skipWaiting() otomatis. Versi baru menunggu sampai
+    // halaman mengirim pesan SKIP_WAITING agar input yang sedang berjalan tidak terputus.
+    event.waitUntil((async () => {
+        const cache = await caches.open(CACHE_NAME);
+        await Promise.all(SHELL.map((url) =>
+            cache.add(url).catch((err) => console.warn('SW: gagal cache', url, err && err.message))
+        ));
+        await Promise.all(CDN.map((url) =>
+            fetch(url, { mode: 'no-cors' }).then((res) => cache.put(url, res)).catch(() => { })
+        ));
+    })());
 });
 
-self.addEventListener('activate', (e) => {
-  // Langsung ambil alih kontrol client
-  e.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
-    await self.clients.claim();
-  })());
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
-self.addEventListener('fetch', (e) => {
-  const req = e.request;
-  if (req.method !== 'GET') return;
-  const host = new URL(req.url).hostname;
-  if (host.endsWith('script.google.com') || host.endsWith('googleusercontent.com')) return;
+self.addEventListener('activate', (event) => {
+    event.waitUntil((async () => {
+        const keys = await caches.keys();
+        await Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)));
+        await self.clients.claim();
+    })());
+});
 
-  // Stale-While-Revalidate untuk halaman utama. 
-  // Akan selalu menampilkan halaman cepat, lalu mendownload pembaruan di latar belakang
-  if (req.mode === 'navigate' || req.headers.get('accept').includes('text/html')) {
-    e.respondWith(
-      fetch(req)
-        .then((res) => {
-          const copy = res.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-          return res;
-        })
-        .catch(() => caches.match(req))
+self.addEventListener('fetch', (event) => {
+    const req = event.request;
+    if (req.method !== 'GET') return;
+
+    const url = new URL(req.url);
+    // Jangan pernah mencegat atau menyimpan respons Apps Script (data transaksi).
+    if (url.hostname.endsWith('script.google.com') || url.hostname.endsWith('googleusercontent.com')) return;
+
+    const accept = req.headers.get('accept') || '';
+    const isPage = req.mode === 'navigate' || accept.indexOf('text/html') !== -1;
+
+    // Pustaka CDN: cache dulu, ambil jaringan bila belum ada.
+    if (url.origin !== self.location.origin) {
+        event.respondWith(
+            caches.match(req).then((hit) => hit || fetch(req).then((res) => {
+                if (res && (res.ok || res.type === 'opaque')) {
+                    const copy = res.clone();
+                    caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+                }
+                return res;
+            }))
+        );
+        return;
+    }
+
+    // File milik sendiri: jaringan dulu, cache sebagai cadangan offline.
+    event.respondWith(
+        fetch(req)
+            .then((res) => {
+                if (res && res.status === 200 && res.type === 'basic') {
+                    const copy = res.clone();
+                    caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+                }
+                return res;
+            })
+            .catch(() => caches.match(req).then((hit) => {
+                if (hit) return hit;
+                if (isPage) {
+                    const fallback = url.pathname.includes('penjahit') ? './penjahit.html' : './index.html';
+                    return caches.match(fallback);
+                }
+                return undefined;
+            }))
     );
-    return;
-  }
-
-  e.respondWith(
-    caches.match(req).then((hit) => hit || fetch(req).then((res) => {
-      if (res && (res.ok || res.type === 'opaque')) {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(req, copy));
-      }
-      return res;
-    }))
-  );
 });

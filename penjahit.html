@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest-penjahit.webmanifest">
+  <link rel="icon" type="image/png" href="logo-192.png">
+  <link rel="apple-touch-icon" href="logo-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mitra Jahit">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Mitra Jahit · Ina Basic Store</title>
+  <script>
+    window.__deferredInstall = null;
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      window.__deferredInstall = e;
+      var btn = document.getElementById('btn-install');
+      if (btn) {
+        btn.classList.remove('hidden');
+        btn.classList.add('inline-flex');
+      }
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      overscroll-behavior-y: contain;
+    }
+
+    .screen-enter {
+      animation: slideUp .18s ease-out both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .toast-item {
+      animation: toastIn .2s ease-out both;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(-8px) scale(.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+    }
+
+    .choice-btn {
+      transition: all .14s ease;
+    }
+
+    .choice-btn.active {
+      background-color: #4f46e5;
+      border-color: #4f46e5;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, .24);
+    }
+
+    .safe-bottom {
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
+  <!-- Overlay & Banner Validasi Loading (Anti-Double Klik) -->
+  <div id="global-lock-overlay"
+    style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
+    <div
+      style="background:#fff; padding:20px 28px; border-radius:14px; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.2); max-width:300px;">
+      <div class="spinner"
+        style="width:32px; height:32px; border:4px solid #e2e8f0; border-top-color:#4f46e5; border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 12px;">
+      </div>
+      <div id="lock-message" style="font-weight:700; color:#0f172a; font-size:14px;">Memproses data...</div>
+      <div style="font-size:12px; color:#64748b; margin-top:4px;">Mohon tunggu, jangan tutup halaman</div>
+    </div>
+  </div>
+
+  <div class="mx-auto flex min-h-screen max-w-md flex-col bg-slate-100">
+    <!-- Header -->
+    <header class="app-header px-5 pb-5 pt-12 text-white" style="padding-top:max(3rem,env(safe-area-inset-top));">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 ring-1 ring-white/20">
+            <img src="logo.png" alt="Ina Basic Store" class="h-7 w-7 rounded-lg object-contain"
+              onerror="this.style.display='none'">
+          </div>
+          <div>
+            <p class="text-[10px] font-semibold uppercase tracking-[.18em] text-slate-400">Ina Basic Store</p>
+            <h1 class="text-base font-bold leading-tight">Mitra Jahit · Input Stok</h1>
+          </div>
+        </div>
+        <button id="btn-install" type="button"
+          class="hidden items-center gap-1.5 rounded-full bg-indigo-500 px-3.5 py-2 text-xs font-semibold text-white shadow-lg transition active:scale-95">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+          </svg>
+          <span>Install</span>
+        </button>
+      </div>
+      <div class="mt-4 flex items-center gap-2">
+        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+        <span id="header-label" class="text-xs font-medium text-slate-400">Pilih kategori & catat hasil jahitan</span>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 py-5 safe-bottom">
+      <section id="section-lapor" class="screen-enter">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Form Hasil Jahitan</h2>
+          <span id="kategori-count-badge"
+            class="rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold text-slate-500">MEMUAT DATA</span>
+        </div>
+
+        <form id="form-lapor" class="space-y-3" novalidate>
+          <!-- Card 1: Scan QR SKU & Pilihan Variasi Master Tailor -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+            <div>
+              <div class="mb-1.5 flex items-center justify-between">
+                <label for="lapor-kategori-select"
+                  class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">SKU / Produk Jahit
+                  (Master Tailor)</label>
+                <button type="button" id="btn-refresh-data"
+                  class="text-xs font-semibold text-indigo-600 transition active:opacity-70">Muat ulang</button>
+              </div>
+
+              <!-- Tombol Scan QR Code SKU Gudang -->
+              <button type="button" id="btn-scan-kategori"
+                class="mb-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-3 text-xs font-bold text-indigo-700 transition active:scale-[.98]">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path
+                    d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                  <rect x="7" y="7" width="10" height="10" rx="1.5" />
+                </svg>
+                <span id="btn-scan-label">Scan QR Code SKU</span>
+              </button>
+
+              <!-- Viewport Kamera Scanner -->
+              <div id="scanner-container"
+                class="mb-2.5 hidden overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
+                <div id="qr-reader" class="w-full"></div>
+                <div class="flex items-center justify-between bg-slate-900 px-3 py-2 text-[11px] text-slate-300">
+                  <span>Arahkan kamera ke QR Code SKU</span>
+                  <button type="button" id="btn-stop-scan" class="font-bold text-rose-400">Tutup Kamera</button>
+                </div>
+              </div>
+
+              <!-- Pilihan Produk Jahit dari Master Tailor -->
+              <select id="lapor-kategori-select"
+                class="input-field w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-bold text-slate-800">
+                <option value="">Memuat daftar produk...</option>
+              </select>
+
+              <!-- Input SKU Manual (Cadangan) -->
+              <div id="manual-barcode-wrap" class="mt-2 hidden flex gap-2">
+                <input id="lapor-barcode-manual" type="text"
+                  class="input-field flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-800 uppercase"
+                  placeholder="Ketik kode SKU..." autocomplete="off">
+                <button type="button" id="btn-cari-barcode"
+                  class="rounded-xl bg-slate-800 px-3.5 py-2.5 text-xs font-bold text-white transition active:scale-95">Cek
+                  SKU</button>
+              </div>
+
+              <!-- Banner Hasil Validasi QR Code SKU terhadap MASTER_TAILOR -->
+              <div id="sku-validation-banner" class="mt-2.5 hidden rounded-xl border px-3 py-2.5 text-xs">
+                <p id="sku-validation-title" class="font-bold"></p>
+                <p id="sku-validation-desc" class="mt-0.5 text-[11px]"></p>
+              </div>
+            </div>
+
+            <!-- Pemilih Variasi Master Tailor: Warna & Ukuran -->
+            <div id="variasi-picker-wrap" class="hidden border-t border-slate-100 pt-3 space-y-3">
+              <div>
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih
+                  Warna (Master Tailor)</label>
+                <div id="warna-choices" class="flex flex-wrap gap-2"></div>
+              </div>
+
+              <div>
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih
+                  Ukuran (Master Tailor)</label>
+                <div id="ukuran-choices" class="flex flex-wrap gap-2"></div>
+              </div>
+
+              <div id="selected-item-banner"
+                class="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2.5 text-xs text-emerald-900">
+                <p id="selected-item-title" class="font-bold text-emerald-900">Item terpilih: -</p>
+                <p id="selected-item-stock" class="mt-0.5 text-[11px] font-semibold text-emerald-700">Stok tersedia di
+                  Stock Tailor: 0 pcs</p>
+              </div>
+            </div>
+
+            <div class="border-t border-slate-100 pt-3">
+              <label for="lapor-nama"
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Penjahit /
+                Tim</label>
+              <input id="lapor-nama" type="text"
+                class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm font-medium text-slate-800"
+                placeholder="Ketik nama Anda atau tim..." autocomplete="name" required>
+            </div>
+          </div>
+
+          <!-- Card 2: Kuantitas Hasil Jahitan -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div class="mb-3">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Hasil Produksi</p>
+              <h3 class="mt-0.5 text-sm font-bold text-slate-800">Jumlah Jahitan Selesai</h3>
+            </div>
+
+            <div>
+              <label for="lapor-qty"
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Jumlah Pcs
+                Selesai</label>
+              <input id="lapor-qty" type="number" inputmode="numeric" min="1" step="1"
+                class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-3 text-center text-2xl font-bold text-emerald-800"
+                placeholder="0" required>
+            </div>
+
+            <div id="lapor-summary-box"
+              class="mt-3 flex items-center justify-between rounded-xl bg-indigo-50 px-3 py-2.5 text-xs text-indigo-900">
+              <span class="font-semibold text-indigo-600">Saldo Ditambahkan</span>
+              <span id="lapor-total-text" class="font-bold">0 pcs ke stok penjahit</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button id="btn-submit-lapor" type="submit"
+            class="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition active:scale-[.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
+            <span id="btn-submit-text">Simpan Stok Jahitan</span>
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="m5 12 4 4L19 6" />
+            </svg>
+          </button>
+        </form>
+
+        <!-- Info Card -->
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+          <div class="flex items-start gap-3">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m5 12 4 4L19 6" />
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+            </span>
+            <div>
+              <p class="text-sm font-semibold">Alur Gudang Penjahit & Upah</p>
+              <p class="mt-1 text-xs leading-relaxed text-slate-500">Scan QR Code SKU produk jahit untuk memvalidasi ke
+                Master Tailor, pilih variasi warna & ukuran yang tersedia, lalu catat hasil jahitan ke Stock Tailor.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ringkasan Stok Tersedia di Stock Tailor -->
+        <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="mb-2.5 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Stock Tailor Aktif</p>
+              <h3 class="text-xs font-bold text-slate-800">Saldo Jahitan Siap Setor</h3>
+            </div>
+            <span id="tailor-active-stock-badge"
+              class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">0 PCS</span>
+          </div>
+          <div id="tailor-active-stock-list" class="space-y-2 text-xs">
+            <p class="py-2 text-center text-slate-400">Belum ada stok berjalan di penjahit.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="toast-root" class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4"
+    aria-live="polite"></div>
+
+  <script>
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec';
+    const CACHE_STORAGE_KEY = 'IBS_TAILOR_CACHE_V6_0';
+    const TAILOR_NAME_KEY = 'IBS_LAST_TAILOR_NAME';
+
+    let isMutating = false;   // Kunci mutlak saat POST / simpan data
+    let isFetching = false;   // Mencegah fetch menumpuk
+    let isUserTyping = false; // Jeda auto-reload saat user mengisi form
+
+    let MASTER_TAILOR_LIST = [];
+    let STOK_TAILOR_LIST = [];
+    let selectedBarcodeKategori = '';
+    let selectedWarna = '';
+    let selectedUkuran = '';
+    let selectedTailorRecord = null;
+    let html5QrScanner = null;
+    let isScannerRunning = false;
+
+    const $ = id => document.getElementById(id);
+
+    // Deteksi otomatis jika user sedang mengetik di input/select/textarea
+    document.addEventListener('focusin', (e) => {
+      if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) {
+        isUserTyping = true;
+      }
+    });
+    document.addEventListener('focusout', () => {
+      setTimeout(() => { isUserTyping = false; }, 1500);
+    });
+
+    function toast(message, type = 'success') {
+      const el = document.createElement('div');
+      el.className = `toast-item pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium text-white shadow-xl ${type === 'success' ? 'bg-slate-900' : 'bg-rose-600'}`;
+      const mark = document.createElement('span');
+      mark.className = `flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${type === 'success' ? 'bg-emerald-500' : 'bg-rose-400'}`;
+      mark.textContent = type === 'success' ? '✓' : '×';
+      const text = document.createElement('span');
+      text.className = 'flex-1';
+      text.textContent = message;
+      el.append(mark, text);
+      $('toast-root').appendChild(el);
+      setTimeout(() => el.remove(), 3500);
+    }
+
+    function updateTotalPreview() {
+      const qty = parseInt($('lapor-qty').value) || 0;
+      $('lapor-total-text').textContent = `${qty} pcs ke stok penjahit`;
+    }
+
+    $('lapor-qty').addEventListener('input', updateTotalPreview);
+
+    // 1. VALIDASI LOADING & ANTI-DOUBLE SUBMIT UNTUK SEMUA AKSI SIMPAN (POST)
+    async function submitWithLock(action, payload, btnElement, loadingText = 'Menyimpan ke server...') {
+      if (isMutating) {
+        toast('Proses sebelumnya masih berjalan. Harap tunggu hingga selesai.', 'error');
+        return null;
+      }
+
+      isMutating = true;
+      const overlay = $('global-lock-overlay');
+      const msgEl = $('lock-message');
+      const origBtnHtml = btnElement ? btnElement.innerHTML : '';
+
+      if (msgEl) msgEl.textContent = loadingText;
+      if (overlay) overlay.style.display = 'flex';
+      if (btnElement) {
+        btnElement.disabled = true;
+        btnElement.innerHTML = '⏳ Memproses...';
+      }
+
+      try {
+        const res = await fetch(GAS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action, ...payload })
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.message || 'Gagal memproses data');
+
+        // Segera muat ulang data terbaru setelah simpan sukses
+        await syncAppData(true);
+        return json;
+      } catch (err) {
+        toast('Gagal: ' + err.message, 'error');
+        return null;
+      } finally {
+        isMutating = false;
+        if (overlay) overlay.style.display = 'none';
+        if (btnElement) {
+          btnElement.disabled = false;
+          btnElement.innerHTML = origBtnHtml;
+        }
+      }
+    }
+
+    // 2. RENDER PRODUK & VARIASI DARI MASTER_TAILOR (BARANG MENTAH / BELUM SIAP JUAL)
+    function renderAppState(data) {
+      if (!data) return;
+      const list = Array.isArray(data.master_tailor) ? data.master_tailor : [];
+      MASTER_TAILOR_LIST = list.filter(it => it.status_aktif !== false);
+      STOK_TAILOR_LIST = Array.isArray(data.stok_tailor) ? data.stok_tailor : [];
+
+      const sel = $('lapor-kategori-select');
+      const badge = $('kategori-count-badge');
+      const currentSelected = selectedBarcodeKategori || sel.value;
+
+      // Kelompokkan produk unik berdasarkan Barcode_Kategori di MASTER_TAILOR
+      const uniqueMap = new Map();
+      MASTER_TAILOR_LIST.forEach(item => {
+        const key = String(item.barcode_kategori || '').trim();
+        if (key && !uniqueMap.has(key)) {
+          uniqueMap.set(key, item.nama_kategori || key);
+        }
+      });
+
+      sel.innerHTML = '<option value="">-- Pilih atau Scan QR SKU --</option>';
+      uniqueMap.forEach((namaKat, barcodeKat) => {
+        const opt = document.createElement('option');
+        opt.value = barcodeKat;
+        opt.textContent = `${namaKat} (${barcodeKat})`;
+        sel.appendChild(opt);
+      });
+
+      const optManual = document.createElement('option');
+      optManual.value = '__MANUAL__';
+      optManual.textContent = '+ Ketik SKU Manual';
+      sel.appendChild(optManual);
+
+      badge.textContent = `${uniqueMap.size} SKU TAILOR`;
+      if (!uniqueMap.size) {
+        badge.textContent = 'BELUM ADA SKU';
+      }
+
+      if (currentSelected && uniqueMap.has(currentSelected)) {
+        sel.value = currentSelected;
+        selectCategoryByBarcode(currentSelected, false);
+      }
+
+      renderTailorActiveStockList();
+    }
+
+    function renderTailorActiveStockList() {
+      const container = $('tailor-active-stock-list');
+      const badge = $('tailor-active-stock-badge');
+      if (!container || !badge) return;
+
+      const filterSku = selectedBarcodeKategori ? selectedBarcodeKategori.toUpperCase() : '';
+      const filterName = $('lapor-nama').value.trim().toUpperCase();
+
+      let filtered = STOK_TAILOR_LIST.filter(it => (Number(it.stok_ready) || 0) > 0);
+      if (filterSku) {
+        filtered = filtered.filter(it => String(it.barcode_kategori || '').toUpperCase() === filterSku);
+      }
+      if (filterName) {
+        const byName = filtered.filter(it => String(it.nama_penjahit || '').toUpperCase().includes(filterName));
+        if (byName.length > 0) filtered = byName;
+      }
+
+      const totalPcs = filtered.reduce((sum, it) => sum + (Number(it.stok_ready) || 0), 0);
+      badge.textContent = `${totalPcs.toLocaleString('id-ID')} PCS`;
+
+      if (!filtered.length) {
+        container.innerHTML = `<p class="py-2 text-center text-slate-400">${filterSku ? 'Belum ada stok berjalan untuk SKU ' + filterSku + '.' : 'Belum ada stok berjalan di Stock Tailor.'}</p>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(it => `
+        <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+          <div class="min-w-0 flex-1 pr-2">
+            <p class="truncate font-bold text-slate-800">${it.nama_kategori} · <span class="text-indigo-700">${it.warna} · ${it.ukuran}</span></p>
+            <p class="text-[11px] text-slate-500">Penjahit: <span class="font-semibold text-slate-700">${it.nama_penjahit}</span> · <span class="font-mono">${it.barcode_kategori}</span></p>
+          </div>
+          <span class="shrink-0 rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800">${Number(it.stok_ready).toLocaleString('id-ID')} pcs</span>
+        </div>
+      `).join('');
+    }
+
+    function showSkuValidationBanner(isValid, title, desc) {
+      const banner = $('sku-validation-banner');
+      const titleEl = $('sku-validation-title');
+      const descEl = $('sku-validation-desc');
+      if (!banner) return;
+
+      banner.classList.remove('hidden', 'border-emerald-200', 'bg-emerald-50', 'text-emerald-900', 'border-rose-200', 'bg-rose-50', 'text-rose-900');
+      if (isValid) {
+        banner.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-900');
+      } else {
+        banner.classList.add('border-rose-200', 'bg-rose-50', 'text-rose-900');
+      }
+      titleEl.textContent = title;
+      descEl.textContent = desc;
+    }
+
+    function hideSkuValidationBanner() {
+      const banner = $('sku-validation-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    function extractSkuFromQr(rawText) {
+      const raw = String(rawText || '').trim();
+      if (!raw) return '';
+      try {
+        if (/^https?:\/\//i.test(raw)) {
+          const u = new URL(raw);
+          const param = u.searchParams.get('sku') ||
+            u.searchParams.get('barcode') ||
+            u.searchParams.get('produk') ||
+            u.searchParams.get('kategori');
+          if (param) return param.trim();
+        }
+      } catch (e) { }
+      return raw;
+    }
+
+    async function validateAndSelectSku(barcodeInput, notify = true) {
+      const code = extractSkuFromQr(barcodeInput);
+      if (!code || code === '__MANUAL__') {
+        hideSkuValidationBanner();
+        return selectCategoryByBarcode('', false);
+      }
+
+      // Cek di cache MASTER_TAILOR lokal dulu
+      let matches = MASTER_TAILOR_LIST.filter(
+        it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+      );
+
+      // Jika tidak ketemu di cache lokal, validasi langsung ke endpoint GET_TAILOR_SKU (Master Tailor)
+      if (!matches.length) {
+        try {
+          const res = await fetch(`${GAS_URL}?action=GET_TAILOR_SKU&sku=${encodeURIComponent(code)}&_t=${Date.now()}`);
+          const json = await res.json();
+          if (json.success && json.data && Array.isArray(json.data.variants) && json.data.variants.length) {
+            json.data.variants.forEach(v => {
+              const exists = MASTER_TAILOR_LIST.some(m => m.id_tailor === v.id_tailor);
+              if (!exists) {
+                MASTER_TAILOR_LIST.push(v);
+              }
+            });
+            renderAppState({ master_tailor: MASTER_TAILOR_LIST, stok_tailor: STOK_TAILOR_LIST });
+            matches = MASTER_TAILOR_LIST.filter(
+              it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+            );
+          }
+        } catch (err) {
+          console.warn('Gagal cek SKU ke server:', err);
+        }
+      }
+
+      return selectCategoryByBarcode(code, notify);
+    }
+
+    function selectCategoryByBarcode(barcodeInput, notify = true) {
+      const code = extractSkuFromQr(barcodeInput);
+      const wrap = $('variasi-picker-wrap');
+
+      if (!code || code === '__MANUAL__') {
+        selectedBarcodeKategori = '';
+        selectedWarna = '';
+        selectedUkuran = '';
+        selectedTailorRecord = null;
+        wrap.classList.add('hidden');
+        hideSkuValidationBanner();
+        renderTailorActiveStockList();
+        return false;
+      }
+
+      // Validasi SKU HANYA terhadap MASTER_TAILOR (bukan MASTER_PRODUK)
+      const matches = MASTER_TAILOR_LIST.filter(
+        it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+      );
+
+      if (!matches.length) {
+        selectedBarcodeKategori = '';
+        selectedWarna = '';
+        selectedUkuran = '';
+        selectedTailorRecord = null;
+        wrap.classList.add('hidden');
+        showSkuValidationBanner(
+          false,
+          `Validasi Gagal: SKU "${code}" Tidak Terdaftar`,
+          'SKU ini tidak ditemukan atau nonaktif di Master Tailor. Pastikan QR Code sesuai SKU barang jahit.'
+        );
+        renderTailorActiveStockList();
+        if (notify) {
+          toast(`Validasi Gagal: SKU "${code}" tidak ada di Master Tailor.`, 'error');
+        }
+        return false;
+      }
+
+      const resolvedBarcode = String(matches[0].barcode_kategori).trim();
+      selectedBarcodeKategori = resolvedBarcode;
+      $('lapor-kategori-select').value = resolvedBarcode;
+      $('manual-barcode-wrap').classList.add('hidden');
+
+      const colors = [...new Set(matches.map(m => String(m.warna || '-').trim()))];
+      if (!colors.includes(selectedWarna)) {
+        selectedWarna = colors[0] || '-';
+      }
+
+      showSkuValidationBanner(
+        true,
+        `SKU Tervalidasi: ${matches[0].nama_kategori} (${resolvedBarcode})`,
+        `Ditemukan ${matches.length} variasi aktif di Master Tailor. Pilih warna & ukuran di bawah.`
+      );
+
+      renderVariationChoices(matches);
+      wrap.classList.remove('hidden');
+      renderTailorActiveStockList();
+
+      if (notify) {
+        toast(`SKU Tervalidasi: ${matches[0].nama_kategori} (${resolvedBarcode})`);
+      }
+      return true;
+    }
+
+    function getStockReadyForTailorId(idTailor) {
+      const tailorName = $('lapor-nama').value.trim().toUpperCase();
+      const matchingStok = STOK_TAILOR_LIST.filter(s => String(s.id_tailor) === String(idTailor));
+      const totalAll = matchingStok.reduce((sum, s) => sum + (Number(s.stok_ready) || 0), 0);
+      const personal = tailorName
+        ? matchingStok
+          .filter(s => String(s.nama_penjahit || '').toUpperCase() === tailorName)
+          .reduce((sum, s) => sum + (Number(s.stok_ready) || 0), 0)
+        : 0;
+      return { totalAll, personal };
+    }
+
+    function renderVariationChoices(categoryItems) {
+      const warnaBox = $('warna-choices');
+      const ukuranBox = $('ukuran-choices');
+      warnaBox.innerHTML = '';
+      ukuranBox.innerHTML = '';
+
+      const colors = [...new Set(categoryItems.map(m => String(m.warna || '-').trim()))];
+      if (!colors.includes(selectedWarna)) {
+        selectedWarna = colors[0] || '-';
+      }
+
+      colors.forEach(warna => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `choice-btn rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 ${selectedWarna === warna ? 'active' : ''}`;
+        btn.textContent = warna;
+        btn.addEventListener('click', () => {
+          selectedWarna = warna;
+          renderVariationChoices(categoryItems);
+        });
+        warnaBox.appendChild(btn);
+      });
+
+      const itemsForColor = categoryItems.filter(m => String(m.warna || '-').trim() === selectedWarna);
+      const uniqueSizes = [...new Set(itemsForColor.map(m => String(m.ukuran || '-').trim()))];
+
+      if (!uniqueSizes.includes(selectedUkuran)) {
+        selectedUkuran = uniqueSizes[0] || '-';
+      }
+
+      uniqueSizes.forEach(ukuran => {
+        const rec = itemsForColor.find(m => String(m.ukuran || '-').trim() === ukuran);
+        const stInfo = rec ? getStockReadyForTailorId(rec.id_tailor) : { totalAll: 0, personal: 0 };
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `choice-btn rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-bold text-slate-700 ${selectedUkuran === ukuran ? 'active' : ''}`;
+        btn.textContent = stInfo.totalAll > 0 ? `${ukuran} (${stInfo.totalAll})` : ukuran;
+        btn.addEventListener('click', () => {
+          selectedUkuran = ukuran;
+          renderVariationChoices(categoryItems);
+        });
+        ukuranBox.appendChild(btn);
+      });
+
+      selectedTailorRecord = categoryItems.find(
+        m => String(m.warna || '-').trim() === selectedWarna &&
+          String(m.ukuran || '-').trim() === selectedUkuran
+      ) || null;
+
+      const titleEl = $('selected-item-title');
+      const stockEl = $('selected-item-stock');
+      if (selectedTailorRecord) {
+        const stInfo = getStockReadyForTailorId(selectedTailorRecord.id_tailor);
+        titleEl.textContent = `Item terpilih: ${selectedTailorRecord.nama_kategori} · ${selectedWarna} · ${selectedUkuran}`;
+        stockEl.textContent = stInfo.personal > 0
+          ? `Saldo Stock Tailor Anda: ${stInfo.personal} pcs (Total semua penjahit: ${stInfo.totalAll} pcs)`
+          : `Saldo di Stock Tailor saat ini: ${stInfo.totalAll} pcs`;
+      } else {
+        titleEl.textContent = 'Kombinasi variasi tidak tersedia di Master Tailor.';
+        stockEl.textContent = '-';
+      }
+    }
+
+    // 3. KONTROL KAMERA SCANNER QR CODE SKU
+    async function startCategoryScanner() {
+      if (typeof Html5Qrcode === 'undefined') {
+        toast('Pustaka kamera belum siap, silakan pilih dari daftar atau ketik SKU manual.', 'error');
+        return;
+      }
+      const container = $('scanner-container');
+      container.classList.remove('hidden');
+
+      if (isScannerRunning) return;
+      try {
+        if (!html5QrScanner) {
+          html5QrScanner = new Html5Qrcode('qr-reader');
+        }
+        isScannerRunning = true;
+        $('btn-scan-label').textContent = 'Kamera Aktif...';
+        await html5QrScanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 140 } },
+          async (decodedText) => {
+            await stopCategoryScanner();
+            await validateAndSelectSku(decodedText, true);
+          },
+          () => { }
+        );
+      } catch (err) {
+        isScannerRunning = false;
+        container.classList.add('hidden');
+        $('btn-scan-label').textContent = 'Scan QR Code SKU';
+        toast('Kamera tidak dapat diakses. Gunakan pilihan daftar atau input manual.', 'error');
+      }
+    }
+
+    async function stopCategoryScanner() {
+      const container = $('scanner-container');
+      container.classList.add('hidden');
+      $('btn-scan-label').textContent = 'Scan QR Code SKU';
+      if (html5QrScanner && isScannerRunning) {
+        try {
+          await html5QrScanner.stop();
+        } catch (e) { }
+      }
+      isScannerRunning = false;
+    }
+
+    $('btn-scan-kategori').addEventListener('click', () => {
+      if (isScannerRunning) {
+        stopCategoryScanner();
+      } else {
+        startCategoryScanner();
+      }
+    });
+
+    $('btn-stop-scan').addEventListener('click', () => stopCategoryScanner());
+
+    // 4. INSTANT LOAD (0ms DARI LOCALSTORAGE) + SINKRONISASI LATAR BELAKANG
+    async function syncAppData(force = false) {
+      if (isFetching || isMutating) return;
+      if (!force && (isUserTyping || document.visibilityState !== 'visible')) return;
+
+      // Tampilkan data cache lokal seketika pada load pertama
+      const localRaw = localStorage.getItem(CACHE_STORAGE_KEY);
+      if (localRaw && !window.__hasInitialRender) {
+        try {
+          renderAppState(JSON.parse(localRaw));
+          window.__hasInitialRender = true;
+        } catch (e) { }
+      }
+
+      isFetching = true;
+      try {
+        const res = await fetch(`${GAS_URL}?action=GET_BOOTSTRAP&_t=${Date.now()}`);
+        const json = await res.json();
+        if (json.success && json.data) {
+          localStorage.setItem(CACHE_STORAGE_KEY, JSON.stringify(json.data));
+          renderAppState(json.data);
+          window.__hasInitialRender = true;
+        }
+      } catch (e) {
+        console.warn('Background sync dilewati:', e);
+      } finally {
+        isFetching = false;
+      }
+    }
+
+    $('lapor-kategori-select').addEventListener('change', (e) => {
+      const val = e.target.value;
+      const manualWrap = $('manual-barcode-wrap');
+      if (val === '__MANUAL__') {
+        manualWrap.classList.remove('hidden');
+        $('variasi-picker-wrap').classList.add('hidden');
+        hideSkuValidationBanner();
+        selectedBarcodeKategori = '';
+        selectedTailorRecord = null;
+        $('lapor-barcode-manual').focus();
+      } else {
+        manualWrap.classList.add('hidden');
+        selectCategoryByBarcode(val, false);
+      }
+    });
+
+    $('btn-cari-barcode').addEventListener('click', async () => {
+      const code = $('lapor-barcode-manual').value.trim();
+      if (!code) return toast('Ketik kode SKU terlebih dahulu.', 'error');
+      await validateAndSelectSku(code, true);
+    });
+
+    $('lapor-nama').addEventListener('input', () => {
+      if (selectedBarcodeKategori) {
+        const matches = MASTER_TAILOR_LIST.filter(
+          it => String(it.barcode_kategori || '').trim().toUpperCase() === selectedBarcodeKategori.toUpperCase()
+        );
+        if (matches.length) renderVariationChoices(matches);
+      }
+      renderTailorActiveStockList();
+    });
+
+    $('lapor-barcode-manual').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        $('btn-cari-barcode').click();
+      }
+    });
+
+    $('btn-refresh-data').addEventListener('click', () => syncAppData(true));
+
+    // 5. SUBMIT STOK PENJAHIT KE ENDPOINT SUBMIT_STOK_TAILOR
+    $('form-lapor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = $('btn-submit-lapor');
+      if (btn.disabled || isMutating) return;
+
+      const nama = $('lapor-nama').value.trim();
+      const qty = parseInt($('lapor-qty').value) || 0;
+
+      if (!selectedTailorRecord) {
+        return toast('Harap scan atau pilih kategori, warna, dan ukuran jahitan.', 'error');
+      }
+      if (!nama) {
+        return toast('Harap isi Nama Penjahit atau Tim.', 'error');
+      }
+      if (qty <= 0) {
+        return toast('Jumlah hasil jahitan minimal 1 pcs.', 'error');
+      }
+
+      const result = await submitWithLock('SUBMIT_STOK_TAILOR', {
+        transaction_id: 'JHT-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
+        id_tailor: selectedTailorRecord.id_tailor,
+        barcode_kategori: selectedTailorRecord.barcode_kategori,
+        warna: selectedWarna,
+        ukuran: selectedUkuran,
+        nama_penjahit: nama,
+        qty: qty
+      }, btn, 'Menyimpan Stok Penjahit...');
+
+      if (result && result.success) {
+        localStorage.setItem(TAILOR_NAME_KEY, nama);
+        toast(result.message || 'Stok jahitan berhasil dicatat!');
+        $('lapor-qty').value = '';
+        updateTotalPreview();
+      }
+    });
+
+    // Inisialisasi awal + Auto-Reload setiap 25 detik
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedName = localStorage.getItem(TAILOR_NAME_KEY);
+      if (savedName) {
+        $('lapor-nama').value = savedName;
+      }
+      syncAppData(true);
+      setInterval(() => syncAppData(false), 25000);
+    });
+
+    // Service Worker & Update Banner
+    if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+      let reloadRequested = false;
+      function showUpdateBanner(worker) {
+        if (document.getElementById('sw-update-banner')) return;
+        const bar = document.createElement('div');
+        bar.id = 'sw-update-banner';
+        bar.className = 'fixed left-3 right-3 bottom-3 z-50 flex items-center justify-between gap-3 rounded-xl bg-slate-900 px-4 py-3 text-sm text-white shadow-lg';
+        bar.innerHTML = '<span>Versi baru tersedia. Selesaikan input yang sedang diisi dulu.</span>';
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'shrink-0 rounded-lg bg-white px-3 py-1.5 font-semibold text-slate-900';
+        btn.textContent = 'Muat ulang';
+        btn.addEventListener('click', () => {
+          reloadRequested = true;
+          worker.postMessage({ type: 'SKIP_WAITING' });
+        });
+        bar.appendChild(btn);
+        document.body.appendChild(bar);
+      }
+
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => {
+          if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner(reg.waiting);
+          reg.addEventListener('updatefound', () => {
+            const worker = reg.installing;
+            if (!worker) return;
+            worker.addEventListener('statechange', () => {
+              if (worker.state === 'installed' && navigator.serviceWorker.controller) showUpdateBanner(worker);
+            });
+          });
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(err => console.warn('Service worker error:', err));
+      });
+
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!reloadRequested) return;
+        reloadRequested = false;
+        location.reload();
+      });
+    }
+
+    // PWA Native Install Prompt
+    let deferredInstall = window.__deferredInstall || null;
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (standalone) {
+      $('btn-install').classList.add('hidden');
+      $('btn-install').classList.remove('inline-flex');
+    } else if (deferredInstall) {
+      $('btn-install').classList.remove('hidden');
+      $('btn-install').classList.add('inline-flex');
+    }
+
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      deferredInstall = event;
+      window.__deferredInstall = event;
+      if (!standalone) {
+        $('btn-install').classList.remove('hidden');
+        $('btn-install').classList.add('inline-flex');
+      }
+    });
+
+    $('btn-install').addEventListener('click', async () => {
+      const promptEvent = deferredInstall || window.__deferredInstall;
+      if (!promptEvent) return;
+      promptEvent.prompt();
+      const { outcome } = await promptEvent.userChoice;
+      deferredInstall = null;
+      window.__deferredInstall = null;
+      if (outcome === 'accepted') {
+        $('btn-install').classList.add('hidden');
+        $('btn-install').classList.remove('inline-flex');
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstall = null;
+      window.__deferredInstall = null;
+      $('btn-install').classList.add('hidden');
+      $('btn-install').classList.remove('inline-flex');
+      toast('Aplikasi Mitra Jahit berhasil dipasang.');
+    });
+  </script>
+</body>
+
+</html>

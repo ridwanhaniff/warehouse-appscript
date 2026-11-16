@@ -1,0 +1,26 @@
+{
+    "id": "./penjahit.html",
+    "name": "Mitra Jahit · Ina Basic",
+    "short_name": "Mitra Jahit",
+    "description": "Aplikasi laporan selesai jahit untuk mitra penjahit Ina Basic Store",
+    "start_url": "./penjahit.html",
+    "scope": "./",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f1f5f9",
+    "theme_color": "#0f172a",
+    "icons": [
+        {
+            "src": "logo-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "logo-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
