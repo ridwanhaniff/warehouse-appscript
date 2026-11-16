@@ -473,13 +473,15 @@
 
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
+                <label id="tarif-warna-label"
+                  class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
                   Warna (Pisah Koma)</label>
                 <input id="tarif-warna" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
                   placeholder="Hitam, Putih, Cream" required>
               </div>
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
+                <label id="tarif-ukuran-label"
+                  class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
                   Ukuran (Pisah Koma)</label>
                 <input id="tarif-ukuran"
                   class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm uppercase"
@@ -501,7 +503,7 @@
               <div class="mb-2 flex items-center justify-between">
                 <div>
                   <p class="text-xs font-bold text-slate-800">Daftar Pilihan Warna & Ukuran</p>
-                  <p class="text-[11px] text-slate-400">Centang pilihan yang dipakai untuk barang ini</p>
+                  <p class="text-[11px] text-slate-400">Centang pilihan baru yang dipakai untuk barang ini</p>
                 </div>
                 <span id="tarif-matrix-count"
                   class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">0</span>
@@ -624,7 +626,8 @@
             <div id="product-fields" class="mt-4 hidden border-t border-slate-100 pt-3">
               <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama
                 Produk</label>
-              <input id="product-name" class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm"
+              <input id="product-name"
+                class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm disabled:bg-slate-100 disabled:text-slate-500"
                 placeholder="Contoh: Kaos Polos">
               <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"><input id="product-active"
                   type="checkbox" class="h-4 w-4 accent-indigo-600" checked> Produk aktif</label>
@@ -859,45 +862,53 @@
           <!-- Card Produk & Lokasi Tujuan Gudang Utama -->
           <div id="qc-target-warehouse-card"
             class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-            <div>
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan ke Stok Jual</p>
-              <h3 class="text-sm font-bold text-slate-800 mt-0.5">Pilih Produk & Rak Tujuan</h3>
-            </div>
-
-            <div class="flex gap-2">
-              <button type="button" id="btn-scan-wip"
-                class="flex-1 rounded-xl bg-slate-800 px-3 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path
-                    d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
-                  <rect x="7" y="7" width="10" height="10" rx="1.5" />
-                </svg>
-                <span>Scan Produk</span>
-              </button>
-              <input id="qc-manual-barcode" type="text"
-                class="input-field w-32 rounded-xl border border-slate-200 px-2.5 py-2 text-xs font-mono"
-                placeholder="Barcode...">
-              <button type="button" id="btn-cari-qc-barcode"
-                class="rounded-xl bg-indigo-50 border border-indigo-200 px-3 py-2 text-xs font-bold text-indigo-700">Cari</button>
-            </div>
-
-            <div id="qc-wip-detail" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-              <div class="flex items-center justify-between">
-                <p id="qc-wip-prod-name" class="text-xs font-bold text-slate-800"></p>
-                <span id="qc-wip-prod-code" class="font-mono text-[10px] text-slate-400"></span>
-              </div>
+            <div id="qc-warehouse-target-fields" class="space-y-3">
               <div>
-                <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk
-                  Stok</label>
-                <div id="qc-wip-variants"></div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan ke Stok Jual</p>
+                <h3 class="text-sm font-bold text-slate-800 mt-0.5">Pilih Produk & Rak Tujuan</h3>
+              </div>
+
+              <div class="flex gap-2">
+                <button type="button" id="btn-scan-wip"
+                  class="flex-1 rounded-xl bg-slate-800 px-3 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <path
+                      d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <rect x="7" y="7" width="10" height="10" rx="1.5" />
+                  </svg>
+                  <span>Scan Produk</span>
+                </button>
+                <input id="qc-manual-barcode" type="text"
+                  class="input-field w-32 rounded-xl border border-slate-200 px-2.5 py-2 text-xs font-mono"
+                  placeholder="Barcode...">
+                <button type="button" id="btn-cari-qc-barcode"
+                  class="rounded-xl bg-indigo-50 border border-indigo-200 px-3 py-2 text-xs font-bold text-indigo-700">Cari</button>
+              </div>
+
+              <div id="qc-wip-detail" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between">
+                  <p id="qc-wip-prod-name" class="text-xs font-bold text-slate-800"></p>
+                  <span id="qc-wip-prod-code" class="font-mono text-[10px] text-slate-400"></span>
+                </div>
+                <div>
+                  <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk
+                    Stok</label>
+                  <div id="qc-wip-variants"></div>
+                </div>
+              </div>
+
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di
+                  Rak
+                  Mana</label>
+                <select id="qc-lokasi-tujuan"
+                  class="input-field w-full rounded-xl border border-slate-200 p-2.5 text-sm font-semibold bg-white"></select>
               </div>
             </div>
 
-            <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di Rak
-                Mana</label>
-              <select id="qc-lokasi-tujuan"
-                class="input-field w-full rounded-xl border border-slate-200 p-2.5 text-sm font-semibold bg-white"></select>
+            <div id="qc-no-stock-note"
+              class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs text-rose-800">
+              Karena jumlah <strong>Bagus = 0 pcs</strong>, tidak ada barang yang dimasukkan ke rak gudang.
             </div>
 
             <div>
@@ -1039,14 +1050,14 @@
                 (Rp)</label>
               <input id="pricing-bulk-hpp" type="number" min="0"
                 class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold"
-                placeholder="0">
+                placeholder="Kosongkan jika tetap">
             </div>
             <div class="flex-1">
               <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Harga Jual
                 (Rp)</label>
               <input id="pricing-bulk-harga" type="number" min="0"
                 class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold"
-                placeholder="0">
+                placeholder="Kosongkan jika tetap">
             </div>
           </div>
           <button type="button" id="btn-apply-bulk-pricing"
@@ -1127,6 +1138,7 @@
       locFrom: '',
       locTo: '',
       isAddingVariants: false,
+      attributeMatrixCombos: [],
       selectedQcItem: null,
       qcTargetProduct: null,
       qcTargetVariantId: '',
@@ -1145,6 +1157,15 @@
     document.addEventListener('focusout', () => {
       setTimeout(() => { isUserTyping = false; }, 1200);
     });
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     function formatRp(num) {
       return 'Rp ' + (Number(num) || 0).toLocaleString('id-ID');
@@ -1422,7 +1443,7 @@
     }
 
     function populateLocationSelects() {
-      const locHtml = STATE.locations.map(l => `<option value="${l.value}">${l.label || l.value}</option>`).join('');
+      const locHtml = STATE.locations.map(l => `<option value="${escapeHtml(l.value)}">${escapeHtml(l.label || l.value)}</option>`).join('');
       if ($('opname-session-loc')) $('opname-session-loc').innerHTML = locHtml;
       if ($('qc-lokasi-tujuan')) $('qc-lokasi-tujuan').innerHTML = locHtml;
     }
@@ -1616,6 +1637,8 @@
       $('form-barcode').textContent = barcode;
       $('product-status-pill').classList.add('hidden');
       $('product-fields').classList.remove('hidden');
+      $('product-name').disabled = false;
+      $('product-active').disabled = false;
       $('product-name').value = '';
       $('product-active').checked = true;
 
@@ -1668,6 +1691,8 @@
 
       if (act === 'KelolaData') {
         $('product-fields').classList.remove('hidden');
+        $('product-name').disabled = false;
+        $('product-active').disabled = false;
         $('product-name').value = p.nama;
         $('product-active').checked = p.aktif;
         $('variant-select-card').classList.add('hidden');
@@ -1704,7 +1729,37 @@
         $('qty-input').value = '';
         $('reporter-card').classList.remove('hidden');
         renderLocationChoices();
+        updateQtyContextHint();
         $('btn-submit-text').textContent = act === 'Opname' ? 'Simpan Hasil Hitung' : `Simpan Barang ${act}`;
+      }
+    }
+
+    function updateQtyContextHint() {
+      const act = STATE.currentActivity;
+      const lbl = $('qty-label');
+      const hint = $('qty-hint');
+      if (!lbl || !hint) return;
+
+      const vStocks = (STATE.selectedVariant && STATE.selectedVariant.stocks) ? STATE.selectedVariant.stocks : {};
+
+      if (act === 'Opname') {
+        lbl.textContent = 'Jumlah Hitungan Fisik di Rak (Pcs)';
+        const loc = STATE.activeOpname ? STATE.activeOpname.lokasi : '';
+        const sysStock = loc ? (Number(vStocks[loc]) || 0) : 0;
+        hint.textContent = loc
+          ? `Stok tercatat di sistem (${loc}): ${sysStock} pcs. Masukkan total fisik aktual di rak (isi 0 hanya jika stok benar-benar habis).`
+          : 'Masukkan jumlah fisik aktual yang ditemukan di rak.';
+      } else if (act === 'Keluar') {
+        lbl.textContent = 'Jumlah Barang Keluar (Pcs)';
+        const avail = Number(vStocks[STATE.locFrom]) || 0;
+        hint.textContent = `Stok tersedia di ${STATE.locFrom || 'rak asal'}: ${avail} pcs (Maksimal keluar: ${avail} pcs).`;
+      } else if (act === 'Mutasi') {
+        lbl.textContent = 'Jumlah Barang Dipindah (Pcs)';
+        const avail = Number(vStocks[STATE.locFrom]) || 0;
+        hint.textContent = `Stok tersedia di ${STATE.locFrom || 'rak asal'}: ${avail} pcs.`;
+      } else {
+        lbl.textContent = 'Jumlah Barang Masuk (Pcs)';
+        hint.textContent = `Masukkan jumlah barang masuk ke ${STATE.locTo || 'rak tujuan'} (minimal 1 pcs).`;
       }
     }
 
@@ -1716,6 +1771,7 @@
       if (!p.attributes || !p.attributes.length) {
         STATE.selectedVariant = p.variants[0] || null;
         updateSelectedVariantSummary();
+        updateQtyContextHint();
         return;
       }
 
@@ -1754,6 +1810,7 @@
       if (!$('location-card').classList.contains('hidden')) {
         renderLocationChoices();
       }
+      updateQtyContextHint();
     }
 
     function updateSelectedVariantSummary() {
@@ -1804,6 +1861,7 @@
 
       if (act === 'Opname') {
         $('location-card').classList.add('hidden');
+        updateQtyContextHint();
         return;
       }
       $('location-card').classList.remove('hidden');
@@ -1813,9 +1871,9 @@
         $('location-from-options').innerHTML = locs.map(l => {
           const stk = Number(variantStocks[l.value]) || 0;
           return `
-            <button type="button" data-loc-from="${l.value}"
+            <button type="button" data-loc-from="${escapeHtml(l.value)}"
               class="choice-btn flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2.5 text-left text-xs font-bold ${STATE.locFrom === l.value ? 'selected' : ''}">
-              <span>${l.label || l.value}</span>
+              <span>${escapeHtml(l.label || l.value)}</span>
               <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">Stok: ${stk}</span>
             </button>
           `;
@@ -1835,9 +1893,9 @@
         $('location-to-options').innerHTML = locs.map(l => {
           const stk = Number(variantStocks[l.value]) || 0;
           return `
-            <button type="button" data-loc-to="${l.value}"
+            <button type="button" data-loc-to="${escapeHtml(l.value)}"
               class="choice-btn flex items-center justify-between rounded-xl border border-slate-200 px-3.5 py-2.5 text-left text-xs font-bold ${STATE.locTo === l.value ? 'selected' : ''}">
-              <span>${l.label || l.value}</span>
+              <span>${escapeHtml(l.label || l.value)}</span>
               <span class="rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">Stok: ${stk}</span>
             </button>
           `;
@@ -1848,6 +1906,8 @@
       } else {
         $('location-to-wrap').classList.add('hidden');
       }
+
+      updateQtyContextHint();
     }
 
     function renderVariantManageList() {
@@ -1857,10 +1917,10 @@
       list.innerHTML = p.variants.map(v => `
         <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs">
           <div>
-            <p class="font-bold text-slate-800">${v.label || 'Standar'}</p>
+            <p class="font-bold text-slate-800">${escapeHtml(v.label || 'Standar')}</p>
             <p class="text-[10px] text-slate-400">Modal: ${formatRp(v.hpp)} · Jual: ${formatRp(v.harga_jual)}</p>
           </div>
-          <button type="button" data-toggle-var="${v.id}" data-active="${v.active ? '1' : '0'}"
+          <button type="button" data-toggle-var="${escapeHtml(v.id)}" data-active="${v.active ? '1' : '0'}"
             class="rounded-lg px-2.5 py-1 text-[10px] font-bold ${v.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
             ${v.active ? 'AKTIF' : 'NONAKTIF'}
           </button>
@@ -1890,10 +1950,10 @@
       row.className = 'attr-builder-row rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2';
       row.innerHTML = `
         <div class="flex gap-2">
-          <input type="text" class="attr-name input-field flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold" placeholder="Kategori (Warna / Ukuran)" value="${defaultName}">
+          <input type="text" class="attr-name input-field flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold" placeholder="Kategori (Warna / Ukuran)" value="${escapeHtml(defaultName)}">
           <button type="button" class="btn-remove-attr rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600">Hapus</button>
         </div>
-        <input type="text" class="attr-values input-field w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs" placeholder="Pilihan dipisah koma (S, M, L)" value="${defaultValues}">
+        <input type="text" class="attr-values input-field w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs" placeholder="Pilihan dipisah koma (S, M, L)" value="${escapeHtml(defaultValues)}">
       `;
       row.querySelector('.btn-remove-attr').addEventListener('click', () => {
         row.remove();
@@ -1923,18 +1983,39 @@
       return defs;
     }
 
+    function isComboAlreadyOnProduct(comboAttrs) {
+      if (!STATE.currentProduct || !Array.isArray(STATE.currentProduct.variants)) return false;
+      const keys = Object.keys(comboAttrs || {});
+      return STATE.currentProduct.variants.some(v => {
+        const vAttrs = v.attributes || {};
+        const vKeys = Object.keys(vAttrs).filter(k => String(vAttrs[k] ?? '').trim() !== '');
+        if (keys.length === 0 && vKeys.length === 0) return true;
+        if (keys.length !== vKeys.length) return false;
+        return keys.every(k => String(vAttrs[k] ?? '').trim().toLowerCase() === String(comboAttrs[k] ?? '').trim().toLowerCase());
+      });
+    }
+
     function rebuildAttributeMatrix() {
       const wrap = $('matrix-wrap');
       const list = $('matrix-list');
       if ($('simple-product').checked) {
+        STATE.attributeMatrixCombos = [{}];
+        const exists = STATE.isAddingVariants && STATE.currentProduct ? isComboAlreadyOnProduct({}) : false;
         wrap.classList.remove('hidden');
         $('matrix-count').textContent = '1 VARIAN';
-        list.innerHTML = `<label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold"><input type="checkbox" class="matrix-combo-chk accent-indigo-600" data-attrs="{}" checked> Standar</label>`;
+        list.innerHTML = `<label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold ${exists ? 'opacity-60' : ''}">
+          <span class="flex items-center gap-2">
+            <input type="checkbox" class="matrix-combo-chk accent-indigo-600" data-combo-idx="0" ${exists ? 'disabled' : 'checked'}>
+            <span>Standar</span>
+          </span>
+          ${exists ? '<span class="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">SUDAH ADA</span>' : ''}
+        </label>`;
         return;
       }
 
       const defs = collectAttributeDefinitions();
       if (!defs.length) {
+        STATE.attributeMatrixCombos = [];
         wrap.classList.add('hidden');
         list.innerHTML = '';
         return;
@@ -1951,19 +2032,26 @@
         combos = next;
       });
 
+      STATE.attributeMatrixCombos = combos;
       wrap.classList.remove('hidden');
       $('matrix-count').textContent = `${combos.length} VARIAN`;
-      list.innerHTML = combos.map(c => {
+      list.innerHTML = combos.map((c, idx) => {
         const lbl = defs.map(d => `${d.name}: ${c[d.name]}`).join(' · ');
-        return `<label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold">
-          <input type="checkbox" class="matrix-combo-chk accent-indigo-600" data-attrs='${JSON.stringify(c)}' checked>
-          <span>${lbl}</span>
+        const exists = STATE.isAddingVariants && STATE.currentProduct ? isComboAlreadyOnProduct(c) : false;
+        return `<label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold ${exists ? 'opacity-60' : ''}">
+          <span class="flex items-center gap-2">
+            <input type="checkbox" class="matrix-combo-chk accent-indigo-600" data-combo-idx="${idx}" ${exists ? 'disabled' : 'checked'}>
+            <span>${escapeHtml(lbl)}</span>
+          </span>
+          ${exists ? '<span class="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">SUDAH ADA</span>' : ''}
         </label>`;
       }).join('');
     }
 
     $('btn-open-add-variants').addEventListener('click', () => {
       STATE.isAddingVariants = true;
+      $('product-name').disabled = true;
+      $('product-active').disabled = true;
       $('attribute-builder-card').classList.remove('hidden');
       $('btn-cancel-add-variants').classList.remove('hidden');
       $('btn-submit-text').textContent = 'Simpan Varian Baru';
@@ -1975,6 +2063,7 @@
         addAttributeRow('Warna', 'text', '');
       }
       rebuildAttributeMatrix();
+      $('attribute-builder-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 
     $('btn-cancel-add-variants').addEventListener('click', goBackInApp);
@@ -1985,20 +2074,34 @@
       e.preventDefault();
       const btn = $('btn-submit');
       const pelapor = $('reporter-input').value.trim();
-      if (pelapor) localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
 
       const act = STATE.currentActivity;
       const barcode = $('form-barcode').textContent.trim();
 
       if (act === 'KelolaData') {
+        if (!pelapor) {
+          $('reporter-input').focus();
+          return toast('Nama petugas wajib diisi.', 'error');
+        }
+        localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+
         if (!STATE.currentProduct) {
           const nama = $('product-name').value.trim();
-          if (!nama) return toast('Nama produk wajib diisi.', 'error');
+          if (!nama) {
+            $('product-name').focus();
+            return toast('Nama produk wajib diisi.', 'error');
+          }
           const defs = collectAttributeDefinitions();
           const variants = [];
           document.querySelectorAll('.matrix-combo-chk').forEach(chk => {
-            if (chk.checked) variants.push({ attributes: JSON.parse(chk.dataset.attrs), active: true });
+            if (chk.checked && !chk.disabled) {
+              const attrs = STATE.attributeMatrixCombos[Number(chk.dataset.comboIdx)];
+              if (attrs) variants.push({ attributes: attrs, active: true });
+            }
           });
+          if (!variants.length) {
+            return toast('Pilih minimal 1 varian produk (atau centang "Produk tanpa varian").', 'error');
+          }
           const res = await postApi('CREATE_PRODUCT', {
             transaction_id: 'NEW-' + Date.now(),
             barcode,
@@ -2006,7 +2109,7 @@
             status_aktif: $('product-active').checked,
             attributes: defs,
             variants,
-            nama_pelapor: pelapor || 'Admin'
+            nama_pelapor: pelapor
           }, btn, 'Mendaftarkan produk baru...');
           if (res) {
             toast(res.message);
@@ -2019,14 +2122,20 @@
           const defs = collectAttributeDefinitions();
           const variants = [];
           document.querySelectorAll('.matrix-combo-chk').forEach(chk => {
-            if (chk.checked) variants.push({ attributes: JSON.parse(chk.dataset.attrs), active: true });
+            if (chk.checked && !chk.disabled) {
+              const attrs = STATE.attributeMatrixCombos[Number(chk.dataset.comboIdx)];
+              if (attrs) variants.push({ attributes: attrs, active: true });
+            }
           });
+          if (!variants.length) {
+            return toast('Pilih minimal 1 varian baru yang belum terdaftar.', 'error');
+          }
           const res = await postApi('ADD_VARIANTS', {
             transaction_id: 'ADDV-' + Date.now(),
             barcode,
             attributes: defs,
             variants,
-            nama_pelapor: pelapor || 'Admin'
+            nama_pelapor: pelapor
           }, btn, 'Menambahkan varian baru...');
           if (res) {
             toast(res.message);
@@ -2035,12 +2144,18 @@
           return;
         }
 
+        const nama = $('product-name').value.trim();
+        if (!nama) {
+          $('product-name').focus();
+          return toast('Nama produk tidak boleh kosong.', 'error');
+        }
+
         const res = await postApi('UPDATE_PRODUCT', {
           transaction_id: 'UPD-' + Date.now(),
           barcode,
-          nama: $('product-name').value.trim(),
+          nama,
           status_aktif: $('product-active').checked,
-          nama_pelapor: pelapor || 'Admin'
+          nama_pelapor: pelapor
         }, btn, 'Menyimpan perubahan...');
         if (res) {
           toast(res.message);
@@ -2050,11 +2165,39 @@
       }
 
       if (!STATE.selectedVariant) return toast('Pilih warna/ukuran produk terlebih dahulu.', 'error');
-      const qty = Number($('qty-input').value);
-      if (!pelapor) return toast('Nama petugas wajib diisi.', 'error');
+
+      const rawQty = $('qty-input').value.trim();
+      if (rawQty === '') {
+        $('qty-input').focus();
+        return toast('Jumlah barang wajib diisi (tidak boleh kosong).', 'error');
+      }
+      const qty = Number(rawQty);
+      if (!Number.isFinite(qty) || !Number.isInteger(qty)) {
+        $('qty-input').focus();
+        return toast('Jumlah barang harus berupa angka bulat.', 'error');
+      }
+      if (qty < 0) {
+        $('qty-input').focus();
+        return toast('Jumlah barang tidak boleh negatif.', 'error');
+      }
+      if (!pelapor) {
+        $('reporter-input').focus();
+        return toast('Nama petugas wajib diisi.', 'error');
+      }
 
       if (act === 'Opname') {
         if (!STATE.activeOpname) return toast('Pilih sesi hitung stok terlebih dahulu.', 'error');
+        if (qty === 0) {
+          const sysStock = (STATE.selectedVariant.stocks && Number(STATE.selectedVariant.stocks[STATE.activeOpname.lokasi])) || 0;
+          const okZero = window.confirm(
+            `Konfirmasi Stok 0 Pcs\n\nAnda memasukkan jumlah fisik 0 pcs untuk:\n${STATE.currentProduct.nama} (${STATE.selectedVariant.label || 'Standar'})\nLokasi: ${STATE.activeOpname.lokasi} (Stok sistem saat ini: ${sysStock} pcs)\n\nYakin stok fisik di rak benar-benar KOSONG (0 pcs)?`
+          );
+          if (!okZero) {
+            $('qty-input').focus();
+            return;
+          }
+        }
+        localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
         const res = await postApi('SUBMIT_OPNAME_COUNT', {
           session_id: STATE.activeOpname.session_id,
           barcode,
@@ -2069,13 +2212,49 @@
         return;
       }
 
+      if (qty <= 0) {
+        $('qty-input').focus();
+        return toast('Jumlah barang minimal 1 pcs.', 'error');
+      }
+
+      const variantStocks = STATE.selectedVariant.stocks || {};
+      let payloadLocFrom = '';
+      let payloadLocTo = '';
+
+      if (act === 'Masuk') {
+        if (!STATE.locTo) return toast('Pilih lokasi rak tujuan terlebih dahulu.', 'error');
+        payloadLocTo = STATE.locTo;
+      } else if (act === 'Keluar') {
+        if (!STATE.locFrom) return toast('Pilih lokasi rak asal terlebih dahulu.', 'error');
+        const availStock = Number(variantStocks[STATE.locFrom]) || 0;
+        if (qty > availStock) {
+          $('qty-input').focus();
+          return toast(`Stok di ${STATE.locFrom} tidak mencukupi (Tersedia: ${availStock} pcs).`, 'error');
+        }
+        payloadLocFrom = STATE.locFrom;
+      } else if (act === 'Mutasi') {
+        if (!STATE.locFrom || !STATE.locTo) return toast('Pilih rak asal dan rak tujuan terlebih dahulu.', 'error');
+        if (STATE.locFrom === STATE.locTo) {
+          return toast('Rak asal dan rak tujuan tidak boleh sama.', 'error');
+        }
+        const availStock = Number(variantStocks[STATE.locFrom]) || 0;
+        if (qty > availStock) {
+          $('qty-input').focus();
+          return toast(`Stok di ${STATE.locFrom} tidak mencukupi untuk dipindah (Tersedia: ${availStock} pcs).`, 'error');
+        }
+        payloadLocFrom = STATE.locFrom;
+        payloadLocTo = STATE.locTo;
+      }
+
+      localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+
       const res = await postApi('SAVE_TRANSACTION', {
         transaction_id: 'TRX-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
         activity: act,
         barcode,
         variant_id: STATE.selectedVariant.id,
-        location_from: STATE.locFrom,
-        location_to: STATE.locTo,
+        location_from: payloadLocFrom,
+        location_to: payloadLocTo,
         qty,
         nama_pelapor: pelapor
       }, btn, 'Menyimpan catatan...');
@@ -2098,15 +2277,15 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
           <div class="flex items-start justify-between">
             <div>
-              <p class="text-sm font-bold text-slate-900">${s.nama_sesi}</p>
-              <p class="text-xs text-slate-500">Rak: <span class="font-bold text-slate-700">${s.lokasi}</span> · Petugas: ${s.dibuat_oleh}</p>
+              <p class="text-sm font-bold text-slate-900">${escapeHtml(s.nama_sesi)}</p>
+              <p class="text-xs text-slate-500">Rak: <span class="font-bold text-slate-700">${escapeHtml(s.lokasi)}</span> · Petugas: ${escapeHtml(s.dibuat_oleh)}</p>
             </div>
             <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">BERJALAN</span>
           </div>
           <div class="flex gap-2">
-            <button type="button" data-use-opname="${s.session_id}"
+            <button type="button" data-use-opname="${escapeHtml(s.session_id)}"
               class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white">Mulai Scan Barang</button>
-            <button type="button" data-approve-opname="${s.session_id}"
+            <button type="button" data-approve-opname="${escapeHtml(s.session_id)}"
               class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2.5 text-xs font-bold text-emerald-700">Selesai</button>
           </div>
         </div>
@@ -2127,7 +2306,23 @@
 
       box.querySelectorAll('button[data-approve-opname]').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const pelapor = $('reporter-input').value.trim() || $('opname-session-user').value.trim() || 'Admin';
+          const sesi = STATE.opnameSessions.find(x => x.session_id === btn.dataset.approveOpname);
+          const pelapor = $('opname-session-user').value.trim() || $('reporter-input').value.trim();
+          if (!pelapor) {
+            $('opname-session-user').focus();
+            return toast('Isi Nama Petugas terlebih dahulu sebelum menyelesaikan sesi.', 'error');
+          }
+
+          const labelSesi = sesi ? `${sesi.nama_sesi} (Rak: ${sesi.lokasi})` : btn.dataset.approveOpname;
+          const okClose = window.confirm(
+            `Selesaikan & Tutup Sesi Hitung Stok?\n\n` +
+            `Sesi: ${labelSesi}\n` +
+            `Petugas Penutup: ${pelapor}\n\n` +
+            `Pastikan seluruh barang di rak tersebut sudah selesai dihitung. Sesi yang ditutup tidak dapat dibuka kembali.`
+          );
+          if (!okClose) return;
+
+          localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
           const res = await postApi('APPROVE_OPNAME_SESSION', {
             session_id: btn.dataset.approveOpname,
             nama_pelapor: pelapor
@@ -2151,6 +2346,7 @@
       const nama_pelapor = $('opname-session-user').value.trim();
       if (!nama_sesi || !nama_pelapor) return toast('Isi nama sesi dan nama petugas.', 'error');
 
+      localStorage.setItem(REPORTER_STORAGE_KEY, nama_pelapor);
       const res = await postApi('CREATE_OPNAME_SESSION', { nama_sesi, lokasi, nama_pelapor }, $('btn-create-opname'), 'Membuat sesi hitung...');
       if (res) {
         toast(res.message);
@@ -2186,6 +2382,18 @@
       }
     }
 
+    function isTailorComboExisting(barcodeKategori, warna, ukuran, excludeId = '') {
+      const skuNorm = String(barcodeKategori || '').trim().toUpperCase();
+      const wNorm = String(warna || '').trim().toLowerCase();
+      const uNorm = String(ukuran || '').trim().toUpperCase();
+      return STATE.masterTailor.some(m =>
+        String(m.id_tailor || '') !== String(excludeId) &&
+        String(m.barcode_kategori || '').trim().toUpperCase() === skuNorm &&
+        String(m.warna || '').trim().toLowerCase() === wNorm &&
+        String(m.ukuran || '').trim().toUpperCase() === uNorm
+      );
+    }
+
     function rebuildTarifMatrixPreview() {
       const editId = $('tarif-id-tailor').value.trim();
       const wrap = $('tarif-matrix-wrap');
@@ -2197,6 +2405,7 @@
         return;
       }
 
+      const sku = $('tarif-barcode-sku').value.trim().toUpperCase();
       const colors = $('tarif-warna').value.split(',').map(v => v.trim()).filter(Boolean);
       const sizes = $('tarif-ukuran').value.split(',').map(v => v.trim().toUpperCase()).filter(Boolean);
 
@@ -2211,7 +2420,11 @@
       const combos = [];
       uniqueColors.forEach(w => {
         uniqueSizes.forEach(u => {
-          combos.push({ warna: w, ukuran: u });
+          combos.push({
+            warna: w,
+            ukuran: u,
+            exists: sku ? isTailorComboExisting(sku, w, u) : false
+          });
         });
       });
 
@@ -2219,16 +2432,19 @@
       wrap.classList.remove('hidden');
       $('tarif-matrix-count').textContent = `${combos.length} PILIHAN`;
       list.innerHTML = combos.map((c, idx) => `
-        <label class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold">
+        <label class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold ${c.exists ? 'opacity-60' : ''}">
           <span class="flex items-center gap-2">
-            <input type="checkbox" class="tarif-combo-chk accent-indigo-600" data-idx="${idx}" checked>
-            <span>Warna: <strong>${c.warna}</strong> · Ukuran: <strong>${c.ukuran}</strong></span>
+            <input type="checkbox" class="tarif-combo-chk accent-indigo-600" data-idx="${idx}" ${c.exists ? 'disabled' : 'checked'}>
+            <span>Warna: <strong>${escapeHtml(c.warna)}</strong> · Ukuran: <strong>${escapeHtml(c.ukuran)}</strong></span>
           </span>
-          <span class="text-[10px] font-bold text-indigo-600">AKTIF</span>
+          ${c.exists
+          ? '<span class="rounded bg-slate-200 px-1.5 py-0.5 text-[9px] font-bold text-slate-600">SUDAH ADA</span>'
+          : '<span class="text-[10px] font-bold text-indigo-600">BARU</span>'}
         </label>
       `).join('');
     }
 
+    $('tarif-barcode-sku').addEventListener('input', rebuildTarifMatrixPreview);
     $('tarif-warna').addEventListener('input', rebuildTarifMatrixPreview);
     $('tarif-ukuran').addEventListener('input', rebuildTarifMatrixPreview);
 
@@ -2237,7 +2453,11 @@
       $('tarif-form-mode-badge').textContent = 'TAMBAH BARANG & ONGKOS JAHIT';
       $('tarif-barcode-sku').value = '';
       $('tarif-nama-produk').value = '';
+      $('tarif-warna-label').textContent = 'Pilihan Warna (Pisah Koma)';
+      $('tarif-warna').placeholder = 'Hitam, Putih, Cream';
       $('tarif-warna').value = '';
+      $('tarif-ukuran-label').textContent = 'Pilihan Ukuran (Pisah Koma)';
+      $('tarif-ukuran').placeholder = 'S, M, L, XL';
       $('tarif-ukuran').value = '';
       $('tarif-upah').value = '';
       $('tarif-status-aktif').checked = true;
@@ -2257,14 +2477,16 @@
       const editId = $('tarif-id-tailor').value.trim();
       const barcode_kategori = $('tarif-barcode-sku').value.trim().toUpperCase();
       const nama_kategori = $('tarif-nama-produk').value.trim();
-      const upah_per_pcs = Number($('tarif-upah').value);
+      const rawUpah = $('tarif-upah').value.trim();
+      const upah_per_pcs = Number(rawUpah);
       const status_aktif = $('tarif-status-aktif').checked;
 
       if (!barcode_kategori || !nama_kategori) {
         return toast('Kode dan Nama Barang Jahit wajib diisi.', 'error');
       }
-      if (isNaN(upah_per_pcs) || upah_per_pcs < 0 || $('tarif-upah').value === '') {
-        return toast('Masukkan ongkos jahit per pcs yang valid.', 'error');
+      if (rawUpah === '' || !Number.isFinite(upah_per_pcs) || upah_per_pcs < 0) {
+        $('tarif-upah').focus();
+        return toast('Masukkan ongkos jahit per pcs yang valid (0 atau lebih).', 'error');
       }
 
       let payload = {
@@ -2275,21 +2497,36 @@
       };
 
       if (editId) {
-        const warna = $('tarif-warna').value.split(',')[0]?.trim() || '-';
-        const ukuran = $('tarif-ukuran').value.split(',')[0]?.trim().toUpperCase() || '-';
+        const rawWarna = $('tarif-warna').value.trim();
+        const rawUkuran = $('tarif-ukuran').value.trim();
+
+        if (rawWarna.includes(',') || rawUkuran.includes(',')) {
+          return toast('Mode Ubah hanya untuk 1 warna & 1 ukuran. Untuk menambah variasi baru, klik "+ Warna/Ukuran" atau "+ Baru".', 'error');
+        }
+        if (!rawWarna || !rawUkuran) {
+          return toast('Warna dan Ukuran wajib diisi.', 'error');
+        }
+
+        const warna = rawWarna;
+        const ukuran = rawUkuran.toUpperCase();
+
+        if (isTailorComboExisting(barcode_kategori, warna, ukuran, editId)) {
+          return toast(`Kombinasi ${warna} · ${ukuran} sudah terdaftar pada kode ${barcode_kategori}.`, 'error');
+        }
+
         payload.id_tailor = editId;
         payload.warna = warna;
         payload.ukuran = ukuran;
       } else {
         const selectedCombos = [];
         document.querySelectorAll('.tarif-combo-chk').forEach(chk => {
-          if (chk.checked) {
+          if (chk.checked && !chk.disabled) {
             const c = STATE.tarifMatrixItems[Number(chk.dataset.idx)];
             if (c) selectedCombos.push({ warna: c.warna, ukuran: c.ukuran, upah_per_pcs, status_aktif });
           }
         });
         if (!selectedCombos.length) {
-          return toast('Isi warna dan ukuran, lalu pilih minimal 1 variasi.', 'error');
+          return toast('Isi warna & ukuran baru, lalu pilih minimal 1 variasi yang belum terdaftar.', 'error');
         }
         payload.variants = selectedCombos;
       }
@@ -2353,12 +2590,12 @@
           return `
             <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs">
               <div class="min-w-0 flex-1 pr-2">
-                <p class="font-bold text-slate-800">${v.warna} · ${v.ukuran}
+                <p class="font-bold text-slate-800">${escapeHtml(v.warna)} · ${escapeHtml(v.ukuran)}
                   ${v.status_aktif ? '' : '<span class="ml-1 rounded bg-rose-100 px-1.5 py-0.5 text-[9px] text-rose-700">NONAKTIF</span>'}
                 </p>
                 <p class="text-[11px] text-slate-500">Ongkos: <span class="font-bold text-indigo-700">${formatRp(v.upah_per_pcs)}</span>/pcs · Di Penjahit: <span class="font-bold text-emerald-700">${stokVar} pcs</span></p>
               </div>
-              <button type="button" data-edit-tailor="${v.id_tailor}"
+              <button type="button" data-edit-tailor="${escapeHtml(v.id_tailor)}"
                 class="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 shadow-xs ring-1 ring-slate-200">Ubah</button>
             </div>
           `;
@@ -2368,11 +2605,11 @@
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <span class="rounded-md bg-indigo-50 px-2 py-0.5 font-mono text-[11px] font-extrabold text-indigo-700">${grp.barcode_kategori}</span>
-                <h4 class="mt-1 text-sm font-bold text-slate-900">${grp.nama_kategori}</h4>
+                <span class="rounded-md bg-indigo-50 px-2 py-0.5 font-mono text-[11px] font-extrabold text-indigo-700">${escapeHtml(grp.barcode_kategori)}</span>
+                <h4 class="mt-1 text-sm font-bold text-slate-900">${escapeHtml(grp.nama_kategori)}</h4>
                 <p class="text-[11px] text-slate-400">${grp.items.length} pilihan · Siap setor: ${totalStokSku} pcs</p>
               </div>
-              <button type="button" data-add-var-sku="${grp.barcode_kategori}"
+              <button type="button" data-add-var-sku="${escapeHtml(grp.barcode_kategori)}"
                 class="rounded-xl bg-indigo-50 px-2.5 py-1.5 text-[11px] font-bold text-indigo-700">+ Warna/Ukuran</button>
             </div>
             <div class="space-y-1.5">${rowsHtml}</div>
@@ -2403,7 +2640,11 @@
           $('tarif-form-mode-badge').textContent = 'UBAH DATA BARANG JAHIT';
           $('tarif-barcode-sku').value = item.barcode_kategori;
           $('tarif-nama-produk').value = item.nama_kategori;
+          $('tarif-warna-label').textContent = 'Warna (1 Pilihan)';
+          $('tarif-warna').placeholder = 'Contoh: Hitam';
           $('tarif-warna').value = item.warna;
+          $('tarif-ukuran-label').textContent = 'Ukuran (1 Pilihan)';
+          $('tarif-ukuran').placeholder = 'Contoh: M';
           $('tarif-ukuran').value = item.ukuran;
           $('tarif-upah').value = item.upah_per_pcs;
           $('tarif-status-aktif').checked = item.status_aktif !== false;
@@ -2464,9 +2705,9 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div class="flex items-start justify-between gap-2">
             <div>
-              <span class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">${it.nama_penjahit}</span>
-              <h4 class="mt-1.5 text-sm font-bold text-slate-900">${it.nama_kategori} · ${it.warna} · ${it.ukuran}</h4>
-              <p class="mt-0.5 font-mono text-[11px] text-slate-400">Kode: ${it.barcode_kategori} · Ongkos: ${formatRp(it.upah_per_pcs)}/pcs</p>
+              <span class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">${escapeHtml(it.nama_penjahit)}</span>
+              <h4 class="mt-1.5 text-sm font-bold text-slate-900">${escapeHtml(it.nama_kategori)} · ${escapeHtml(it.warna)} · ${escapeHtml(it.ukuran)}</h4>
+              <p class="mt-0.5 font-mono text-[11px] text-slate-400">Kode: ${escapeHtml(it.barcode_kategori)} · Ongkos: ${formatRp(it.upah_per_pcs)}/pcs</p>
             </div>
             <div class="text-right">
               <p class="text-lg font-black text-emerald-700">${it.stok_ready} pcs</p>
@@ -2530,6 +2771,16 @@
       $('qc-sisa-stok-text').textContent = `Sisa di penjahit: ${sisa} pcs`;
       if (gagal > 0) $('qc-reject-reason-wrap').classList.remove('hidden');
       else $('qc-reject-reason-wrap').classList.add('hidden');
+
+      if ($('qc-warehouse-target-fields') && $('qc-no-stock-note')) {
+        if (lolos === 0 && gagal > 0) {
+          $('qc-warehouse-target-fields').classList.add('hidden');
+          $('qc-no-stock-note').classList.remove('hidden');
+        } else {
+          $('qc-warehouse-target-fields').classList.remove('hidden');
+          $('qc-no-stock-note').classList.add('hidden');
+        }
+      }
     }
 
     $('qc-lolos').addEventListener('input', updateQcWagePreview);
@@ -2570,9 +2821,9 @@
       $('qc-wip-prod-code').textContent = res.data.barcode;
 
       $('qc-wip-variants').innerHTML = variants.map(v => `
-        <button type="button" data-qc-var="${v.id}"
+        <button type="button" data-qc-var="${escapeHtml(v.id)}"
           class="choice-btn mr-1.5 mb-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold ${STATE.qcTargetVariantId === v.id ? 'selected' : ''}">
-          ${v.label || 'Standar'}
+          ${escapeHtml(v.label || 'Standar')}
         </button>
       `).join('');
 
@@ -2589,16 +2840,73 @@
       const it = STATE.selectedQcItem;
       if (!it) return;
 
-      const qty_lolos = Number($('qc-lolos').value) || 0;
-      const qty_gagal = Number($('qc-gagal').value) || 0;
-      const nama_penerima = $('qc-nama').value.trim();
+      const rawLolos = $('qc-lolos').value.trim();
+      const rawGagal = $('qc-gagal').value.trim();
 
-      if (qty_lolos + qty_gagal <= 0) return toast('Jumlah bagus atau rusak minimal 1 pcs.', 'error');
-      if (qty_lolos + qty_gagal > it.stok_ready) return toast('Total melebihi jumlah yang siap setor.', 'error');
-      if (qty_lolos > 0 && (!STATE.qcTargetProduct || !STATE.qcTargetVariantId)) {
-        return toast('Pilih produk & warna/ukuran tujuan di rak.', 'error');
+      if (rawLolos === '' || rawGagal === '') {
+        return toast('Isi jumlah Bagus dan Rusak (isi 0 jika tidak ada).', 'error');
       }
-      if (!nama_penerima) return toast('Isi nama petugas penerima.', 'error');
+
+      const qty_lolos = Number(rawLolos);
+      const qty_gagal = Number(rawGagal);
+
+      if (!Number.isFinite(qty_lolos) || !Number.isInteger(qty_lolos) ||
+        !Number.isFinite(qty_gagal) || !Number.isInteger(qty_gagal)) {
+        return toast('Jumlah Bagus dan Rusak harus berupa angka bulat.', 'error');
+      }
+      if (qty_lolos < 0 || qty_gagal < 0) {
+        return toast('Jumlah Bagus maupun Rusak tidak boleh negatif.', 'error');
+      }
+      if (qty_lolos + qty_gagal <= 0) {
+        return toast('Jumlah Bagus atau Rusak minimal 1 pcs.', 'error');
+      }
+      if (qty_lolos + qty_gagal > Number(it.stok_ready)) {
+        return toast(`Total (${qty_lolos + qty_gagal} pcs) melebihi jumlah siap setor (${it.stok_ready} pcs).`, 'error');
+      }
+
+      const alasan_gagal = $('qc-alasan-gagal').value.trim();
+      if (qty_gagal > 0 && !alasan_gagal) {
+        $('qc-alasan-gagal').focus();
+        return toast('Isi catatan kerusakan untuk barang yang rusak/reject.', 'error');
+      }
+
+      const nama_penerima = $('qc-nama').value.trim();
+      if (!nama_penerima) {
+        $('qc-nama').focus();
+        return toast('Isi nama petugas penerima.', 'error');
+      }
+
+      if (qty_lolos > 0) {
+        if (!STATE.qcTargetProduct || !STATE.qcTargetVariantId) {
+          return toast('Pilih produk & warna/ukuran tujuan di rak.', 'error');
+        }
+        if (!$('qc-lokasi-tujuan').value) {
+          return toast('Pilih lokasi rak tujuan.', 'error');
+        }
+
+        const targetVar = (STATE.qcTargetProduct.variants || []).find(v => v.id === STATE.qcTargetVariantId);
+        if (targetVar) {
+          const attrValues = Object.values(targetVar.attributes || {}).map(v => String(v).trim().toLowerCase());
+          const targetLabelLower = String(targetVar.label || '').toLowerCase();
+          const tailorColor = String(it.warna || '').trim().toLowerCase();
+          const tailorSize = String(it.ukuran || '').trim().toLowerCase();
+
+          const isColorMatch = !tailorColor || tailorColor === '-' ||
+            attrValues.includes(tailorColor) || targetLabelLower.includes(tailorColor);
+          const isSizeMatch = !tailorSize || tailorSize === '-' ||
+            attrValues.includes(tailorSize) || targetLabelLower.includes(tailorSize);
+
+          if (!isColorMatch || !isSizeMatch) {
+            const okMismatch = window.confirm(
+              `Peringatan Ketidaksesuaian Varian!\n\n` +
+              `Setoran Penjahit: ${it.nama_kategori} · ${it.warna} · ${it.ukuran}\n` +
+              `Varian Gudang Dipilih: ${STATE.qcTargetProduct.nama} (${targetVar.label || 'Standar'})\n\n` +
+              `Warna atau ukuran tampak berbeda. Yakin tetap masukkan ke varian gudang tersebut?`
+            );
+            if (!okMismatch) return;
+          }
+        }
+      }
 
       localStorage.setItem(REPORTER_STORAGE_KEY, nama_penerima);
 
@@ -2608,10 +2916,10 @@
         nama_penjahit: it.nama_penjahit,
         qty_lolos,
         qty_gagal,
-        alasan_gagal: $('qc-alasan-gagal').value.trim(),
-        barcode_produk_tujuan: STATE.qcTargetProduct ? STATE.qcTargetProduct.barcode : '',
-        id_variasi_tujuan: STATE.qcTargetVariantId,
-        lokasi_tujuan: $('qc-lokasi-tujuan').value,
+        alasan_gagal,
+        barcode_produk_tujuan: qty_lolos > 0 && STATE.qcTargetProduct ? STATE.qcTargetProduct.barcode : '',
+        id_variasi_tujuan: qty_lolos > 0 ? STATE.qcTargetVariantId : '',
+        lokasi_tujuan: qty_lolos > 0 ? $('qc-lokasi-tujuan').value : '',
         nama_penerima
       }, $('btn-submit-qc'), 'Memasukkan ke rak & mencatat upah...');
 
@@ -2656,7 +2964,7 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div>
-              <h4 class="text-sm font-bold text-slate-900">${t.nama_penjahit}</h4>
+              <h4 class="text-sm font-bold text-slate-900">${escapeHtml(t.nama_penjahit)}</h4>
               <p class="text-[11px] text-slate-500">${t.total_qty_bagus} pcs bagus · ${t.jumlah_transaksi} kali setor</p>
             </div>
             <p class="text-base font-black text-violet-700">${formatRp(t.total_upah)}</p>
@@ -2665,8 +2973,8 @@
             ${t.items.map(it => `
               <label class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs">
                 <span class="flex items-center gap-2 min-w-0 pr-2">
-                  <input type="checkbox" class="upah-item-chk-${tIdx} accent-violet-600" data-log-id="${it.log_id}" data-upah="${it.total_upah}" checked>
-                  <span class="truncate text-slate-700">${it.detail_item} (${it.qty_bagus} pcs)</span>
+                  <input type="checkbox" class="upah-item-chk-${tIdx} accent-violet-600" data-log-id="${escapeHtml(it.log_id)}" data-upah="${it.total_upah}" checked>
+                  <span class="truncate text-slate-700">${escapeHtml(it.detail_item)} (${it.qty_bagus} pcs)</span>
                 </span>
                 <span class="shrink-0 font-bold text-slate-800">${formatRp(it.total_upah)}</span>
               </label>
@@ -2714,7 +3022,11 @@
 
     $('btn-confirm-payslip').addEventListener('click', async () => {
       if (!STATE.pendingPaySlip) return;
-      const nama_admin = $('pay-slip-admin').value.trim() || 'Admin';
+      const nama_admin = $('pay-slip-admin').value.trim();
+      if (!nama_admin) {
+        $('pay-slip-admin').focus();
+        return toast('Nama petugas pembayar wajib diisi.', 'error');
+      }
       localStorage.setItem(REPORTER_STORAGE_KEY, nama_admin);
 
       const res = await postApi('GENERATE_PAY_SLIP', {
@@ -2734,13 +3046,13 @@
 
     function showSlipReceiptModal(slip) {
       $('slip-receipt-body').innerHTML = `
-        <div class="flex justify-between"><span class="text-slate-400">No. Slip</span><span class="font-mono font-bold">${slip.slip_id}</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">Penjahit</span><span class="font-bold">${slip.nama_penjahit}</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">Petugas</span><span>${slip.dibayar_oleh}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">No. Slip</span><span class="font-mono font-bold">${escapeHtml(slip.slip_id)}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Penjahit</span><span class="font-bold">${escapeHtml(slip.nama_penjahit)}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Petugas</span><span>${escapeHtml(slip.dibayar_oleh)}</span></div>
         <div class="border-t border-dashed border-slate-200 my-2 pt-2 space-y-1">
           ${(slip.rincian || []).map(r => `
             <div class="flex justify-between text-[11px]">
-              <span class="pr-2">${r.detail_item} (${r.qty_bagus}x)</span>
+              <span class="pr-2">${escapeHtml(r.detail_item)} (${r.qty_bagus}x)</span>
               <span class="font-semibold">${formatRp(r.total_upah)}</span>
             </div>
           `).join('')}
@@ -2804,18 +3116,18 @@
 
       $('pricing-variant-list').innerHTML = (res.data.variants || []).map(v => `
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
-          <p class="text-xs font-bold text-slate-900">${v.label || 'Standar'}</p>
+          <p class="text-xs font-bold text-slate-900">${escapeHtml(v.label || 'Standar')}</p>
           <div class="flex gap-2.5">
             <div class="flex-1">
               <label class="block text-[10px] text-slate-400 font-semibold">Harga Modal (Rp)</label>
-              <input type="number" min="0" class="price-hpp-${v.id} input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold" value="${v.hpp || 0}">
+              <input type="number" min="0" class="price-hpp-${escapeHtml(v.id)} input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold" value="${v.hpp || 0}">
             </div>
             <div class="flex-1">
               <label class="block text-[10px] text-slate-400 font-semibold">Harga Jual (Rp)</label>
-              <input type="number" min="0" class="price-jual-${v.id} input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold" value="${v.harga_jual || 0}">
+              <input type="number" min="0" class="price-jual-${escapeHtml(v.id)} input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold" value="${v.harga_jual || 0}">
             </div>
           </div>
-          <button type="button" data-save-var-price="${v.id}"
+          <button type="button" data-save-var-price="${escapeHtml(v.id)}"
             class="w-full rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white">Simpan Harga Varian Ini</button>
         </div>
       `).join('');
@@ -2823,8 +3135,26 @@
       $('pricing-variant-list').querySelectorAll('button[data-save-var-price]').forEach(btn => {
         btn.addEventListener('click', async () => {
           const vid = btn.dataset.saveVarPrice;
-          const hpp = Number(document.querySelector(`.price-hpp-${vid}`).value) || 0;
-          const harga_jual = Number(document.querySelector(`.price-jual-${vid}`).value) || 0;
+          const hppInp = document.querySelector(`.price-hpp-${vid}`);
+          const jualInp = document.querySelector(`.price-jual-${vid}`);
+          const rawHpp = hppInp ? hppInp.value.trim() : '';
+          const rawJual = jualInp ? jualInp.value.trim() : '';
+
+          if (rawHpp === '' || rawJual === '') {
+            return toast('Harga Modal dan Harga Jual wajib diisi.', 'error');
+          }
+          const hpp = Number(rawHpp);
+          const harga_jual = Number(rawJual);
+          if (!Number.isFinite(hpp) || hpp < 0 || !Number.isFinite(harga_jual) || harga_jual < 0) {
+            return toast('Harga Modal dan Harga Jual harus berupa angka 0 atau lebih.', 'error');
+          }
+          if (harga_jual > 0 && harga_jual < hpp) {
+            const okLoss = window.confirm(
+              `Peringatan Harga Jual di Bawah Modal!\n\nHarga Jual (${formatRp(harga_jual)}) lebih kecil dari Harga Modal (${formatRp(hpp)}).\nYakin tetap simpan harga ini?`
+            );
+            if (!okLoss) return;
+          }
+
           const upd = await postApi('UPDATE_VARIANT_PRICING', {
             barcode: res.data.barcode,
             items: [{ variant_id: vid, hpp, harga_jual }],
@@ -2837,16 +3167,72 @@
 
     $('btn-apply-bulk-pricing').addEventListener('click', async () => {
       if (!STATE.pricingProduct) return;
-      const hpp = $('pricing-bulk-hpp').value;
-      const harga_jual = $('pricing-bulk-harga').value;
-      const res = await postApi('SET_VARIANT_PRICING_BULK', {
-        barcode: STATE.pricingProduct.barcode,
-        hpp,
-        harga_jual,
-        nama_pelapor: localStorage.getItem(REPORTER_STORAGE_KEY) || 'Admin'
-      }, $('btn-apply-bulk-pricing'), 'Menerapkan harga ke semua varian...');
+      const rawHpp = $('pricing-bulk-hpp').value.trim();
+      const rawHarga = $('pricing-bulk-harga').value.trim();
+
+      if (rawHpp === '' && rawHarga === '') {
+        return toast('Isi minimal Harga Modal atau Harga Jual terlebih dahulu.', 'error');
+      }
+
+      const parsedHpp = rawHpp !== '' ? Number(rawHpp) : null;
+      const parsedHarga = rawHarga !== '' ? Number(rawHarga) : null;
+
+      if (parsedHpp !== null && (!Number.isFinite(parsedHpp) || parsedHpp < 0)) {
+        $('pricing-bulk-hpp').focus();
+        return toast('Harga Modal harus berupa angka 0 atau lebih.', 'error');
+      }
+      if (parsedHarga !== null && (!Number.isFinite(parsedHarga) || parsedHarga < 0)) {
+        $('pricing-bulk-harga').focus();
+        return toast('Harga Jual harus berupa angka 0 atau lebih.', 'error');
+      }
+
+      const variants = STATE.pricingProduct.variants || [];
+      if (!variants.length) {
+        return toast('Produk ini belum memiliki varian.', 'error');
+      }
+
+      const belowCostVariant = variants.find(v => {
+        const finalHpp = parsedHpp !== null ? parsedHpp : (Number(v.hpp) || 0);
+        const finalHarga = parsedHarga !== null ? parsedHarga : (Number(v.harga_jual) || 0);
+        return finalHarga > 0 && finalHarga < finalHpp;
+      });
+
+      if (belowCostVariant) {
+        const finalHpp = parsedHpp !== null ? parsedHpp : (Number(belowCostVariant.hpp) || 0);
+        const finalHarga = parsedHarga !== null ? parsedHarga : (Number(belowCostVariant.harga_jual) || 0);
+        const okLoss = window.confirm(
+          `Peringatan Harga Jual di Bawah Modal!\n\nHarga Jual (${formatRp(finalHarga)}) lebih kecil dari Harga Modal (${formatRp(finalHpp)}).\nApakah Anda yakin angka tersebut sudah benar?`
+        );
+        if (!okLoss) return;
+      }
+
+      const pelapor = localStorage.getItem(REPORTER_STORAGE_KEY) || 'Admin';
+      let res = null;
+
+      if (parsedHpp !== null && parsedHarga !== null) {
+        res = await postApi('SET_VARIANT_PRICING_BULK', {
+          barcode: STATE.pricingProduct.barcode,
+          hpp: parsedHpp,
+          harga_jual: parsedHarga,
+          nama_pelapor: pelapor
+        }, $('btn-apply-bulk-pricing'), 'Menerapkan harga ke semua varian...');
+      } else {
+        const items = variants.map(v => ({
+          variant_id: v.id,
+          hpp: parsedHpp !== null ? parsedHpp : (Number(v.hpp) || 0),
+          harga_jual: parsedHarga !== null ? parsedHarga : (Number(v.harga_jual) || 0)
+        }));
+        res = await postApi('UPDATE_VARIANT_PRICING', {
+          barcode: STATE.pricingProduct.barcode,
+          items,
+          nama_pelapor: pelapor
+        }, $('btn-apply-bulk-pricing'), 'Menerapkan harga ke semua varian...');
+      }
+
       if (res) {
         toast(res.message);
+        $('pricing-bulk-hpp').value = '';
+        $('pricing-bulk-harga').value = '';
         await loadProductForPricing(STATE.pricingProduct.barcode);
       }
     });

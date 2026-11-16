@@ -322,6 +322,30 @@
     </main>
   </div>
 
+  <!-- Modal Konfirmasi Jumlah Besar (P1: Mencegah salah ketik angka besar seperti 200 vs 20) -->
+  <div id="confirm-qty-modal"
+    class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm sm:items-center">
+    <div class="w-full max-w-sm rounded-2xl border border-amber-200 bg-white p-5 shadow-2xl space-y-3">
+      <div class="flex items-center gap-3">
+        <div
+          class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-700 font-black">
+          !
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-slate-900">Konfirmasi Jumlah Setoran</h3>
+          <p class="text-[11px] text-slate-500">Pastikan angka yang diketik sudah sesuai</p>
+        </div>
+      </div>
+      <p id="confirm-qty-desc" class="rounded-xl bg-amber-50 p-3 text-xs leading-relaxed text-amber-950"></p>
+      <div class="flex gap-2 pt-1">
+        <button type="button" id="btn-cancel-confirm-qty"
+          class="flex-1 rounded-xl bg-slate-100 py-3 text-xs font-bold text-slate-600">Periksa Ulang</button>
+        <button type="button" id="btn-proceed-confirm-qty"
+          class="flex-1 rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Ya, Sudah Benar</button>
+      </div>
+    </div>
+  </div>
+
   <div id="toast-root" class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-4"
     aria-live="polite"></div>
 
@@ -329,6 +353,7 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec';
     const CACHE_STORAGE_KEY = 'IBS_TAILOR_CACHE_V6_0';
     const TAILOR_NAME_KEY = 'IBS_LAST_TAILOR_NAME';
+    const LARGE_QTY_CONFIRM_THRESHOLD = 100;
 
     let isMutating = false;
     let isFetching = false;
@@ -340,6 +365,8 @@
     let selectedWarna = '';
     let selectedUkuran = '';
     let selectedTailorRecord = null;
+    let lastRenderedVariationSignature = '';
+    let pendingSubmitPayload = null;
     let html5QrScanner = null;
     let isScannerRunning = false;
     let scannerHistoryPushed = false;
@@ -370,7 +397,9 @@
     }
 
     function updateTotalPreview() {
-      const qty = parseInt($('lapor-qty').value) || 0;
+      const raw = $('lapor-qty').value.trim();
+      const num = Number(raw);
+      const qty = (raw !== '' && Number.isInteger(num) && num > 0) ? num : 0;
       $('lapor-total-text').textContent = `${qty} pcs siap setor`;
     }
 
@@ -419,7 +448,23 @@
       }
     }
 
-    // 2. RENDER DAFTAR MODEL & VARIASI
+    // Helper: Reset total pilihan model & variasi jika model dinonaktifkan / dikosongkan
+    function resetCategorySelection(clearBanner = true) {
+      selectedBarcodeKategori = '';
+      selectedWarna = '';
+      selectedUkuran = '';
+      selectedTailorRecord = null;
+      lastRenderedVariationSignature = '';
+      $('lapor-kategori-select').value = '';
+      $('variasi-picker-wrap').classList.add('hidden');
+      $('warna-choices').innerHTML = '';
+      $('ukuran-choices').innerHTML = '';
+      if (clearBanner) {
+        hideSkuValidationBanner();
+      }
+    }
+
+    // 2. RENDER DAFTAR MODEL & VARIASI (P1: Anti-reset pilihan saat auto-sync & reset aman jika nonaktif)
     function renderAppState(data) {
       if (!data) return;
       const list = Array.isArray(data.master_tailor) ? data.master_tailor : [];
@@ -428,7 +473,8 @@
 
       const sel = $('lapor-kategori-select');
       const badge = $('kategori-count-badge');
-      const currentSelected = selectedBarcodeKategori || sel.value;
+      const prevSelectVal = sel.value;
+      const activeSku = selectedBarcodeKategori || (prevSelectVal !== '__MANUAL__' ? prevSelectVal : '');
 
       const uniqueMap = new Map();
       MASTER_TAILOR_LIST.forEach(item => {
@@ -437,6 +483,25 @@
           uniqueMap.set(key, item.nama_kategori || key);
         }
       });
+
+      // Pertahankan mode input manual jika sedang terbuka
+      if (prevSelectVal === '__MANUAL__' && !$('manual-barcode-wrap').classList.contains('hidden')) {
+        sel.innerHTML = '<option value="">-- Pilih atau Scan QR Baju --</option>';
+        uniqueMap.forEach((namaKat, barcodeKat) => {
+          const opt = document.createElement('option');
+          opt.value = barcodeKat;
+          opt.textContent = `${namaKat} (${barcodeKat})`;
+          sel.appendChild(opt);
+        });
+        const optManual = document.createElement('option');
+        optManual.value = '__MANUAL__';
+        optManual.textContent = '+ Ketik Kode Baju Manual';
+        sel.appendChild(optManual);
+        sel.value = '__MANUAL__';
+        badge.textContent = uniqueMap.size ? `${uniqueMap.size} MODEL BAJU` : 'BELUM ADA MODEL';
+        renderTailorActiveStockList();
+        return;
+      }
 
       sel.innerHTML = '<option value="">-- Pilih atau Scan QR Baju --</option>';
       uniqueMap.forEach((namaKat, barcodeKat) => {
@@ -453,12 +518,56 @@
 
       badge.textContent = uniqueMap.size ? `${uniqueMap.size} MODEL BAJU` : 'BELUM ADA MODEL';
 
-      if (currentSelected && uniqueMap.has(currentSelected)) {
-        sel.value = currentSelected;
-        selectCategoryByBarcode(currentSelected, false);
+      if (activeSku) {
+        if (uniqueMap.has(activeSku)) {
+          sel.value = activeSku;
+          // Sinkronkan pilihan tanpa merusak tombol jika daftar variasi tidak berubah
+          syncActiveCategorySelection(activeSku);
+        } else {
+          // P1: Model dinonaktifkan admin saat penjahit membuka halaman -> reset bersih & beri peringatan
+          const deactivatedCode = activeSku;
+          resetCategorySelection(false);
+          showSkuValidationBanner(
+            false,
+            `Model "${deactivatedCode}" Dinonaktifkan`,
+            'Admin telah menonaktifkan model baju ini. Silakan pilih model baju aktif lainnya.'
+          );
+          toast(`Model baju ${deactivatedCode} baru saja dinonaktifkan admin.`, 'error');
+        }
       }
 
       renderTailorActiveStockList();
+    }
+
+    // Sinkronisasi ringan saat auto-sync 25 detik: hanya render ulang tombol jika struktur variasi berubah
+    function syncActiveCategorySelection(barcodeKategori) {
+      const matches = MASTER_TAILOR_LIST.filter(
+        it => String(it.barcode_kategori || '').trim().toUpperCase() === barcodeKategori.toUpperCase()
+      );
+      if (!matches.length) {
+        resetCategorySelection(true);
+        return;
+      }
+
+      const signature = matches
+        .map(m => `${m.id_tailor}|${m.warna}|${m.ukuran}`)
+        .sort()
+        .join(';;');
+
+      // Cek apakah variasi yang sedang dipilih penjahit masih aktif
+      const stillValidRecord = matches.find(
+        m => String(m.warna || '-').trim() === selectedWarna &&
+          String(m.ukuran || '-').trim() === selectedUkuran
+      );
+
+      if (signature !== lastRenderedVariationSignature || !stillValidRecord) {
+        renderVariationChoices(matches);
+      } else {
+        // Cukup perbarui info stok siap setor tanpa menghancurkan DOM tombol pilihan
+        selectedTailorRecord = stillValidRecord;
+        updateSelectedItemStockBanner();
+      }
+      $('variasi-picker-wrap').classList.remove('hidden');
     }
 
     function renderTailorActiveStockList() {
@@ -534,6 +643,7 @@
       return raw;
     }
 
+    // P1: Filter varian aktif saat fetch GET_TAILOR_SKU agar item nonaktif tidak masuk ke pilihan
     async function validateAndSelectSku(barcodeInput, notify = true) {
       const code = extractSkuFromQr(barcodeInput);
       if (!code || code === '__MANUAL__') {
@@ -542,7 +652,8 @@
       }
 
       let matches = MASTER_TAILOR_LIST.filter(
-        it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+        it => it.status_aktif !== false &&
+          String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
       );
 
       if (!matches.length) {
@@ -550,7 +661,19 @@
           const res = await fetch(`${GAS_URL}?action=GET_TAILOR_SKU&sku=${encodeURIComponent(code)}&_t=${Date.now()}`);
           const json = await res.json();
           if (json.success && json.data && Array.isArray(json.data.variants) && json.data.variants.length) {
-            json.data.variants.forEach(v => {
+            const activeVariants = json.data.variants.filter(v => v.status_aktif !== false);
+            if (!activeVariants.length) {
+              resetCategorySelection(false);
+              showSkuValidationBanner(
+                false,
+                `Kode "${code}" Nonaktif`,
+                'Model baju ini berstatus nonaktif di sistem gudang dan tidak dapat dipilih.'
+              );
+              if (notify) toast(`Kode "${code}" sudah dinonaktifkan.`, 'error');
+              return false;
+            }
+
+            activeVariants.forEach(v => {
               const exists = MASTER_TAILOR_LIST.some(m => m.id_tailor === v.id_tailor);
               if (!exists) {
                 MASTER_TAILOR_LIST.push(v);
@@ -558,7 +681,8 @@
             });
             renderAppState({ master_tailor: MASTER_TAILOR_LIST, stok_tailor: STOK_TAILOR_LIST });
             matches = MASTER_TAILOR_LIST.filter(
-              it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+              it => it.status_aktif !== false &&
+                String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
             );
           }
         } catch (err) {
@@ -574,34 +698,26 @@
       const wrap = $('variasi-picker-wrap');
 
       if (!code || code === '__MANUAL__') {
-        selectedBarcodeKategori = '';
-        selectedWarna = '';
-        selectedUkuran = '';
-        selectedTailorRecord = null;
-        wrap.classList.add('hidden');
-        hideSkuValidationBanner();
+        resetCategorySelection(true);
         renderTailorActiveStockList();
         return false;
       }
 
       const matches = MASTER_TAILOR_LIST.filter(
-        it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
+        it => it.status_aktif !== false &&
+          String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
       );
 
       if (!matches.length) {
-        selectedBarcodeKategori = '';
-        selectedWarna = '';
-        selectedUkuran = '';
-        selectedTailorRecord = null;
-        wrap.classList.add('hidden');
+        resetCategorySelection(false);
         showSkuValidationBanner(
           false,
           `Kode "${code}" Tidak Terdaftar`,
-          'Kode QR ini tidak ditemukan di daftar baju jahitan. Pastikan QR Code sesuai dengan label produksi.'
+          'Kode QR ini tidak ditemukan atau sudah dinonaktifkan. Pastikan QR Code sesuai dengan label produksi.'
         );
         renderTailorActiveStockList();
         if (notify) {
-          toast(`Kode "${code}" tidak ditemukan di daftar jahitan.`, 'error');
+          toast(`Kode "${code}" tidak ditemukan di daftar jahitan aktif.`, 'error');
         }
         return false;
       }
@@ -619,7 +735,7 @@
       showSkuValidationBanner(
         true,
         `Baju Ditemukan: ${matches[0].nama_kategori} (${resolvedBarcode})`,
-        `Tersedia ${matches.length} pilihan variasi. Silakan pilih warna & ukuran di bawah.`
+        `Tersedia ${matches.length} pilihan variasi aktif. Silakan pilih warna & ukuran di bawah.`
       );
 
       renderVariationChoices(matches);
@@ -644,11 +760,31 @@
       return { totalAll, personal };
     }
 
+    function updateSelectedItemStockBanner() {
+      const titleEl = $('selected-item-title');
+      const stockEl = $('selected-item-stock');
+      if (selectedTailorRecord) {
+        const stInfo = getStockReadyForTailorId(selectedTailorRecord.id_tailor);
+        titleEl.textContent = `Baju dipilih: ${selectedTailorRecord.nama_kategori} · ${selectedWarna} · ${selectedUkuran}`;
+        stockEl.textContent = stInfo.personal > 0
+          ? `Stok Anda belum disetor: ${stInfo.personal} pcs (Total semua penjahit: ${stInfo.totalAll} pcs)`
+          : `Stok belum disetor saat ini: ${stInfo.totalAll} pcs`;
+      } else {
+        titleEl.textContent = 'Pilihan warna & ukuran ini tidak tersedia.';
+        stockEl.textContent = '-';
+      }
+    }
+
     function renderVariationChoices(categoryItems) {
       const warnaBox = $('warna-choices');
       const ukuranBox = $('ukuran-choices');
       warnaBox.innerHTML = '';
       ukuranBox.innerHTML = '';
+
+      lastRenderedVariationSignature = categoryItems
+        .map(m => `${m.id_tailor}|${m.warna}|${m.ukuran}`)
+        .sort()
+        .join(';;');
 
       const colors = [...new Set(categoryItems.map(m => String(m.warna || '-').trim()))];
       if (!colors.includes(selectedWarna)) {
@@ -693,18 +829,7 @@
           String(m.ukuran || '-').trim() === selectedUkuran
       ) || null;
 
-      const titleEl = $('selected-item-title');
-      const stockEl = $('selected-item-stock');
-      if (selectedTailorRecord) {
-        const stInfo = getStockReadyForTailorId(selectedTailorRecord.id_tailor);
-        titleEl.textContent = `Baju dipilih: ${selectedTailorRecord.nama_kategori} · ${selectedWarna} · ${selectedUkuran}`;
-        stockEl.textContent = stInfo.personal > 0
-          ? `Stok Anda belum disetor: ${stInfo.personal} pcs (Total semua penjahit: ${stInfo.totalAll} pcs)`
-          : `Stok belum disetor saat ini: ${stInfo.totalAll} pcs`;
-      } else {
-        titleEl.textContent = 'Pilihan warna & ukuran ini tidak tersedia.';
-        stockEl.textContent = '-';
-      }
+      updateSelectedItemStockBanner();
     }
 
     // 3. KONTROL KAMERA SCANNER QR CODE (DENGAN FALLBACK & DIAGNOSIS ERROR)
@@ -782,10 +907,8 @@
         isScannerRunning = true;
 
         try {
-          // Prioritas 1: Kamera belakang via facingMode
           await html5QrScanner.start({ facingMode: 'environment' }, scanConfig, onScanSuccess, () => { });
         } catch (firstErr) {
-          // Prioritas 2: Fallback mengambil daftar kamera yang tersedia di perangkat
           const cameras = await Html5Qrcode.getCameras();
           if (!cameras || !cameras.length) throw firstErr;
           const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label)) || cameras[cameras.length - 1];
@@ -824,7 +947,6 @@
       scannerHistoryPushed = false;
     }
 
-    // Tombol Kembali (Back HP / Browser) menutup kamera dulu sebelum keluar halaman
     window.addEventListener('popstate', () => {
       if (isScannerRunning) {
         stopCategoryScanner(true);
@@ -875,10 +997,8 @@
       const manualWrap = $('manual-barcode-wrap');
       if (val === '__MANUAL__') {
         manualWrap.classList.remove('hidden');
-        $('variasi-picker-wrap').classList.add('hidden');
-        hideSkuValidationBanner();
-        selectedBarcodeKategori = '';
-        selectedTailorRecord = null;
+        resetCategorySelection(true);
+        $('lapor-kategori-select').value = '__MANUAL__';
         $('lapor-barcode-manual').focus();
       } else {
         manualWrap.classList.add('hidden');
@@ -894,10 +1014,7 @@
 
     $('lapor-nama').addEventListener('input', () => {
       if (selectedBarcodeKategori) {
-        const matches = MASTER_TAILOR_LIST.filter(
-          it => String(it.barcode_kategori || '').trim().toUpperCase() === selectedBarcodeKategori.toUpperCase()
-        );
-        if (matches.length) renderVariationChoices(matches);
+        updateSelectedItemStockBanner();
       }
       renderTailorActiveStockList();
     });
@@ -911,26 +1028,66 @@
 
     $('btn-refresh-data').addEventListener('click', () => syncAppData(true));
 
-    // 5. SIMPAN HASIL JAHITAN
+    // 5. SIMPAN HASIL JAHITAN (P1: Validasi ketat bilangan bulat & konfirmasi jumlah besar)
+    async function executeSubmitSetoran(payload) {
+      const btn = $('btn-submit-lapor');
+      const result = await submitWithLock('SUBMIT_STOK_TAILOR', payload, btn, 'Menyimpan Hasil Jahitan...');
+      if (result && result.success) {
+        localStorage.setItem(TAILOR_NAME_KEY, payload.nama_penjahit);
+        toast(result.message || 'Hasil jahitan berhasil disimpan!');
+        $('lapor-qty').value = '';
+        updateTotalPreview();
+      }
+    }
+
+    $('btn-cancel-confirm-qty').addEventListener('click', () => {
+      pendingSubmitPayload = null;
+      $('confirm-qty-modal').classList.add('hidden');
+      $('confirm-qty-modal').classList.remove('flex');
+      $('lapor-qty').focus();
+    });
+
+    $('btn-proceed-confirm-qty').addEventListener('click', async () => {
+      const payload = pendingSubmitPayload;
+      pendingSubmitPayload = null;
+      $('confirm-qty-modal').classList.add('hidden');
+      $('confirm-qty-modal').classList.remove('flex');
+      if (payload) {
+        await executeSubmitSetoran(payload);
+      }
+    });
+
     $('form-lapor').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = $('btn-submit-lapor');
       if (btn.disabled || isMutating) return;
 
       const nama = $('lapor-nama').value.trim();
-      const qty = parseInt($('lapor-qty').value) || 0;
+      const rawQty = $('lapor-qty').value.trim();
 
-      if (!selectedTailorRecord) {
-        return toast('Harap scan atau pilih model baju, warna, dan ukuran.', 'error');
+      if (!selectedTailorRecord || selectedTailorRecord.status_aktif === false) {
+        return toast('Harap scan atau pilih model baju aktif, warna, dan ukuran.', 'error');
       }
       if (!nama) {
+        $('lapor-nama').focus();
         return toast('Harap isi Nama Penjahit atau Tim.', 'error');
       }
+      if (rawQty === '') {
+        $('lapor-qty').focus();
+        return toast('Jumlah baju selesai wajib diisi.', 'error');
+      }
+
+      const qty = Number(rawQty);
+      if (!Number.isFinite(qty) || !Number.isInteger(qty)) {
+        $('lapor-qty').focus();
+        return toast('Jumlah baju harus berupa angka bulat (tidak boleh desimal/koma).', 'error');
+      }
       if (qty <= 0) {
+        $('lapor-qty').focus();
         return toast('Jumlah baju selesai minimal 1 pcs.', 'error');
       }
 
-      const result = await submitWithLock('SUBMIT_STOK_TAILOR', {
+      const payload = {
         transaction_id: 'JHT-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
         id_tailor: selectedTailorRecord.id_tailor,
         barcode_kategori: selectedTailorRecord.barcode_kategori,
@@ -938,14 +1095,18 @@
         ukuran: selectedUkuran,
         nama_penjahit: nama,
         qty: qty
-      }, btn, 'Menyimpan Hasil Jahitan...');
+      };
 
-      if (result && result.success) {
-        localStorage.setItem(TAILOR_NAME_KEY, nama);
-        toast(result.message || 'Hasil jahitan berhasil disimpan!');
-        $('lapor-qty').value = '';
-        updateTotalPreview();
+      if (qty >= LARGE_QTY_CONFIRM_THRESHOLD) {
+        pendingSubmitPayload = payload;
+        $('confirm-qty-desc').innerHTML =
+          `Anda akan mencatat <strong>${qty.toLocaleString('id-ID')} pcs</strong> untuk <strong>${selectedTailorRecord.nama_kategori} (${selectedWarna} · ${selectedUkuran})</strong> atas nama <strong>${nama}</strong>. Pastikan jumlah ini tidak salah ketik.`;
+        $('confirm-qty-modal').classList.remove('hidden');
+        $('confirm-qty-modal').classList.add('flex');
+        return;
       }
+
+      await executeSubmitSetoran(payload);
     });
 
     // Inisialisasi awal + cek parameter ?sku= dari kamera bawaan HP
