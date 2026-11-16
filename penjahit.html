@@ -93,6 +93,12 @@
       padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
     }
 
+    #qr-reader video {
+      width: 100% !important;
+      border-radius: 0.5rem;
+      object-fit: cover;
+    }
+
     @keyframes spin {
       to {
         transform: rotate(360deg);
@@ -102,7 +108,7 @@
 </head>
 
 <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
-  <!-- Overlay & Banner Validasi Loading (Anti-Double Klik) -->
+  <!-- Overlay Validasi Loading (Anti-Double Klik) -->
   <div id="global-lock-overlay"
     style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); z-index:9999; align-items:center; justify-content:center; backdrop-filter:blur(2px);">
     <div
@@ -126,7 +132,7 @@
           </div>
           <div>
             <p class="text-[10px] font-semibold uppercase tracking-[.18em] text-slate-400">Ina Basic Store</p>
-            <h1 class="text-base font-bold leading-tight">Mitra Jahit · Input Stok</h1>
+            <h1 class="text-base font-bold leading-tight">Mitra Jahit · Catat Setoran</h1>
           </div>
         </div>
         <button id="btn-install" type="button"
@@ -134,12 +140,12 @@
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           </svg>
-          <span>Install</span>
+          <span>Pasang</span>
         </button>
       </div>
       <div class="mt-4 flex items-center gap-2">
         <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-        <span id="header-label" class="text-xs font-medium text-slate-400">Pilih kategori & catat hasil jahitan</span>
+        <span id="header-label" class="text-xs font-medium text-slate-400">Scan QR atau pilih baju yang selesai dijahit</span>
       </div>
     </header>
 
@@ -147,24 +153,23 @@
     <main class="flex-1 px-4 py-5 safe-bottom">
       <section id="section-lapor" class="screen-enter">
         <div class="mb-4 flex items-center justify-between">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Form Hasil Jahitan</h2>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">Catatan Hasil Jahit</h2>
           <span id="kategori-count-badge"
             class="rounded-full bg-slate-200 px-2.5 py-1 text-[10px] font-bold text-slate-500">MEMUAT DATA</span>
         </div>
 
         <form id="form-lapor" class="space-y-3" novalidate>
-          <!-- Card 1: Scan QR SKU & Pilihan Variasi Master Tailor -->
+          <!-- Card 1: Scan QR Baju & Pilihan Warna/Ukuran -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div>
               <div class="mb-1.5 flex items-center justify-between">
                 <label for="lapor-kategori-select"
-                  class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">SKU / Produk Jahit
-                  (Master Tailor)</label>
+                  class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Model / Baju Jahitan</label>
                 <button type="button" id="btn-refresh-data"
-                  class="text-xs font-semibold text-indigo-600 transition active:opacity-70">Muat ulang</button>
+                  class="text-xs font-semibold text-indigo-600 transition active:opacity-70">Segarkan Data</button>
               </div>
 
-              <!-- Tombol Scan QR Code SKU Gudang -->
+              <!-- Tombol Scan QR Code -->
               <button type="button" id="btn-scan-kategori"
                 class="mb-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-3 text-xs font-bold text-indigo-700 transition active:scale-[.98]">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -172,68 +177,70 @@
                     d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
                   <rect x="7" y="7" width="10" height="10" rx="1.5" />
                 </svg>
-                <span id="btn-scan-label">Scan QR Code SKU</span>
+                <span id="btn-scan-label">Scan QR Code Baju</span>
               </button>
 
               <!-- Viewport Kamera Scanner -->
               <div id="scanner-container"
                 class="mb-2.5 hidden overflow-hidden rounded-xl border border-slate-200 bg-slate-900">
-                <div id="qr-reader" class="w-full"></div>
-                <div class="flex items-center justify-between bg-slate-900 px-3 py-2 text-[11px] text-slate-300">
-                  <span>Arahkan kamera ke QR Code SKU</span>
+                <div id="qr-reader" class="w-full min-h-[250px]"></div>
+                <div class="flex items-center justify-between bg-slate-900 px-3 py-2.5 text-[11px] text-slate-300">
+                  <span>Arahkan kamera ke kotak QR Code</span>
                   <button type="button" id="btn-stop-scan" class="font-bold text-rose-400">Tutup Kamera</button>
                 </div>
               </div>
 
-              <!-- Pilihan Produk Jahit dari Master Tailor -->
+              <!-- Banner Error Kamera Spesifik -->
+              <div id="camera-error-banner"
+                class="mb-2.5 hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs text-rose-900">
+                <p class="font-bold">Kamera Tidak Dapat Dibuka</p>
+                <p id="camera-error-desc" class="mt-0.5 text-[11px] leading-relaxed"></p>
+              </div>
+
+              <!-- Pilihan Model Baju -->
               <select id="lapor-kategori-select"
                 class="input-field w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-bold text-slate-800">
-                <option value="">Memuat daftar produk...</option>
+                <option value="">Memuat daftar baju...</option>
               </select>
 
-              <!-- Input SKU Manual (Cadangan) -->
+              <!-- Input Kode Manual (Cadangan) -->
               <div id="manual-barcode-wrap" class="mt-2 hidden flex gap-2">
                 <input id="lapor-barcode-manual" type="text"
                   class="input-field flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-800 uppercase"
-                  placeholder="Ketik kode SKU..." autocomplete="off">
+                  placeholder="Ketik kode baju..." autocomplete="off">
                 <button type="button" id="btn-cari-barcode"
-                  class="rounded-xl bg-slate-800 px-3.5 py-2.5 text-xs font-bold text-white transition active:scale-95">Cek
-                  SKU</button>
+                  class="rounded-xl bg-slate-800 px-3.5 py-2.5 text-xs font-bold text-white transition active:scale-95">Cari</button>
               </div>
 
-              <!-- Banner Hasil Validasi QR Code SKU terhadap MASTER_TAILOR -->
+              <!-- Banner Hasil Validasi QR Code -->
               <div id="sku-validation-banner" class="mt-2.5 hidden rounded-xl border px-3 py-2.5 text-xs">
                 <p id="sku-validation-title" class="font-bold"></p>
                 <p id="sku-validation-desc" class="mt-0.5 text-[11px]"></p>
               </div>
             </div>
 
-            <!-- Pemilih Variasi Master Tailor: Warna & Ukuran -->
+            <!-- Pemilih Variasi: Warna & Ukuran -->
             <div id="variasi-picker-wrap" class="hidden border-t border-slate-100 pt-3 space-y-3">
               <div>
-                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih
-                  Warna (Master Tailor)</label>
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih Warna</label>
                 <div id="warna-choices" class="flex flex-wrap gap-2"></div>
               </div>
 
               <div>
-                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih
-                  Ukuran (Master Tailor)</label>
+                <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih Ukuran</label>
                 <div id="ukuran-choices" class="flex flex-wrap gap-2"></div>
               </div>
 
               <div id="selected-item-banner"
                 class="rounded-xl border border-emerald-200 bg-emerald-50/70 px-3 py-2.5 text-xs text-emerald-900">
-                <p id="selected-item-title" class="font-bold text-emerald-900">Item terpilih: -</p>
-                <p id="selected-item-stock" class="mt-0.5 text-[11px] font-semibold text-emerald-700">Stok tersedia di
-                  Stock Tailor: 0 pcs</p>
+                <p id="selected-item-title" class="font-bold text-emerald-900">Baju dipilih: -</p>
+                <p id="selected-item-stock" class="mt-0.5 text-[11px] font-semibold text-emerald-700">Stok belum disetor: 0 pcs</p>
               </div>
             </div>
 
             <div class="border-t border-slate-100 pt-3">
               <label for="lapor-nama"
-                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Penjahit /
-                Tim</label>
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Penjahit / Tim</label>
               <input id="lapor-nama" type="text"
                 class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm font-medium text-slate-800"
                 placeholder="Ketik nama Anda atau tim..." autocomplete="name" required>
@@ -243,14 +250,13 @@
           <!-- Card 2: Kuantitas Hasil Jahitan -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="mb-3">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Hasil Produksi</p>
-              <h3 class="mt-0.5 text-sm font-bold text-slate-800">Jumlah Jahitan Selesai</h3>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Hasil Jahitan</p>
+              <h3 class="mt-0.5 text-sm font-bold text-slate-800">Jumlah Baju Selesai</h3>
             </div>
 
             <div>
               <label for="lapor-qty"
-                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Jumlah Pcs
-                Selesai</label>
+                class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Jumlah Pcs Selesai</label>
               <input id="lapor-qty" type="number" inputmode="numeric" min="1" step="1"
                 class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-3 text-center text-2xl font-bold text-emerald-800"
                 placeholder="0" required>
@@ -258,15 +264,15 @@
 
             <div id="lapor-summary-box"
               class="mt-3 flex items-center justify-between rounded-xl bg-indigo-50 px-3 py-2.5 text-xs text-indigo-900">
-              <span class="font-semibold text-indigo-600">Saldo Ditambahkan</span>
-              <span id="lapor-total-text" class="font-bold">0 pcs ke stok penjahit</span>
+              <span class="font-semibold text-indigo-600">Akan Dicatat</span>
+              <span id="lapor-total-text" class="font-bold">0 pcs siap setor</span>
             </div>
           </div>
 
           <!-- Submit Button -->
           <button id="btn-submit-lapor" type="submit"
             class="flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 transition active:scale-[.98] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none">
-            <span id="btn-submit-text">Simpan Stok Jahitan</span>
+            <span id="btn-submit-text">Simpan Hasil Jahitan</span>
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <path d="m5 12 4 4L19 6" />
             </svg>
@@ -283,25 +289,24 @@
               </svg>
             </span>
             <div>
-              <p class="text-sm font-semibold">Alur Gudang Penjahit & Upah</p>
-              <p class="mt-1 text-xs leading-relaxed text-slate-500">Scan QR Code SKU produk jahit untuk memvalidasi ke
-                Master Tailor, pilih variasi warna & ukuran yang tersedia, lalu catat hasil jahitan ke Stock Tailor.</p>
+              <p class="text-sm font-semibold">Cara Mencatat Hasil Jahit</p>
+              <p class="mt-1 text-xs leading-relaxed text-slate-500">Scan QR Code pada label pola/baju, pilih warna dan ukuran yang sudah selesai dijahit, lalu masukkan jumlah pcs untuk dicatat ke daftar siap setor gudang.</p>
             </div>
           </div>
         </div>
 
-        <!-- Ringkasan Stok Tersedia di Stock Tailor -->
+        <!-- Ringkasan Stok Tersedia di Penjahit -->
         <div class="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div class="mb-2.5 flex items-center justify-between">
             <div>
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Stock Tailor Aktif</p>
-              <h3 class="text-xs font-bold text-slate-800">Saldo Jahitan Siap Setor</h3>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Stok di Penjahit</p>
+              <h3 class="text-xs font-bold text-slate-800">Jahitan Siap Setor ke Gudang</h3>
             </div>
             <span id="tailor-active-stock-badge"
               class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">0 PCS</span>
           </div>
           <div id="tailor-active-stock-list" class="space-y-2 text-xs">
-            <p class="py-2 text-center text-slate-400">Belum ada stok berjalan di penjahit.</p>
+            <p class="py-2 text-center text-slate-400">Belum ada stok jahitan yang menunggu setor.</p>
           </div>
         </div>
       </section>
@@ -316,9 +321,9 @@
     const CACHE_STORAGE_KEY = 'IBS_TAILOR_CACHE_V6_0';
     const TAILOR_NAME_KEY = 'IBS_LAST_TAILOR_NAME';
 
-    let isMutating = false;   // Kunci mutlak saat POST / simpan data
-    let isFetching = false;   // Mencegah fetch menumpuk
-    let isUserTyping = false; // Jeda auto-reload saat user mengisi form
+    let isMutating = false;
+    let isFetching = false;
+    let isUserTyping = false;
 
     let MASTER_TAILOR_LIST = [];
     let STOK_TAILOR_LIST = [];
@@ -328,10 +333,10 @@
     let selectedTailorRecord = null;
     let html5QrScanner = null;
     let isScannerRunning = false;
+    let scannerHistoryPushed = false;
 
     const $ = id => document.getElementById(id);
 
-    // Deteksi otomatis jika user sedang mengetik di input/select/textarea
     document.addEventListener('focusin', (e) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) {
         isUserTyping = true;
@@ -357,15 +362,15 @@
 
     function updateTotalPreview() {
       const qty = parseInt($('lapor-qty').value) || 0;
-      $('lapor-total-text').textContent = `${qty} pcs ke stok penjahit`;
+      $('lapor-total-text').textContent = `${qty} pcs siap setor`;
     }
 
     $('lapor-qty').addEventListener('input', updateTotalPreview);
 
-    // 1. VALIDASI LOADING & ANTI-DOUBLE SUBMIT UNTUK SEMUA AKSI SIMPAN (POST)
+    // 1. VALIDASI LOADING & ANTI-DOUBLE SUBMIT
     async function submitWithLock(action, payload, btnElement, loadingText = 'Menyimpan ke server...') {
       if (isMutating) {
-        toast('Proses sebelumnya masih berjalan. Harap tunggu hingga selesai.', 'error');
+        toast('Proses sebelumnya masih berjalan. Harap tunggu sebentar.', 'error');
         return null;
       }
 
@@ -378,7 +383,7 @@
       if (overlay) overlay.style.display = 'flex';
       if (btnElement) {
         btnElement.disabled = true;
-        btnElement.innerHTML = '⏳ Memproses...';
+        btnElement.innerHTML = '⏳ Menyimpan...';
       }
 
       try {
@@ -390,7 +395,6 @@
         const json = await res.json();
         if (!json.success) throw new Error(json.message || 'Gagal memproses data');
 
-        // Segera muat ulang data terbaru setelah simpan sukses
         await syncAppData(true);
         return json;
       } catch (err) {
@@ -406,7 +410,7 @@
       }
     }
 
-    // 2. RENDER PRODUK & VARIASI DARI MASTER_TAILOR (BARANG MENTAH / BELUM SIAP JUAL)
+    // 2. RENDER DAFTAR MODEL & VARIASI
     function renderAppState(data) {
       if (!data) return;
       const list = Array.isArray(data.master_tailor) ? data.master_tailor : [];
@@ -417,7 +421,6 @@
       const badge = $('kategori-count-badge');
       const currentSelected = selectedBarcodeKategori || sel.value;
 
-      // Kelompokkan produk unik berdasarkan Barcode_Kategori di MASTER_TAILOR
       const uniqueMap = new Map();
       MASTER_TAILOR_LIST.forEach(item => {
         const key = String(item.barcode_kategori || '').trim();
@@ -426,7 +429,7 @@
         }
       });
 
-      sel.innerHTML = '<option value="">-- Pilih atau Scan QR SKU --</option>';
+      sel.innerHTML = '<option value="">-- Pilih atau Scan QR Baju --</option>';
       uniqueMap.forEach((namaKat, barcodeKat) => {
         const opt = document.createElement('option');
         opt.value = barcodeKat;
@@ -436,13 +439,10 @@
 
       const optManual = document.createElement('option');
       optManual.value = '__MANUAL__';
-      optManual.textContent = '+ Ketik SKU Manual';
+      optManual.textContent = '+ Ketik Kode Baju Manual';
       sel.appendChild(optManual);
 
-      badge.textContent = `${uniqueMap.size} SKU TAILOR`;
-      if (!uniqueMap.size) {
-        badge.textContent = 'BELUM ADA SKU';
-      }
+      badge.textContent = uniqueMap.size ? `${uniqueMap.size} MODEL BAJU` : 'BELUM ADA MODEL';
 
       if (currentSelected && uniqueMap.has(currentSelected)) {
         sel.value = currentSelected;
@@ -473,7 +473,7 @@
       badge.textContent = `${totalPcs.toLocaleString('id-ID')} PCS`;
 
       if (!filtered.length) {
-        container.innerHTML = `<p class="py-2 text-center text-slate-400">${filterSku ? 'Belum ada stok berjalan untuk SKU ' + filterSku + '.' : 'Belum ada stok berjalan di Stock Tailor.'}</p>`;
+        container.innerHTML = `<p class="py-2 text-center text-slate-400">${filterSku ? 'Belum ada stok siap setor untuk kode ' + filterSku + '.' : 'Belum ada stok jahitan yang menunggu setor.'}</p>`;
         return;
       }
 
@@ -532,12 +532,10 @@
         return selectCategoryByBarcode('', false);
       }
 
-      // Cek di cache MASTER_TAILOR lokal dulu
       let matches = MASTER_TAILOR_LIST.filter(
         it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
       );
 
-      // Jika tidak ketemu di cache lokal, validasi langsung ke endpoint GET_TAILOR_SKU (Master Tailor)
       if (!matches.length) {
         try {
           const res = await fetch(`${GAS_URL}?action=GET_TAILOR_SKU&sku=${encodeURIComponent(code)}&_t=${Date.now()}`);
@@ -555,7 +553,7 @@
             );
           }
         } catch (err) {
-          console.warn('Gagal cek SKU ke server:', err);
+          console.warn('Gagal cek kode baju ke server:', err);
         }
       }
 
@@ -577,7 +575,6 @@
         return false;
       }
 
-      // Validasi SKU HANYA terhadap MASTER_TAILOR (bukan MASTER_PRODUK)
       const matches = MASTER_TAILOR_LIST.filter(
         it => String(it.barcode_kategori || '').trim().toUpperCase() === code.toUpperCase()
       );
@@ -590,12 +587,12 @@
         wrap.classList.add('hidden');
         showSkuValidationBanner(
           false,
-          `Validasi Gagal: SKU "${code}" Tidak Terdaftar`,
-          'SKU ini tidak ditemukan atau nonaktif di Master Tailor. Pastikan QR Code sesuai SKU barang jahit.'
+          `Kode "${code}" Tidak Terdaftar`,
+          'Kode QR ini tidak ditemukan di daftar baju jahitan. Pastikan QR Code sesuai dengan label produksi.'
         );
         renderTailorActiveStockList();
         if (notify) {
-          toast(`Validasi Gagal: SKU "${code}" tidak ada di Master Tailor.`, 'error');
+          toast(`Kode "${code}" tidak ditemukan di daftar jahitan.`, 'error');
         }
         return false;
       }
@@ -612,8 +609,8 @@
 
       showSkuValidationBanner(
         true,
-        `SKU Tervalidasi: ${matches[0].nama_kategori} (${resolvedBarcode})`,
-        `Ditemukan ${matches.length} variasi aktif di Master Tailor. Pilih warna & ukuran di bawah.`
+        `Baju Ditemukan: ${matches[0].nama_kategori} (${resolvedBarcode})`,
+        `Tersedia ${matches.length} pilihan variasi. Silakan pilih warna & ukuran di bawah.`
       );
 
       renderVariationChoices(matches);
@@ -621,7 +618,7 @@
       renderTailorActiveStockList();
 
       if (notify) {
-        toast(`SKU Tervalidasi: ${matches[0].nama_kategori} (${resolvedBarcode})`);
+        toast(`Terpilih: ${matches[0].nama_kategori} (${resolvedBarcode})`);
       }
       return true;
     }
@@ -691,77 +688,155 @@
       const stockEl = $('selected-item-stock');
       if (selectedTailorRecord) {
         const stInfo = getStockReadyForTailorId(selectedTailorRecord.id_tailor);
-        titleEl.textContent = `Item terpilih: ${selectedTailorRecord.nama_kategori} · ${selectedWarna} · ${selectedUkuran}`;
+        titleEl.textContent = `Baju dipilih: ${selectedTailorRecord.nama_kategori} · ${selectedWarna} · ${selectedUkuran}`;
         stockEl.textContent = stInfo.personal > 0
-          ? `Saldo Stock Tailor Anda: ${stInfo.personal} pcs (Total semua penjahit: ${stInfo.totalAll} pcs)`
-          : `Saldo di Stock Tailor saat ini: ${stInfo.totalAll} pcs`;
+          ? `Stok Anda belum disetor: ${stInfo.personal} pcs (Total semua penjahit: ${stInfo.totalAll} pcs)`
+          : `Stok belum disetor saat ini: ${stInfo.totalAll} pcs`;
       } else {
-        titleEl.textContent = 'Kombinasi variasi tidak tersedia di Master Tailor.';
+        titleEl.textContent = 'Pilihan warna & ukuran ini tidak tersedia.';
         stockEl.textContent = '-';
       }
     }
 
-    // 3. KONTROL KAMERA SCANNER QR CODE SKU
+    // 3. KONTROL KAMERA SCANNER QR CODE (DENGAN FALLBACK & DIAGNOSIS ERROR)
+    function showCameraError(reasonText) {
+      const banner = $('camera-error-banner');
+      const desc = $('camera-error-desc');
+      if (banner && desc) {
+        desc.textContent = reasonText;
+        banner.classList.remove('hidden');
+      }
+    }
+
+    function hideCameraError() {
+      const banner = $('camera-error-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    function formatCameraErrorMessage(err) {
+      const rawMsg = String((err && (err.message || err.name || err)) || '');
+      if (!window.isSecureContext) {
+        return 'Halaman harus dibuka melalui alamat HTTPS (aman) agar kamera HP diizinkan berjalan.';
+      }
+      if (/NotAllowedError|Permission/i.test(rawMsg)) {
+        return 'Izin kamera ditolak. Ketuk ikon gembok di bilah alamat browser lalu ubah izin Kamera menjadi Izinkan.';
+      }
+      if (/NotFoundError|DevicesNotFound/i.test(rawMsg)) {
+        return 'Perangkat kamera tidak ditemukan di HP/browser ini.';
+      }
+      if (/NotReadableError|TrackStartError/i.test(rawMsg)) {
+        return 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi kamera lain lalu coba lagi.';
+      }
+      return `Gagal membuka kamera (${rawMsg || 'Error tidak diketahui'}). Anda tetap bisa memilih model baju lewat daftar di bawah.`;
+    }
+
     async function startCategoryScanner() {
-      if (typeof Html5Qrcode === 'undefined') {
-        toast('Pustaka kamera belum siap, silakan pilih dari daftar atau ketik SKU manual.', 'error');
+      hideCameraError();
+
+      if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const msg = 'Browser memblokir kamera karena halaman tidak dibuka lewat koneksi HTTPS yang aman.';
+        showCameraError(msg);
+        toast(msg, 'error');
         return;
       }
-      const container = $('scanner-container');
-      container.classList.remove('hidden');
+
+      if (typeof Html5Qrcode === 'undefined') {
+        const msg = 'Komponen pemindai QR belum termuat. Periksa koneksi internet lalu tekan Segarkan Data.';
+        showCameraError(msg);
+        toast(msg, 'error');
+        return;
+      }
 
       if (isScannerRunning) return;
+
+      const container = $('scanner-container');
+      container.classList.remove('hidden');
+      $('btn-scan-label').textContent = 'Membuka Kamera...';
+
+      const qrboxFunction = (viewfinderWidth, viewfinderHeight) => {
+        const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+        const boxSize = Math.max(160, Math.min(240, Math.floor(minEdge * 0.7)));
+        return { width: boxSize, height: boxSize };
+      };
+
+      const scanConfig = { fps: 10, qrbox: qrboxFunction };
+      const onScanSuccess = async (decodedText) => {
+        await stopCategoryScanner(true);
+        await validateAndSelectSku(decodedText, true);
+      };
+
       try {
         if (!html5QrScanner) {
           html5QrScanner = new Html5Qrcode('qr-reader');
         }
+
         isScannerRunning = true;
-        $('btn-scan-label').textContent = 'Kamera Aktif...';
-        await html5QrScanner.start(
-          { facingMode: 'environment' },
-          { fps: 10, qrbox: { width: 220, height: 140 } },
-          async (decodedText) => {
-            await stopCategoryScanner();
-            await validateAndSelectSku(decodedText, true);
-          },
-          () => { }
-        );
+
+        try {
+          // Prioritas 1: Kamera belakang via facingMode
+          await html5QrScanner.start({ facingMode: 'environment' }, scanConfig, onScanSuccess, () => { });
+        } catch (firstErr) {
+          // Prioritas 2: Fallback mengambil daftar kamera yang tersedia di perangkat
+          const cameras = await Html5Qrcode.getCameras();
+          if (!cameras || !cameras.length) throw firstErr;
+          const backCam = cameras.find(c => /back|rear|belakang|environment/i.test(c.label)) || cameras[cameras.length - 1];
+          await html5QrScanner.start(backCam.id, scanConfig, onScanSuccess, () => { });
+        }
+
+        $('btn-scan-label').textContent = 'Kamera Aktif · Ketuk untuk Tutup';
+        if (!scannerHistoryPushed) {
+          history.pushState({ scannerOpen: true }, '');
+          scannerHistoryPushed = true;
+        }
       } catch (err) {
         isScannerRunning = false;
         container.classList.add('hidden');
-        $('btn-scan-label').textContent = 'Scan QR Code SKU';
-        toast('Kamera tidak dapat diakses. Gunakan pilihan daftar atau input manual.', 'error');
+        $('btn-scan-label').textContent = 'Scan QR Code Baju';
+        const friendlyErr = formatCameraErrorMessage(err);
+        showCameraError(friendlyErr);
+        toast('Kamera gagal dibuka. Lihat keterangan di layar.', 'error');
       }
     }
 
-    async function stopCategoryScanner() {
+    async function stopCategoryScanner(fromPopState = false) {
       const container = $('scanner-container');
       container.classList.add('hidden');
-      $('btn-scan-label').textContent = 'Scan QR Code SKU';
+      $('btn-scan-label').textContent = 'Scan QR Code Baju';
       if (html5QrScanner && isScannerRunning) {
         try {
           await html5QrScanner.stop();
         } catch (e) { }
       }
       isScannerRunning = false;
+      if (!fromPopState && scannerHistoryPushed) {
+        scannerHistoryPushed = false;
+        try { history.back(); } catch (e) { }
+      }
+      scannerHistoryPushed = false;
     }
+
+    // Tombol Kembali (Back HP / Browser) menutup kamera dulu sebelum keluar halaman
+    window.addEventListener('popstate', () => {
+      if (isScannerRunning) {
+        stopCategoryScanner(true);
+      }
+    });
 
     $('btn-scan-kategori').addEventListener('click', () => {
       if (isScannerRunning) {
-        stopCategoryScanner();
+        stopCategoryScanner(false);
       } else {
         startCategoryScanner();
       }
     });
 
-    $('btn-stop-scan').addEventListener('click', () => stopCategoryScanner());
+    $('btn-stop-scan').addEventListener('click', () => stopCategoryScanner(false));
 
-    // 4. INSTANT LOAD (0ms DARI LOCALSTORAGE) + SINKRONISASI LATAR BELAKANG
+    // 4. INSTANT LOAD & SINKRONISASI DATA
     async function syncAppData(force = false) {
-      if (isFetching || isMutating) return;
+      if (isFetching || isMutating || isScannerRunning) return;
       if (!force && (isUserTyping || document.visibilityState !== 'visible')) return;
 
-      // Tampilkan data cache lokal seketika pada load pertama
       const localRaw = localStorage.getItem(CACHE_STORAGE_KEY);
       if (localRaw && !window.__hasInitialRender) {
         try {
@@ -780,7 +855,7 @@
           window.__hasInitialRender = true;
         }
       } catch (e) {
-        console.warn('Background sync dilewati:', e);
+        console.warn('Sinkronisasi latar belakang dilewati:', e);
       } finally {
         isFetching = false;
       }
@@ -804,7 +879,7 @@
 
     $('btn-cari-barcode').addEventListener('click', async () => {
       const code = $('lapor-barcode-manual').value.trim();
-      if (!code) return toast('Ketik kode SKU terlebih dahulu.', 'error');
+      if (!code) return toast('Ketik kode baju terlebih dahulu.', 'error');
       await validateAndSelectSku(code, true);
     });
 
@@ -827,7 +902,7 @@
 
     $('btn-refresh-data').addEventListener('click', () => syncAppData(true));
 
-    // 5. SUBMIT STOK PENJAHIT KE ENDPOINT SUBMIT_STOK_TAILOR
+    // 5. SIMPAN HASIL JAHITAN
     $('form-lapor').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = $('btn-submit-lapor');
@@ -837,13 +912,13 @@
       const qty = parseInt($('lapor-qty').value) || 0;
 
       if (!selectedTailorRecord) {
-        return toast('Harap scan atau pilih kategori, warna, dan ukuran jahitan.', 'error');
+        return toast('Harap scan atau pilih model baju, warna, dan ukuran.', 'error');
       }
       if (!nama) {
         return toast('Harap isi Nama Penjahit atau Tim.', 'error');
       }
       if (qty <= 0) {
-        return toast('Jumlah hasil jahitan minimal 1 pcs.', 'error');
+        return toast('Jumlah baju selesai minimal 1 pcs.', 'error');
       }
 
       const result = await submitWithLock('SUBMIT_STOK_TAILOR', {
@@ -854,23 +929,30 @@
         ukuran: selectedUkuran,
         nama_penjahit: nama,
         qty: qty
-      }, btn, 'Menyimpan Stok Penjahit...');
+      }, btn, 'Menyimpan Hasil Jahitan...');
 
       if (result && result.success) {
         localStorage.setItem(TAILOR_NAME_KEY, nama);
-        toast(result.message || 'Stok jahitan berhasil dicatat!');
+        toast(result.message || 'Hasil jahitan berhasil disimpan!');
         $('lapor-qty').value = '';
         updateTotalPreview();
       }
     });
 
-    // Inisialisasi awal + Auto-Reload setiap 25 detik
-    document.addEventListener('DOMContentLoaded', () => {
+    // Inisialisasi awal + cek parameter ?sku= dari kamera bawaan HP
+    document.addEventListener('DOMContentLoaded', async () => {
       const savedName = localStorage.getItem(TAILOR_NAME_KEY);
       if (savedName) {
         $('lapor-nama').value = savedName;
       }
-      syncAppData(true);
+      await syncAppData(true);
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const initialSku = urlParams.get('sku') || urlParams.get('barcode') || urlParams.get('kategori');
+      if (initialSku) {
+        await validateAndSelectSku(initialSku, true);
+      }
+
       setInterval(() => syncAppData(false), 25000);
     });
 
