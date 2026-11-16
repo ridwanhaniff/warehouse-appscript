@@ -12,7 +12,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Ina Warehouse">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Ina Basic Store · Warehouse Admin</title>
+  <title>Ina Basic Store · Aplikasi Gudang</title>
   <!-- Tangkap event beforeinstallprompt sejak awal di <head> dan daftarkan Service Worker -->
   <script>
     window.__deferredInstallPrompt = null;
@@ -26,7 +26,7 @@
       }
     });
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function () { });
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function () {});
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -160,7 +160,7 @@
           </div>
           <div>
             <p class="text-[10px] font-semibold uppercase tracking-[.18em] text-slate-400">Ina Basic Store</p>
-            <h1 class="text-base font-bold leading-tight">Warehouse Manager</h1>
+            <h1 class="text-base font-bold leading-tight">Aplikasi Gudang</h1>
           </div>
         </div>
         <!-- Tombol Install App selalu tampil saat dibuka di browser (otomatis sembunyi jika sudah terpasang) -->
@@ -169,12 +169,12 @@
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <path d="M12 3v12m0 0-4-4m4 4 4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
           </svg>
-          <span>Install App</span>
+          <span>Pasang Aplikasi</span>
         </button>
       </div>
       <div class="mt-4 flex items-center gap-2">
         <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-        <span id="header-label" class="text-xs font-medium text-slate-300">Siap memindai aktivitas gudang</span>
+        <span id="header-label" class="text-xs font-medium text-slate-300">Pilih menu untuk mulai mencatat</span>
       </div>
     </header>
 
@@ -182,10 +182,11 @@
       <!-- HOME / MENU UTAMA -->
       <section id="screen-home" class="screen-enter space-y-5">
         <!-- Banner Sesi Opname Aktif -->
-        <div id="home-opname-banner" class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
+        <div id="home-opname-banner"
+          class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
           <div class="flex items-center justify-between gap-2">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Mode Stock Opname Aktif</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Sedang Hitung Stok</p>
               <p id="home-opname-title" class="text-xs font-extrabold text-amber-950 mt-0.5"></p>
             </div>
             <div class="flex gap-1.5">
@@ -200,9 +201,8 @@
         <!-- Operasional Gudang Utama -->
         <div>
           <div class="mb-2.5 flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Operasional Gudang Utama</h2>
-            <span id="home-badge-locations"
-              class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">MASTER PRODUK</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Stok Barang Gudang</h2>
+            <span id="home-badge-locations" class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">LOKASI RAK</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <button type="button" data-activity="Masuk"
@@ -224,7 +224,7 @@
                 </svg>
               </span>
               <span class="mt-3 text-sm font-bold text-slate-900">Barang Keluar</span>
-              <span class="mt-0.5 text-[11px] text-slate-400">Pengiriman & penjualan</span>
+              <span class="mt-0.5 text-[11px] text-slate-400">Kirim pesanan / terjual</span>
             </button>
 
             <button type="button" data-activity="Mutasi"
@@ -234,8 +234,8 @@
                   <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4" />
                 </svg>
               </span>
-              <span class="mt-3 text-sm font-bold text-slate-900">Mutasi Rak</span>
-              <span class="mt-0.5 text-[11px] text-slate-400">Pindah antar lokasi</span>
+              <span class="mt-3 text-sm font-bold text-slate-900">Pindah Rak</span>
+              <span class="mt-0.5 text-[11px] text-slate-400">Pindah barang antar rak</span>
             </button>
 
             <button type="button" data-nav="opname"
@@ -246,8 +246,8 @@
                   <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
                 </svg>
               </span>
-              <span class="mt-3 text-sm font-bold text-slate-900">Stock Opname</span>
-              <span class="mt-0.5 text-[11px] text-slate-400">Hitung fisik & sesi</span>
+              <span class="mt-3 text-sm font-bold text-slate-900">Hitung Stok Fisik</span>
+              <span class="mt-0.5 text-[11px] text-slate-400">Cocokkan stok rak</span>
             </button>
 
             <button type="button" data-activity="CekStok"
@@ -260,24 +260,22 @@
                   </svg>
                 </span>
                 <div>
-                  <span class="block text-sm font-bold text-slate-900">Cek Stok & Variasi Produk</span>
-                  <span class="text-[11px] text-slate-400">Scan barcode untuk melihat saldo rak siap jual</span>
+                  <span class="block text-sm font-bold text-slate-900">Cek Sisa Stok</span>
+                  <span class="text-[11px] text-slate-400">Scan barang untuk lihat jumlah stok di rak</span>
                 </div>
               </div>
-              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5">
+              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
               </svg>
             </button>
           </div>
         </div>
 
-        <!-- Gudang Penjahit & Upah Otomatis -->
+        <!-- Penjahit & Upah Jahit -->
         <div>
           <div class="mb-2.5 flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Gudang Penjahit & Upah</h2>
-            <span class="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">MASTER
-              TAILOR</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Penjahit & Upah Jahit</h2>
+            <span class="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">PENJAHIT</span>
           </div>
           <div class="space-y-2.5">
             <button type="button" data-nav="qc"
@@ -285,14 +283,13 @@
               <div class="flex items-center gap-3">
                 <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
-                    <path
-                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                     <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" />
                   </svg>
                 </span>
                 <div>
-                  <span class="block text-sm font-bold text-slate-900">Stok Penjahit & Terima QC</span>
-                  <span class="text-[11px] text-slate-500">Terima setoran ke gudang utama & hitung upah</span>
+                  <span class="block text-sm font-bold text-slate-900">Terima Setoran Jahitan</span>
+                  <span class="text-[11px] text-slate-500">Cek kualitas barang penjahit & masukkan ke rak</span>
                 </div>
               </div>
               <span id="home-badge-tailor-stok"
@@ -310,12 +307,12 @@
                   </svg>
                 </span>
                 <div>
-                  <span class="block text-sm font-bold text-slate-900">Master Produk & Tarif Jahit</span>
-                  <span class="text-[11px] text-slate-500">Atur SKU jahit, variasi warna/ukuran & upah/pcs</span>
+                  <span class="block text-sm font-bold text-slate-900">Daftar Barang & Ongkos Jahit</span>
+                  <span class="text-[11px] text-slate-500">Atur kode barang jahit, warna, ukuran & upah/pcs</span>
                 </div>
               </div>
               <span id="home-badge-master-tailor"
-                class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600">0 SKU</span>
+                class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600">0 Kode</span>
             </button>
 
             <button type="button" data-nav="upah"
@@ -328,8 +325,8 @@
                   </svg>
                 </span>
                 <div>
-                  <span class="block text-sm font-bold text-slate-900">Rekap Upah & Slip Gaji</span>
-                  <span class="text-[11px] text-slate-500">Tagihan upah UNPAID & cetak slip digital</span>
+                  <span class="block text-sm font-bold text-slate-900">Bayar Upah & Slip Gaji</span>
+                  <span class="text-[11px] text-slate-500">Lihat upah belum dibayar & buat slip lunas</span>
                 </div>
               </div>
               <span id="home-badge-unpaid-upah"
@@ -338,10 +335,10 @@
           </div>
         </div>
 
-        <!-- Master Data Produk Gudang Utama -->
+        <!-- Data Produk & Harga Jual -->
         <div>
           <div class="mb-2.5">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Master Data & Harga Jual</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Data Produk & Harga</h2>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <button type="button" data-activity="KelolaData"
@@ -351,8 +348,8 @@
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </span>
-              <span class="mt-2.5 text-xs font-bold text-slate-900">Kelola Data Produk</span>
-              <span class="mt-0.5 text-[10px] text-slate-400">Produk baru & variasi</span>
+              <span class="mt-2.5 text-xs font-bold text-slate-900">Tambah / Edit Produk</span>
+              <span class="mt-0.5 text-[10px] text-slate-400">Daftar barang & warna baru</span>
             </button>
 
             <button type="button" data-nav="pricing"
@@ -363,14 +360,14 @@
                   <circle cx="7" cy="7" r="1.2" />
                 </svg>
               </span>
-              <span class="mt-2.5 text-xs font-bold text-slate-900">Atur HPP & Harga</span>
-              <span class="mt-0.5 text-[10px] text-slate-400">Modal & margin jual</span>
+              <span class="mt-2.5 text-xs font-bold text-slate-900">Atur Modal & Harga Jual</span>
+              <span class="mt-0.5 text-[10px] text-slate-400">Ubah harga modal & jual</span>
             </button>
           </div>
         </div>
       </section>
 
-      <!-- SESI STOCK OPNAME -->
+      <!-- SESI HITUNG STOK FISIK (OPNAME) -->
       <section id="screen-opname" class="hidden space-y-4">
         <div class="flex items-center gap-3">
           <button id="btn-back-opname"
@@ -380,17 +377,17 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-bold">Stock Opname Sesi</h2>
-            <p class="text-xs text-slate-400">Buat atau lanjutkan perhitungan fisik rak</p>
+            <h2 class="text-base font-bold">Hitung Stok Fisik</h2>
+            <p class="text-xs text-slate-400">Buat sesi baru atau lanjutkan hitung barang di rak</p>
           </div>
         </div>
 
         <form id="form-create-opname" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-          <p class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Buat Sesi Opname Baru</p>
+          <p class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Buat Sesi Hitung Baru</p>
           <div>
             <label class="mb-1 block text-[10px] font-semibold uppercase text-slate-400">Nama Sesi</label>
             <input id="opname-session-name" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
-              placeholder="Contoh: Opname Rak Utama Nov" required>
+              placeholder="Contoh: Hitung Stok Rak Utama" required>
           </div>
           <div class="grid grid-cols-2 gap-2.5">
             <div>
@@ -399,25 +396,24 @@
                 class="input-field w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-semibold"></select>
             </div>
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase text-slate-400">Dibuat Oleh</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase text-slate-400">Nama Petugas</label>
               <input id="opname-session-user" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
-                placeholder="Nama admin" required>
+                placeholder="Nama Anda" required>
             </div>
           </div>
           <button type="submit" id="btn-create-opname"
-            class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mulai Sesi
-            Opname</button>
+            class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mulai Hitung Stok</button>
         </form>
 
         <div>
-          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Sesi Opname Aktif</h3>
+          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Sesi Hitung yang Sedang Berjalan</h3>
           <div id="opname-session-list" class="space-y-2.5">
             <p class="text-center text-xs text-slate-400 py-4">Memuat daftar sesi...</p>
           </div>
         </div>
       </section>
 
-      <!-- MASTER PRODUK & VARIASI PENJAHIT (MASTER_TAILOR) -->
+      <!-- DAFTAR BARANG & ONGKOS JAHIT -->
       <section id="screen-tarif" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back-tarif"
@@ -427,8 +423,8 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-bold">Master Produk & Tarif Jahit</h2>
-            <p class="text-xs text-slate-400">Alur SKU & variasi mentah untuk validasi penjahit</p>
+            <h2 class="text-base font-bold">Daftar Barang & Ongkos Jahit</h2>
+            <p class="text-xs text-slate-400">Atur kode barang jahit, pilihan warna/ukuran & upah</p>
           </div>
           <button type="button" id="btn-reset-tarif-form"
             class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-indigo-600 shadow-sm ring-1 ring-slate-200">+
@@ -439,23 +435,20 @@
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
               <span id="tarif-form-mode-badge"
-                class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">TAMBAH SKU &
-                VARIASI JAHIT</span>
+                class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">TAMBAH BARANG & ONGKOS JAHIT</span>
               <input type="hidden" id="tarif-id-tailor" value="">
             </div>
 
             <div>
               <div class="mb-1 flex items-center justify-between">
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode SKU Jahit
-                  (Barcode QR)</label>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode Barang Jahit (QR)</label>
                 <button type="button" id="btn-scan-tarif-target"
                   class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600">
                   <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path
-                      d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
                     <rect x="7" y="7" width="10" height="10" rx="1.5" />
                   </svg>
-                  <span>Scan QR SKU</span>
+                  <span>Scan QR Kode</span>
                 </button>
               </div>
               <input id="tarif-barcode-sku"
@@ -464,8 +457,7 @@
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Produk
-                Jahit</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Barang Jahit</label>
               <input id="tarif-nama-produk"
                 class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm font-semibold"
                 placeholder="Contoh: Croptop Rib Knit" required>
@@ -473,14 +465,13 @@
 
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Warna (Pisah
-                  Koma)</label>
-                <input id="tarif-warna" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Warna (Pisah Koma)</label>
+                <input id="tarif-warna"
+                  class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
                   placeholder="Hitam, Putih, Cream" required>
               </div>
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Ukuran
-                  (Pisah Koma)</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Ukuran (Pisah Koma)</label>
                 <input id="tarif-ukuran"
                   class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm uppercase"
                   placeholder="S, M, L, XL" required>
@@ -488,8 +479,7 @@
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Tarif Upah
-                per
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Ongkos Jahit per
                 Pcs (Rp)</label>
               <input id="tarif-upah" type="number" inputmode="numeric" min="0"
                 class="input-field w-full rounded-xl border border-indigo-200 bg-indigo-50/40 p-3 text-base font-bold text-indigo-800"
@@ -500,8 +490,8 @@
             <div id="tarif-matrix-wrap" class="hidden border-t border-slate-100 pt-3">
               <div class="mb-2 flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-bold text-slate-800">Kombinasi Variasi Jahit</p>
-                  <p class="text-[11px] text-slate-400">Centang variasi yang tersedia untuk SKU ini</p>
+                  <p class="text-xs font-bold text-slate-800">Daftar Pilihan Warna & Ukuran</p>
+                  <p class="text-[11px] text-slate-400">Centang pilihan yang dipakai untuk barang ini</p>
                 </div>
                 <span id="tarif-matrix-count"
                   class="rounded-full bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-700">0</span>
@@ -511,28 +501,27 @@
 
             <label class="flex items-center gap-2 pt-1 text-xs font-semibold text-slate-700">
               <input id="tarif-status-aktif" type="checkbox" class="h-4 w-4 accent-indigo-600" checked>
-              Variasi Jahit Aktif
+              Aktifkan Barang Jahit Ini
             </label>
           </div>
 
           <button id="btn-submit-tarif" type="submit"
             class="w-full rounded-2xl bg-indigo-600 p-4 text-sm font-bold text-white shadow-lg shadow-indigo-500/20 active:scale-[.98]">Simpan
-            Produk & Variasi Jahit</button>
+            Barang & Ongkos Jahit</button>
         </form>
 
-        <!-- Daftar Produk & Variasi di MASTER_TAILOR -->
+        <!-- Daftar Barang di Penjahit -->
         <div class="mt-6">
           <div class="mb-2.5 flex items-center justify-between">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Daftar Master Tailor (SKU & Variasi)
-            </h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500">Daftar Barang & Ongkos Jahit</h3>
             <span id="master-tailor-count"
-              class="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600">0 VARIASI</span>
+              class="rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-bold text-slate-600">0 PILIHAN</span>
           </div>
           <input id="master-tailor-search" type="text"
             class="input-field mb-3 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs"
-            placeholder="Filter nama produk, SKU, warna, atau ukuran...">
+            placeholder="Cari nama barang, kode, warna, atau ukuran...">
           <div id="master-tailor-list" class="space-y-3">
-            <p class="text-center text-xs text-slate-400 py-4">Memuat daftar master tailor...</p>
+            <p class="text-center text-xs text-slate-400 py-4">Memuat daftar barang jahit...</p>
           </div>
         </div>
       </section>
@@ -549,7 +538,7 @@
           </button>
           <div class="min-w-0 flex-1">
             <h2 id="scan-title" class="text-base font-bold"></h2>
-            <p id="scan-subtitle" class="text-xs text-slate-400">Arahkan kamera ke QR/barcode produk</p>
+            <p id="scan-subtitle" class="text-xs text-slate-400">Arahkan kamera ke barcode atau QR barang</p>
           </div>
           <button id="btn-torch"
             class="hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-amber-500 shadow-sm ring-1 ring-slate-200"
@@ -563,7 +552,7 @@
           <span
             class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">!</span>
           <div>
-            <p class="text-[10px] font-bold text-amber-600 uppercase">Mode Opname Aktif</p>
+            <p class="text-[10px] font-bold text-amber-600 uppercase">Sedang Hitung Stok</p>
             <p id="scan-opname-info" class="text-xs font-medium text-amber-800"></p>
           </div>
         </div>
@@ -585,10 +574,10 @@
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 20h9" />
               <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
-            </svg>Ketik kode secara manual</button>
+            </svg>Ketik kode barcode secara manual</button>
           <form id="manual-form" class="mt-3 hidden gap-2"><input id="manual-barcode"
               class="input-field min-w-0 flex-1 rounded-xl border border-slate-200 px-3 py-3 text-sm"
-              placeholder="Masukkan barcode..." autocomplete="off"><button
+              placeholder="Ketik kode barcode..." autocomplete="off"><button
               class="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white">Cari</button></form>
         </div>
       </section>
@@ -604,27 +593,26 @@
             </svg></button>
           <div class="min-w-0 flex-1">
             <h2 id="form-title" class="text-base font-bold"></h2>
-            <p id="form-subtitle" class="text-xs text-slate-400">Pilih detail produk</p>
+            <p id="form-subtitle" class="text-xs text-slate-400">Lengkapi rincian barang</p>
           </div>
         </div>
 
         <div id="form-opname-alert" class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2 border border-amber-200">
-          <p class="text-xs font-bold text-amber-800">Menghitung Sesi: <span id="form-opname-session-name"></span></p>
-          <p class="text-[10px] text-amber-600">Lokasi: <span id="form-opname-location"></span></p>
+          <p class="text-xs font-bold text-amber-800">Sesi Hitung: <span id="form-opname-session-name"></span></p>
+          <p class="text-[10px] text-amber-600">Lokasi Rak: <span id="form-opname-location"></span></p>
         </div>
 
         <form id="main-form" class="space-y-3" novalidate>
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between gap-2">
               <div>
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Barcode induk</p>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode Barcode Barang</p>
                 <p id="form-barcode" class="mt-1 font-mono text-sm font-bold"></p>
               </div><span id="product-status-pill"
                 class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">AKTIF</span>
             </div>
             <div id="product-fields" class="mt-4 hidden border-t border-slate-100 pt-3">
-              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama produk
-                induk</label>
+              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Produk</label>
               <input id="product-name" class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm"
                 placeholder="Contoh: Kaos Polos">
               <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"><input id="product-active"
@@ -634,14 +622,14 @@
 
           <div id="variant-select-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="mb-3">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih variasi barang</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih Warna / Ukuran</p>
               <h3 id="variant-product-name" class="mt-1 text-base font-bold"></h3>
-              <p class="mt-1 text-xs text-slate-400">Pilihan diambil dari variasi aktif produk ini.</p>
+              <p class="mt-1 text-xs text-slate-400">Pilih salah satu varian produk di bawah ini.</p>
             </div>
             <div id="variant-selectors" class="space-y-4"></div>
             <div id="variant-selected-summary"
               class="mt-4 hidden rounded-xl bg-indigo-50 px-3 py-3 text-sm text-indigo-900">
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">Variasi terpilih</p>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">Varian terpilih</p>
               <p id="variant-selected-label" class="mt-1 font-bold"></p>
               <p id="variant-stock-summary" class="mt-1 text-xs text-indigo-700"></p>
             </div>
@@ -650,37 +638,36 @@
           <div id="variant-manage-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
               <div>
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Daftar variasi</p>
-                <h3 class="mt-1 text-sm font-bold">Kelola kombinasi</h3>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Daftar Warna & Ukuran</p>
+                <h3 class="mt-1 text-sm font-bold">Atur Varian Produk</h3>
               </div><span id="variant-count"
                 class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-500"></span>
             </div>
             <div id="variant-manage-list" class="mt-3 space-y-2"></div>
             <button id="btn-open-add-variants" type="button"
               class="mt-3 w-full rounded-xl border border-dashed border-indigo-300 px-3 py-3 text-sm font-semibold text-indigo-600">+
-              Tambah kombinasi variasi</button>
+              Tambah Warna / Ukuran Baru</button>
           </div>
 
           <div id="attribute-builder-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-2">
               <div>
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Atribut produk</p>
-                <h3 class="mt-1 text-sm font-bold">Atur pilihan variasi</h3>
-                <p class="mt-1 text-xs leading-relaxed text-slate-500">Tambahkan atribut sesuai produk. Nilai tiap
-                  atribut dipisahkan koma.</p>
-              </div><span class="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">DINAMIS</span>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Varian</p>
+                <h3 class="mt-1 text-sm font-bold">Atur Warna & Ukuran</h3>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">Masukkan pilihan seperti Warna atau Ukuran. Pisahkan dengan tanda koma.</p>
+              </div><span class="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">OTOMATIS</span>
             </div>
             <label class="mt-3 flex items-center gap-2 text-xs text-slate-600"><input id="simple-product"
-                type="checkbox" class="h-4 w-4 accent-indigo-600"> Produk tanpa pilihan variasi (Standar)</label>
+                type="checkbox" class="h-4 w-4 accent-indigo-600"> Produk tanpa varian (1 jenis saja)</label>
             <div id="attribute-list" class="mt-3 space-y-3"></div>
             <button id="btn-add-attribute" type="button"
               class="mt-3 w-full rounded-xl border border-dashed border-slate-300 px-3 py-2.5 text-sm font-semibold text-slate-600">+
-              Tambah atribut</button>
+              Tambah Kategori Pilihan</button>
             <div id="matrix-wrap" class="mt-4 hidden border-t border-slate-100 pt-3">
               <div class="mb-2 flex items-center justify-between">
                 <div>
-                  <p class="text-xs font-bold">Preview kombinasi</p>
-                  <p class="text-[11px] text-slate-400">Hilangkan centang untuk kombinasi yang tidak tersedia.</p>
+                  <p class="text-xs font-bold">Daftar Varian yang Dibuat</p>
+                  <p class="text-[11px] text-slate-400">Hilangkan centang jika varian tidak dijual.</p>
                 </div><span id="matrix-count"
                   class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-bold text-slate-600"></span>
               </div>
@@ -690,17 +677,16 @@
 
           <div id="location-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Master Lokasi Rak</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Lokasi Rak Gudang</span>
               <div class="flex items-center gap-3">
                 <button type="button" id="btn-open-add-location"
-                  class="text-[11px] font-bold text-emerald-600 active:opacity-70">+ Tambah Lokasi</button>
+                  class="text-[11px] font-bold text-emerald-600 active:opacity-70">+ Tambah Rak</button>
                 <button type="button" id="btn-refresh-locations"
-                  class="text-[11px] font-bold text-indigo-600 active:opacity-70">Muat Ulang</button>
+                  class="text-[11px] font-bold text-indigo-600 active:opacity-70">Perbarui</button>
               </div>
             </div>
-            <div id="quick-add-location-box"
-              class="hidden rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
-              <p class="text-[10px] font-bold uppercase text-emerald-700">Tambah Lokasi Baru ke MASTER_LOKASI</p>
+            <div id="quick-add-location-box" class="hidden rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
+              <p class="text-[10px] font-bold uppercase text-emerald-700">Tambah Nama Rak Baru</p>
               <div class="flex gap-2">
                 <input id="quick-new-loc-name" type="text"
                   class="input-field flex-1 rounded-lg border border-emerald-200 bg-white px-2.5 py-2 text-xs font-semibold"
@@ -711,19 +697,19 @@
             </div>
             <div id="location-from-wrap" class="hidden">
               <p id="location-from-label"
-                class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi asal</p>
+                class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">Dari Rak Mana</p>
               <div id="location-from-options" class="grid grid-cols-1 gap-2"></div>
             </div>
             <div id="location-to-wrap" class="hidden">
               <p id="location-to-label" class="mb-2 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
-                Lokasi tujuan</p>
+                Ke Rak Mana</p>
               <div id="location-to-options" class="grid grid-cols-1 gap-2"></div>
             </div>
           </div>
 
           <div id="qty-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <label id="qty-label"
-              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kuantitas</label>
+              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jumlah Barang (Pcs)</label>
             <input id="qty-input" type="number" inputmode="numeric" min="0" step="1" placeholder="0"
               class="input-field w-full border-0 bg-transparent text-3xl font-bold text-slate-800 outline-none">
             <p id="qty-hint" class="mt-1 text-xs text-slate-400"></p>
@@ -731,8 +717,7 @@
 
           <div id="reporter-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mb-3">
             <label id="reporter-label"
-              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Pelapor /
-              Karyawan</label>
+              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas</label>
             <input id="reporter-input" type="text" placeholder="Ketik nama Anda..." autocomplete="name"
               class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm font-medium text-slate-800 outline-none">
           </div>
@@ -745,11 +730,11 @@
             </svg></button>
           <button id="btn-cancel-add-variants" type="button"
             class="hidden w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600">Batal
-            tambah variasi</button>
+            tambah varian</button>
         </form>
       </section>
 
-      <!-- STOK PENJAHIT & TERIMA KE GUDANG UTAMA (QC) -->
+      <!-- TERIMA SETORAN JAHITAN & CEK KUALITAS (QC) -->
       <section id="screen-qc" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back-qc"
@@ -759,12 +744,11 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-bold">Stok Penjahit & Terima QC</h2>
-            <p class="text-xs text-slate-400">Pindahkan stok selesai ke gudang utama</p>
+            <h2 class="text-base font-bold">Terima Setoran Jahitan</h2>
+            <p class="text-xs text-slate-400">Cek hasil penjahit & masukkan ke rak gudang</p>
           </div>
           <button type="button" id="btn-refresh-tailor-stock"
-            class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-emerald-700 shadow-sm ring-1 ring-slate-200 active:scale-95">Muat
-            Ulang</button>
+            class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-emerald-700 shadow-sm ring-1 ring-slate-200 active:scale-95">Perbarui</button>
         </div>
 
         <!-- Ringkasan Saldo Penjahit -->
@@ -772,11 +756,11 @@
           class="mb-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-600 to-teal-700 p-4 text-white shadow-sm">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Total Stok Siap di Penjahit</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Total Jahitan Siap Disetor</p>
               <p id="tailor-total-pcs" class="mt-0.5 text-2xl font-black">0 pcs</p>
             </div>
             <div class="text-right">
-              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Estimasi Upah</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Perkiraan Upah</p>
               <p id="tailor-total-est-upah" class="mt-0.5 text-sm font-extrabold">Rp 0</p>
             </div>
           </div>
@@ -786,12 +770,12 @@
         <div id="tailor-filter-wrap" class="mb-3">
           <input id="tailor-stock-search" type="text"
             class="input-field w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-medium"
-            placeholder="Cari nama penjahit, kategori, atau warna...">
+            placeholder="Cari nama penjahit, nama barang, atau warna...">
         </div>
 
         <!-- Daftar Stok Penjahit -->
         <div id="qc-list-wrap" class="space-y-3">
-          <p class="text-center text-xs text-slate-500 py-4" id="qc-loading">Memuat stok gudang penjahit...</p>
+          <p class="text-center text-xs text-slate-500 py-4" id="qc-loading">Memuat daftar jahitan siap setor...</p>
         </div>
 
         <!-- Form Terima ke Gudang Utama & QC -->
@@ -799,10 +783,9 @@
           <div class="flex items-center justify-between">
             <button type="button" id="btn-cancel-qc-form"
               class="inline-flex items-center gap-1 text-xs font-bold text-slate-500">
-              ← Kembali ke Daftar Stok Penjahit
+              ← Kembali ke Daftar Setoran
             </button>
-            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">TERIMA &
-              QC</span>
+            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">TERIMA BARANG</span>
           </div>
 
           <!-- Info Item Penjahit Terpilih -->
@@ -814,7 +797,7 @@
                 <p id="qc-item-detail" class="text-xs font-semibold text-emerald-800 mt-0.5"></p>
               </div>
               <div class="text-right">
-                <p class="text-[10px] font-bold uppercase text-emerald-600">Stok Ready</p>
+                <p class="text-[10px] font-bold uppercase text-emerald-600">Siap Setor</p>
                 <p id="qc-stok-ready-badge" class="text-lg font-black text-emerald-900">0 pcs</p>
                 <p id="qc-tarif-info" class="text-[10px] font-semibold text-emerald-700">Rp 0 / pcs</p>
               </div>
@@ -825,15 +808,13 @@
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex gap-3">
               <div class="flex-1">
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Lolos
-                  (Masuk Stok)</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Bagus (Masuk Stok)</label>
                 <input id="qc-lolos" type="number" inputmode="numeric" min="0"
                   class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 text-center text-lg font-bold text-emerald-800"
                   required>
               </div>
               <div class="flex-1">
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Gagal
-                  (Reject)</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Rusak / Reject</label>
                 <input id="qc-gagal" type="number" inputmode="numeric" min="0"
                   class="input-field w-full rounded-xl border border-rose-200 bg-rose-50/40 p-3 text-center text-lg font-bold text-rose-700"
                   value="0" required>
@@ -841,8 +822,7 @@
             </div>
 
             <div id="qc-reject-reason-wrap" class="hidden">
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Catatan /
-                Alasan Reject</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Catatan Kerusakan</label>
               <input id="qc-alasan-gagal" type="text"
                 class="input-field w-full rounded-xl border border-rose-200 px-3 py-2 text-xs"
                 placeholder="Contoh: Jahitan miring, noda kain...">
@@ -850,7 +830,7 @@
 
             <div class="rounded-xl bg-indigo-50 px-3 py-2.5 flex items-center justify-between text-xs">
               <div>
-                <p class="font-semibold text-indigo-700">Upah Otomatis (UNPAID)</p>
+                <p class="font-semibold text-indigo-700">Upah Penjahit (Belum Dibayar)</p>
                 <p id="qc-sisa-stok-text" class="text-[10px] text-indigo-500">Sisa di penjahit: 0 pcs</p>
               </div>
               <p id="qc-upah-preview" class="text-sm font-black text-indigo-900">Rp 0</p>
@@ -858,19 +838,17 @@
           </div>
 
           <!-- Card Produk & Lokasi Tujuan Gudang Utama -->
-          <div id="qc-target-warehouse-card"
-            class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+          <div id="qc-target-warehouse-card" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div>
-              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Tujuan Gudang Utama</p>
-              <h3 class="text-sm font-bold text-slate-800 mt-0.5">Produk & Variasi Siap Jual</h3>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan ke Stok Jual</p>
+              <h3 class="text-sm font-bold text-slate-800 mt-0.5">Pilih Produk & Rak Tujuan</h3>
             </div>
 
             <div class="flex gap-2">
               <button type="button" id="btn-scan-wip"
                 class="flex-1 rounded-xl bg-slate-800 px-3 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path
-                    d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                  <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
                   <rect x="7" y="7" width="10" height="10" rx="1.5" />
                 </svg>
                 <span>Scan Produk</span>
@@ -888,34 +866,31 @@
                 <span id="qc-wip-prod-code" class="font-mono text-[10px] text-slate-400"></span>
               </div>
               <div>
-                <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Variasi Masuk
-                  Stok</label>
+                <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk Stok</label>
                 <div id="qc-wip-variants"></div>
               </div>
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Lokasi Rak
-                Tujuan</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di Rak Mana</label>
               <select id="qc-lokasi-tujuan"
                 class="input-field w-full rounded-xl border border-slate-200 p-2.5 text-sm font-semibold bg-white"></select>
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Admin
-                Penerima / QC</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas Penerima</label>
               <input id="qc-nama" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
                 placeholder="Ketik nama Anda..." required>
             </div>
           </div>
 
           <button id="btn-submit-qc" type="submit"
-            class="w-full rounded-2xl bg-emerald-600 p-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 active:scale-[.98]">Simpan
-            ke Gudang & Catat Upah</button>
+            class="w-full rounded-2xl bg-emerald-600 p-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 active:scale-[.98]">Masukkan
+            ke Rak & Catat Upah</button>
         </form>
       </section>
 
-      <!-- REKAP UPAH & SLIP GAJI -->
+      <!-- BAYAR UPAH & SLIP GAJI -->
       <section id="screen-upah" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back-upah"
@@ -925,12 +900,11 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-bold">Rekap Upah & Slip Gaji</h2>
-            <p class="text-xs text-slate-400">Tagihan upah penjahit belum dibayar</p>
+            <h2 class="text-base font-bold">Bayar Upah & Slip Gaji</h2>
+            <p class="text-xs text-slate-400">Tagihan upah penjahit yang belum dibayar</p>
           </div>
           <button type="button" id="btn-refresh-upah"
-            class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-violet-700 shadow-sm ring-1 ring-slate-200 active:scale-95">Muat
-            Ulang</button>
+            class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-violet-700 shadow-sm ring-1 ring-slate-200 active:scale-95">Perbarui</button>
         </div>
 
         <!-- Summary Total Upah UNPAID -->
@@ -938,36 +912,35 @@
           class="mb-4 rounded-2xl border border-violet-200 bg-gradient-to-br from-violet-600 to-indigo-700 p-4 text-white shadow-sm">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-violet-200">Total Tagihan Belum Dibayar</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-violet-200">Total Upah Belum Dibayar</p>
               <p id="upah-grand-total" class="mt-0.5 text-2xl font-black">Rp 0</p>
             </div>
-            <span id="upah-tailor-count-badge" class="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">0
-              Penjahit</span>
+            <span id="upah-tailor-count-badge"
+              class="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">0 Penjahit</span>
           </div>
         </div>
 
-        <div id="upah-loading" class="text-center text-xs text-slate-500 py-4">Memuat data tagihan...</div>
+        <div id="upah-loading" class="text-center text-xs text-slate-500 py-4">Memuat data upah...</div>
         <div id="upah-list-wrap" class="space-y-4"></div>
 
         <!-- Modal Form Konfirmasi Pelunasan -->
         <div id="pay-slip-modal"
           class="fixed inset-0 z-40 hidden items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm sm:items-center">
           <div class="w-full max-w-sm rounded-2xl border border-violet-200 bg-white p-5 shadow-2xl">
-            <h3 class="text-base font-bold text-violet-950">Konfirmasi Pelunasan Slip Upah</h3>
+            <h3 class="text-base font-bold text-violet-950">Konfirmasi Bayar Upah</h3>
             <p id="pay-slip-desc" class="mt-1.5 text-xs leading-relaxed text-slate-600"></p>
             <div class="mt-4 space-y-3">
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Admin
-                  Pembayar</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas Pembayar</label>
                 <input id="pay-slip-admin"
                   class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium"
-                  placeholder="Ketik nama admin...">
+                  placeholder="Ketik nama Anda...">
               </div>
               <div class="flex gap-2 pt-1">
                 <button type="button" id="btn-cancel-payslip"
                   class="flex-1 rounded-xl bg-slate-100 py-3 text-xs font-bold text-slate-600">Batal</button>
                 <button type="button" id="btn-confirm-payslip"
-                  class="flex-1 rounded-xl bg-violet-600 py-3 text-xs font-bold text-white shadow-md">Terbitkan Slip &
+                  class="flex-1 rounded-xl bg-violet-600 py-3 text-xs font-bold text-white shadow-md">Buat Slip &
                   Lunas</button>
               </div>
             </div>
@@ -983,15 +956,14 @@
               <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Ina Basic Store</p>
               <h3 class="text-base font-black text-slate-900 mt-0.5">SLIP UPAH PENJAHIT</h3>
               <span
-                class="mt-1 inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">LUNAS
-                (PAID)</span>
+                class="mt-1 inline-block rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">LUNAS</span>
             </div>
             <div id="slip-receipt-body" class="py-3 text-xs space-y-2"></div>
             <div class="mt-3 flex gap-2 border-t border-slate-100 pt-3">
               <button type="button" id="btn-copy-slip"
-                class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white">Salin Slip (WA)</button>
+                class="flex-1 rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white">Salin ke WA</button>
               <button type="button" id="btn-print-slip"
-                class="rounded-xl bg-slate-100 px-3 py-2.5 text-xs font-bold text-slate-700">Print</button>
+                class="rounded-xl bg-slate-100 px-3 py-2.5 text-xs font-bold text-slate-700">Cetak</button>
               <button type="button" id="btn-close-slip"
                 class="rounded-xl bg-slate-900 px-3.5 py-2.5 text-xs font-bold text-white">Tutup</button>
             </div>
@@ -999,7 +971,7 @@
         </div>
       </section>
 
-      <!-- ATUR HPP & HARGA JUAL PER VARIASI -->
+      <!-- ATUR MODAL & HARGA JUAL -->
       <section id="screen-pricing" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back-pricing"
@@ -1009,22 +981,21 @@
               <path d="m15 18-6-6 6-6" />
             </svg></button>
           <div class="min-w-0 flex-1">
-            <h2 class="text-base font-bold">Atur HPP & Harga</h2>
-            <p class="text-xs text-slate-400">Set modal & harga jual per variasi</p>
+            <h2 class="text-base font-bold">Atur Modal & Harga Jual</h2>
+            <p class="text-xs text-slate-400">Ubah harga modal & harga jual per warna/ukuran</p>
           </div>
         </div>
 
         <!-- Scan or select product -->
         <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mb-4">
-          <p class="text-xs text-slate-500 mb-3">Scan barcode produk untuk mengatur HPP & Harga Jual setiap variasi.</p>
+          <p class="text-xs text-slate-500 mb-3">Scan barcode barang untuk mengubah harga modal dan harga jual.</p>
           <button type="button" id="btn-scan-pricing"
             class="w-full rounded-xl bg-slate-800 p-3 text-sm font-bold text-white shadow-sm flex items-center justify-center gap-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path
-                d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
               <rect x="7" y="7" width="10" height="10" rx="1.5" />
             </svg>
-            <span>Scan Barcode Produk</span>
+            <span>Scan Barcode Barang</span>
           </button>
           <div id="pricing-product-info" class="hidden mt-3 bg-indigo-50 p-3 rounded-xl border border-indigo-200">
             <p id="pricing-prod-name" class="text-sm font-bold text-indigo-900"></p>
@@ -1034,11 +1005,11 @@
 
         <!-- Bulk pricing -->
         <div id="pricing-bulk-card" class="hidden rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm mb-4">
-          <p class="text-[10px] font-bold uppercase text-amber-600 mb-2">Set HPP & Harga untuk SEMUA variasi sekaligus
+          <p class="text-[10px] font-bold uppercase text-amber-600 mb-2">Samakan Modal & Harga Jual untuk SEMUA Varian
           </p>
           <div class="flex gap-3">
             <div class="flex-1">
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">HPP
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Harga Modal
                 (Rp)</label>
               <input id="pricing-bulk-hpp" type="number" min="0"
                 class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-bold"
@@ -1054,7 +1025,7 @@
           </div>
           <button type="button" id="btn-apply-bulk-pricing"
             class="mt-3 w-full rounded-xl bg-amber-600 p-3 text-sm font-bold text-white shadow-sm">Terapkan ke Semua
-            Variasi</button>
+            Varian</button>
         </div>
 
         <!-- Per-variant pricing list -->
@@ -1074,12 +1045,11 @@
           </svg>
         </div>
         <div>
-          <h3 class="text-sm font-bold text-slate-900">Pasang Aplikasi Warehouse</h3>
-          <p class="text-[11px] text-slate-500">Akses cepat langsung dari layar utama HP</p>
+          <h3 class="text-sm font-bold text-slate-900">Pasang Aplikasi Gudang</h3>
+          <p class="text-[11px] text-slate-500">Buka lebih cepat langsung dari layar utama HP</p>
         </div>
       </div>
-      <div id="install-guide-steps"
-        class="rounded-xl bg-slate-50 p-3.5 text-xs text-slate-700 space-y-2 leading-relaxed"></div>
+      <div id="install-guide-steps" class="rounded-xl bg-slate-50 p-3.5 text-xs text-slate-700 space-y-2 leading-relaxed"></div>
       <button type="button" id="btn-close-install-guide"
         class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mengerti</button>
     </div>
@@ -1105,7 +1075,7 @@
     // ===== HELPER & KONFIGURASI =====
     const $ = id => document.getElementById(id);
 
-    const APP_CONFIG = { GAS_URL: 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec' };
+    const APP_CONFIG = { GAS_URL: 'https://script.google.com/macros/s/AKfycbyrTPpdKPyFI4EB5_vIPaq7oTyEQ7QLklzcY0f-BJi8KYATw0mq2NV107vwdjp4KDhc/exec' };
     const GAS_URL = APP_CONFIG.GAS_URL;
     const ADMIN_CACHE_KEY = 'IBS_ADMIN_BOOTSTRAP_V6_2';
     const OPNAME_SESSION_KEY = 'IBS_ACTIVE_OPNAME_SESSION';
@@ -1206,13 +1176,15 @@
       }
     }
 
-    // ===== NAVIGASI ANTAR LAYAR =====
+    // ===== NAVIGASI ANTAR LAYAR & DUKUNGAN TOMBOL KEMBALI HP / BROWSER =====
     const SCREENS = ['home', 'opname', 'tarif', 'scan', 'form', 'qc', 'upah', 'pricing'];
+    let currentScreenName = 'home';
 
-    function showScreen(name) {
+    function renderScreenUI(name) {
       if (name !== 'scan' && isCameraActive) {
         stopScanner();
       }
+      currentScreenName = name;
       SCREENS.forEach(s => {
         const el = $('screen-' + s);
         if (!el) return;
@@ -1224,8 +1196,115 @@
           el.classList.remove('screen-enter');
         }
       });
+      if (name === 'home') {
+        $('header-label').textContent = 'Pilih menu untuk mulai mencatat';
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+    function showScreen(name, fromPopState = false) {
+      if (!fromPopState && name !== currentScreenName) {
+        try {
+          if (name === 'home') {
+            history.pushState({ screen: 'home' }, '', '#home');
+          } else {
+            history.pushState({ screen: name }, '', '#' + name);
+          }
+        } catch (e) {}
+      }
+      renderScreenUI(name);
+    }
+
+    function goBackInApp() {
+      if ($('slip-receipt-modal') && !$('slip-receipt-modal').classList.contains('hidden')) {
+        $('slip-receipt-modal').classList.add('hidden');
+        $('slip-receipt-modal').classList.remove('flex');
+        return;
+      }
+      if ($('pay-slip-modal') && !$('pay-slip-modal').classList.contains('hidden')) {
+        $('pay-slip-modal').classList.add('hidden');
+        $('pay-slip-modal').classList.remove('flex');
+        return;
+      }
+      if ($('install-guide-modal') && !$('install-guide-modal').classList.contains('hidden')) {
+        $('install-guide-modal').classList.add('hidden');
+        $('install-guide-modal').classList.remove('flex');
+        return;
+      }
+
+      if (currentScreenName === 'qc' && $('form-qc') && !$('form-qc').classList.contains('hidden')) {
+        $('form-qc').classList.add('hidden');
+        $('qc-list-wrap').classList.remove('hidden');
+        $('tailor-filter-wrap').classList.remove('hidden');
+        return;
+      }
+
+      if (currentScreenName === 'form' && STATE.isAddingVariants && STATE.currentProduct) {
+        STATE.isAddingVariants = false;
+        renderProductForm();
+        return;
+      }
+
+      if (currentScreenName === 'scan') {
+        if (STATE.scanContext === 'tarif-sku') showScreen('tarif');
+        else if (STATE.scanContext === 'qc-target') showScreen('qc');
+        else if (STATE.scanContext === 'pricing') showScreen('pricing');
+        else showScreen('home');
+        return;
+      }
+
+      if (currentScreenName !== 'home') {
+        showScreen('home');
+      }
+    }
+
+    window.addEventListener('popstate', () => {
+      if ($('slip-receipt-modal') && !$('slip-receipt-modal').classList.contains('hidden')) {
+        $('slip-receipt-modal').classList.add('hidden');
+        $('slip-receipt-modal').classList.remove('flex');
+        history.pushState({ screen: currentScreenName }, '', '#' + currentScreenName);
+        return;
+      }
+      if ($('pay-slip-modal') && !$('pay-slip-modal').classList.contains('hidden')) {
+        $('pay-slip-modal').classList.add('hidden');
+        $('pay-slip-modal').classList.remove('flex');
+        history.pushState({ screen: currentScreenName }, '', '#' + currentScreenName);
+        return;
+      }
+      if ($('install-guide-modal') && !$('install-guide-modal').classList.contains('hidden')) {
+        $('install-guide-modal').classList.add('hidden');
+        $('install-guide-modal').classList.remove('flex');
+        history.pushState({ screen: currentScreenName }, '', '#' + currentScreenName);
+        return;
+      }
+
+      if (currentScreenName === 'qc' && $('form-qc') && !$('form-qc').classList.contains('hidden')) {
+        $('form-qc').classList.add('hidden');
+        $('qc-list-wrap').classList.remove('hidden');
+        $('tailor-filter-wrap').classList.remove('hidden');
+        history.pushState({ screen: 'qc' }, '', '#qc');
+        return;
+      }
+
+      if (currentScreenName === 'form' && STATE.isAddingVariants && STATE.currentProduct) {
+        STATE.isAddingVariants = false;
+        renderProductForm();
+        history.pushState({ screen: 'form' }, '', '#form');
+        return;
+      }
+
+      if (currentScreenName === 'scan') {
+        if (STATE.scanContext === 'tarif-sku') renderScreenUI('tarif');
+        else if (STATE.scanContext === 'qc-target') renderScreenUI('qc');
+        else if (STATE.scanContext === 'pricing') renderScreenUI('pricing');
+        else renderScreenUI('home');
+        return;
+      }
+
+      if (currentScreenName !== 'home') {
+        renderScreenUI('home');
+      }
+    });
 
     // ===== SINKRONISASI DATA BOOTSTRAP & LOKASI =====
     async function syncBootstrap(force = false) {
@@ -1237,7 +1316,7 @@
         try {
           applyBootstrapData(JSON.parse(cached));
           window.__adminInitialRendered = true;
-        } catch (e) { }
+        } catch (e) {}
       }
 
       isFetching = true;
@@ -1267,10 +1346,10 @@
           if (!$('screen-form').classList.contains('hidden')) {
             renderLocationChoices();
           }
-          if (notify) toast(`Berhasil memuat ${STATE.locations.length} lokasi aktif.`);
+          if (notify) toast(`Berhasil memuat ${STATE.locations.length} lokasi rak.`);
         }
       } catch (e) {
-        if (notify) toast('Gagal memuat ulang lokasi.', 'error');
+        if (notify) toast('Gagal memuat ulang lokasi rak.', 'error');
       }
     }
 
@@ -1302,9 +1381,9 @@
       const totalTailorPcs = STATE.stokTailor.reduce((sum, it) => sum + (Number(it.stok_ready) || 0), 0);
       const uniqueSkus = new Set(STATE.masterTailor.map(m => String(m.barcode_kategori || '').toUpperCase()).filter(Boolean));
       $('home-badge-tailor-stok').textContent = `${totalTailorPcs.toLocaleString('id-ID')} pcs`;
-      $('home-badge-master-tailor').textContent = `${uniqueSkus.size} SKU`;
+      $('home-badge-master-tailor').textContent = `${uniqueSkus.size} Kode`;
       if ($('home-badge-locations')) {
-        $('home-badge-locations').textContent = `${STATE.locations.length} LOKASI AKTIF`;
+        $('home-badge-locations').textContent = `${STATE.locations.length} LOKASI RAK`;
       }
 
       if (STATE.activeOpname) {
@@ -1336,43 +1415,43 @@
         const target = btn.dataset.nav;
         showScreen(target);
         if (target === 'opname') {
-          $('header-label').textContent = 'Stock Opname Sesi';
+          $('header-label').textContent = 'Hitung Stok Fisik';
           await refreshLocationsOnly(false);
           renderOpnameSessions();
         } else if (target === 'tarif') {
-          $('header-label').textContent = 'Master Produk & Tarif Jahit';
+          $('header-label').textContent = 'Daftar Barang & Ongkos Jahit';
           await loadMasterTailorFull();
         } else if (target === 'qc') {
-          $('header-label').textContent = 'Stok Penjahit & Terima QC';
+          $('header-label').textContent = 'Terima Setoran Jahitan';
           await refreshLocationsOnly(false);
           await loadStokTailorFresh();
         } else if (target === 'upah') {
-          $('header-label').textContent = 'Rekap Upah & Slip Gaji';
+          $('header-label').textContent = 'Bayar Upah & Slip Gaji';
           await loadUnpaidUpah();
         } else if (target === 'pricing') {
-          $('header-label').textContent = 'Atur HPP & Harga Jual';
+          $('header-label').textContent = 'Atur Modal & Harga Jual';
         }
       });
     });
 
-    $('btn-back-opname').addEventListener('click', () => { showScreen('home'); $('header-label').textContent = 'Siap memindai aktivitas gudang'; });
-    $('btn-back-tarif').addEventListener('click', () => { showScreen('home'); $('header-label').textContent = 'Siap memindai aktivitas gudang'; });
-    $('btn-back-qc').addEventListener('click', () => { showScreen('home'); $('header-label').textContent = 'Siap memindai aktivitas gudang'; });
-    $('btn-back-upah').addEventListener('click', () => { showScreen('home'); $('header-label').textContent = 'Siap memindai aktivitas gudang'; });
-    $('btn-back-pricing').addEventListener('click', () => { showScreen('home'); $('header-label').textContent = 'Siap memindai aktivitas gudang'; });
+    $('btn-back-opname').addEventListener('click', goBackInApp);
+    $('btn-back-tarif').addEventListener('click', goBackInApp);
+    $('btn-back-qc').addEventListener('click', goBackInApp);
+    $('btn-back-upah').addEventListener('click', goBackInApp);
+    $('btn-back-pricing').addEventListener('click', goBackInApp);
 
     // ===== SCANNER KAMERA & INPUT MANUAL =====
     function startScanScreen(activityLabel) {
       const titles = {
         Masuk: 'Scan Barang Masuk',
         Keluar: 'Scan Barang Keluar',
-        Mutasi: 'Scan Mutasi Rak',
-        Opname: 'Scan Hitung Opname',
-        CekStok: 'Scan Cek Stok Produk',
-        KelolaData: 'Scan Produk (Kelola Data)',
-        'tarif-sku': 'Scan QR Code SKU Jahit',
-        'qc-target': 'Scan Produk Tujuan Gudang',
-        pricing: 'Scan Produk (Atur HPP & Harga)'
+        Mutasi: 'Scan Pindah Rak',
+        Opname: 'Scan Hitung Stok',
+        CekStok: 'Scan Cek Sisa Stok',
+        KelolaData: 'Scan Tambah / Edit Produk',
+        'tarif-sku': 'Scan QR Kode Barang Jahit',
+        'qc-target': 'Scan Produk Tujuan Rak',
+        pricing: 'Scan Barang (Ubah Harga)'
       };
       $('scan-title').textContent = titles[activityLabel] || 'Scan Barcode / QR';
       $('manual-barcode').value = '';
@@ -1405,7 +1484,7 @@
             await stopScanner();
             handleScannedBarcode(decodedText);
           },
-          () => { }
+          () => {}
         );
       } catch (err) {
         isCameraActive = false;
@@ -1417,17 +1496,12 @@
       if (html5Scanner && isCameraActive) {
         try {
           await html5Scanner.stop();
-        } catch (e) { }
+        } catch (e) {}
       }
       isCameraActive = false;
     }
 
-    $('btn-cancel-scan').addEventListener('click', () => {
-      if (STATE.scanContext === 'tarif-sku') showScreen('tarif');
-      else if (STATE.scanContext === 'qc-target') showScreen('qc');
-      else if (STATE.scanContext === 'pricing') showScreen('pricing');
-      else showScreen('home');
-    });
+    $('btn-cancel-scan').addEventListener('click', goBackInApp);
 
     $('btn-manual-toggle').addEventListener('click', () => {
       $('manual-form').classList.toggle('hidden');
@@ -1453,9 +1527,9 @@
         if (existing) {
           $('tarif-nama-produk').value = existing.nama_kategori || '';
           $('tarif-upah').value = existing.upah_per_pcs || '';
-          toast(`SKU ${code.toUpperCase()} ditemukan di Master Tailor. Tambahkan variasi baru.`);
+          toast(`Kode ${code.toUpperCase()} sudah terdaftar. Tambahkan pilihan warna/ukuran baru.`);
         } else {
-          toast(`SKU ${code.toUpperCase()} siap didaftarkan ke Master Tailor.`);
+          toast(`Kode ${code.toUpperCase()} siap didaftarkan.`);
         }
         rebuildTarifMatrixPreview();
         return;
@@ -1477,7 +1551,7 @@
       await openProductFormByBarcode(code);
     }
 
-    // ===== FORM TRANSAKSI & MASTER PRODUK GUDANG UTAMA =====
+    // ===== FORM TRANSAKSI & DATA PRODUK GUDANG UTAMA =====
     async function openProductFormByBarcode(barcode) {
       const act = STATE.currentActivity;
       const includeInactive = act === 'KelolaData';
@@ -1510,8 +1584,8 @@
       STATE.currentProduct = null;
       STATE.isAddingVariants = true;
 
-      $('form-title').textContent = 'Daftarkan Produk Baru';
-      $('form-subtitle').textContent = 'Buat produk induk & kombinasi variasi';
+      $('form-title').textContent = 'Tambah Produk Baru';
+      $('form-subtitle').textContent = 'Daftarkan nama produk & pilihan warna/ukuran';
       $('form-barcode').textContent = barcode;
       $('product-status-pill').classList.add('hidden');
       $('product-fields').classList.remove('hidden');
@@ -1542,10 +1616,10 @@
       const titles = {
         Masuk: 'Barang Masuk Rak',
         Keluar: 'Barang Keluar Rak',
-        Mutasi: 'Mutasi Antar Rak',
-        Opname: 'Hitung Fisik Opname',
-        CekStok: 'Detail Stok Produk',
-        KelolaData: 'Kelola Data Produk'
+        Mutasi: 'Pindah Antar Rak',
+        Opname: 'Hitung Stok Fisik',
+        CekStok: 'Rincian Sisa Stok',
+        KelolaData: 'Edit Data Produk'
       };
       $('form-title').textContent = titles[act] || 'Detail Produk';
       $('form-subtitle').textContent = p.nama;
@@ -1576,7 +1650,7 @@
         $('qty-card').classList.add('hidden');
         $('reporter-card').classList.remove('hidden');
         $('btn-submit').classList.remove('hidden');
-        $('btn-submit-text').textContent = 'Simpan Perubahan Produk';
+        $('btn-submit-text').textContent = 'Simpan Perubahan';
         $('btn-cancel-add-variants').classList.add('hidden');
         renderVariantManageList();
         return;
@@ -1603,7 +1677,7 @@
         $('qty-input').value = '';
         $('reporter-card').classList.remove('hidden');
         renderLocationChoices();
-        $('btn-submit-text').textContent = act === 'Opname' ? 'Simpan Hasil Hitung' : `Simpan Transaksi ${act}`;
+        $('btn-submit-text').textContent = act === 'Opname' ? 'Simpan Hasil Hitung' : `Simpan Barang ${act}`;
       }
     }
 
@@ -1660,7 +1734,7 @@
       const v = STATE.selectedVariant;
       if (!v) {
         sumBox.classList.remove('hidden');
-        $('variant-selected-label').textContent = 'Kombinasi variasi tidak tersedia / nonaktif';
+        $('variant-selected-label').textContent = 'Pilihan varian tidak tersedia / nonaktif';
         $('variant-stock-summary').textContent = '';
         return;
       }
@@ -1681,8 +1755,8 @@
 
     $('btn-save-quick-location').addEventListener('click', async () => {
       const nama_lokasi = $('quick-new-loc-name').value.trim();
-      if (!nama_lokasi) return toast('Masukkan nama lokasi baru terlebih dahulu.', 'error');
-      const res = await postApi('ADD_LOCATION', { nama_lokasi, jenis_lokasi: 'warehouse' }, $('btn-save-quick-location'), 'Menambahkan lokasi ke MASTER_LOKASI...');
+      if (!nama_lokasi) return toast('Masukkan nama rak baru terlebih dahulu.', 'error');
+      const res = await postApi('ADD_LOCATION', { nama_lokasi, jenis_lokasi: 'warehouse' }, $('btn-save-quick-location'), 'Menambahkan rak baru...');
       if (res) {
         toast(res.message);
         $('quick-new-loc-name').value = '';
@@ -1752,12 +1826,12 @@
     function renderVariantManageList() {
       const p = STATE.currentProduct;
       const list = $('variant-manage-list');
-      $('variant-count').textContent = `${p.variants.length} VARIASI`;
+      $('variant-count').textContent = `${p.variants.length} VARIAN`;
       list.innerHTML = p.variants.map(v => `
         <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs">
           <div>
             <p class="font-bold text-slate-800">${v.label || 'Standar'}</p>
-            <p class="text-[10px] text-slate-400">HPP: ${formatRp(v.hpp)} · Jual: ${formatRp(v.harga_jual)}</p>
+            <p class="text-[10px] text-slate-400">Modal: ${formatRp(v.hpp)} · Jual: ${formatRp(v.harga_jual)}</p>
           </div>
           <button type="button" data-toggle-var="${v.id}" data-active="${v.active ? '1' : '0'}"
             class="rounded-lg px-2.5 py-1 text-[10px] font-bold ${v.active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'}">
@@ -1775,7 +1849,7 @@
             variant_id: vid,
             active: nextActive,
             nama_pelapor: $('reporter-input').value.trim() || 'Admin'
-          }, btn, 'Mengubah status variasi...');
+          }, btn, 'Mengubah status varian...');
           if (res) {
             toast(res.message);
             await openProductFormByBarcode(p.barcode);
@@ -1789,10 +1863,10 @@
       row.className = 'attr-builder-row rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2';
       row.innerHTML = `
         <div class="flex gap-2">
-          <input type="text" class="attr-name input-field flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold" placeholder="Nama atribut (Warna/Ukuran)" value="${defaultName}">
+          <input type="text" class="attr-name input-field flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-bold" placeholder="Kategori (Warna / Ukuran)" value="${defaultName}">
           <button type="button" class="btn-remove-attr rounded-lg bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-600">Hapus</button>
         </div>
-        <input type="text" class="attr-values input-field w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs" placeholder="Nilai dipisah koma (S, M, L)" value="${defaultValues}">
+        <input type="text" class="attr-values input-field w-full rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs" placeholder="Pilihan dipisah koma (S, M, L)" value="${defaultValues}">
       `;
       row.querySelector('.btn-remove-attr').addEventListener('click', () => {
         row.remove();
@@ -1827,7 +1901,7 @@
       const list = $('matrix-list');
       if ($('simple-product').checked) {
         wrap.classList.remove('hidden');
-        $('matrix-count').textContent = '1 KOMBINASI';
+        $('matrix-count').textContent = '1 VARIAN';
         list.innerHTML = `<label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-bold"><input type="checkbox" class="matrix-combo-chk accent-indigo-600" data-attrs="{}" checked> Standar</label>`;
         return;
       }
@@ -1851,7 +1925,7 @@
       });
 
       wrap.classList.remove('hidden');
-      $('matrix-count').textContent = `${combos.length} KOMBINASI`;
+      $('matrix-count').textContent = `${combos.length} VARIAN`;
       list.innerHTML = combos.map(c => {
         const lbl = defs.map(d => `${d.name}: ${c[d.name]}`).join(' · ');
         return `<label class="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold">
@@ -1865,7 +1939,7 @@
       STATE.isAddingVariants = true;
       $('attribute-builder-card').classList.remove('hidden');
       $('btn-cancel-add-variants').classList.remove('hidden');
-      $('btn-submit-text').textContent = 'Simpan Kombinasi Baru';
+      $('btn-submit-text').textContent = 'Simpan Varian Baru';
       $('attribute-list').innerHTML = '';
       const defs = STATE.currentProduct.attributeDefinitions || [];
       if (defs.length) {
@@ -1876,12 +1950,9 @@
       rebuildAttributeMatrix();
     });
 
-    $('btn-cancel-add-variants').addEventListener('click', () => {
-      STATE.isAddingVariants = false;
-      renderProductForm();
-    });
+    $('btn-cancel-add-variants').addEventListener('click', goBackInApp);
 
-    $('btn-back').addEventListener('click', () => showScreen('home'));
+    $('btn-back').addEventListener('click', goBackInApp);
 
     $('main-form').addEventListener('submit', async e => {
       e.preventDefault();
@@ -1929,7 +2000,7 @@
             attributes: defs,
             variants,
             nama_pelapor: pelapor || 'Admin'
-          }, btn, 'Menambahkan variasi baru...');
+          }, btn, 'Menambahkan varian baru...');
           if (res) {
             toast(res.message);
             await openProductFormByBarcode(barcode);
@@ -1951,19 +2022,19 @@
         return;
       }
 
-      if (!STATE.selectedVariant) return toast('Pilih variasi produk terlebih dahulu.', 'error');
+      if (!STATE.selectedVariant) return toast('Pilih warna/ukuran produk terlebih dahulu.', 'error');
       const qty = Number($('qty-input').value);
-      if (!pelapor) return toast('Nama pelapor wajib diisi.', 'error');
+      if (!pelapor) return toast('Nama petugas wajib diisi.', 'error');
 
       if (act === 'Opname') {
-        if (!STATE.activeOpname) return toast('Pilih sesi opname aktif terlebih dahulu.', 'error');
+        if (!STATE.activeOpname) return toast('Pilih sesi hitung stok terlebih dahulu.', 'error');
         const res = await postApi('SUBMIT_OPNAME_COUNT', {
           session_id: STATE.activeOpname.session_id,
           barcode,
           variant_id: STATE.selectedVariant.id,
           qty,
           nama_pelapor: pelapor
-        }, btn, 'Menyimpan hitungan opname...');
+        }, btn, 'Menyimpan hitungan stok...');
         if (res) {
           toast(res.message);
           startScanScreen('Opname');
@@ -1980,7 +2051,7 @@
         location_to: STATE.locTo,
         qty,
         nama_pelapor: pelapor
-      }, btn, 'Menyimpan transaksi...');
+      }, btn, 'Menyimpan catatan...');
 
       if (res) {
         toast(res.message);
@@ -1988,12 +2059,12 @@
       }
     });
 
-    // ===== MODUL STOCK OPNAME =====
+    // ===== MODUL HITUNG STOK FISIK (OPNAME) =====
     function renderOpnameSessions() {
       const box = $('opname-session-list');
       if (!box) return;
       if (!STATE.opnameSessions.length) {
-        box.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400">Belum ada sesi opname aktif.</p>';
+        box.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400">Belum ada sesi hitung stok yang aktif.</p>';
         return;
       }
       box.innerHTML = STATE.opnameSessions.map(s => `
@@ -2001,15 +2072,15 @@
           <div class="flex items-start justify-between">
             <div>
               <p class="text-sm font-bold text-slate-900">${s.nama_sesi}</p>
-              <p class="text-xs text-slate-500">Lokasi: <span class="font-bold text-slate-700">${s.lokasi}</span> · Oleh: ${s.dibuat_oleh}</p>
+              <p class="text-xs text-slate-500">Rak: <span class="font-bold text-slate-700">${s.lokasi}</span> · Petugas: ${s.dibuat_oleh}</p>
             </div>
-            <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">ACTIVE</span>
+            <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">BERJALAN</span>
           </div>
           <div class="flex gap-2">
             <button type="button" data-use-opname="${s.session_id}"
-              class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white">Mulai Scan Hitung</button>
+              class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white">Mulai Scan Barang</button>
             <button type="button" data-approve-opname="${s.session_id}"
-              class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2.5 text-xs font-bold text-emerald-700">Selesaikan</button>
+              class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2.5 text-xs font-bold text-emerald-700">Selesai</button>
           </div>
         </div>
       `).join('');
@@ -2033,7 +2104,7 @@
           const res = await postApi('APPROVE_OPNAME_SESSION', {
             session_id: btn.dataset.approveOpname,
             nama_pelapor: pelapor
-          }, btn, 'Menyelesaikan & mengunci sesi opname...');
+          }, btn, 'Menyelesaikan sesi hitung stok...');
           if (res) {
             toast(res.message);
             if (STATE.activeOpname && STATE.activeOpname.session_id === btn.dataset.approveOpname) {
@@ -2051,9 +2122,9 @@
       const nama_sesi = $('opname-session-name').value.trim();
       const lokasi = $('opname-session-loc').value;
       const nama_pelapor = $('opname-session-user').value.trim();
-      if (!nama_sesi || !nama_pelapor) return toast('Lengkapi nama sesi dan nama admin.', 'error');
+      if (!nama_sesi || !nama_pelapor) return toast('Isi nama sesi dan nama petugas.', 'error');
 
-      const res = await postApi('CREATE_OPNAME_SESSION', { nama_sesi, lokasi, nama_pelapor }, $('btn-create-opname'), 'Membuat sesi opname...');
+      const res = await postApi('CREATE_OPNAME_SESSION', { nama_sesi, lokasi, nama_pelapor }, $('btn-create-opname'), 'Membuat sesi hitung...');
       if (res) {
         toast(res.message);
         $('opname-session-name').value = '';
@@ -2071,10 +2142,10 @@
       STATE.activeOpname = null;
       localStorage.removeItem(OPNAME_SESSION_KEY);
       updateHomeBadges();
-      toast('Keluar dari mode stock opname.');
+      toast('Keluar dari sesi hitung stok.');
     });
 
-    // ===== MODUL MASTER PRODUK & TARIF JAHIT =====
+    // ===== MODUL DAFTAR BARANG & ONGKOS JAHIT =====
     async function loadMasterTailorFull() {
       try {
         const res = await fetch(`${GAS_URL}?action=GET_MASTER_TAILOR&include_inactive=true&_t=${Date.now()}`);
@@ -2119,7 +2190,7 @@
 
       STATE.tarifMatrixItems = combos;
       wrap.classList.remove('hidden');
-      $('tarif-matrix-count').textContent = `${combos.length} VARIASI`;
+      $('tarif-matrix-count').textContent = `${combos.length} PILIHAN`;
       list.innerHTML = combos.map((c, idx) => `
         <label class="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold">
           <span class="flex items-center gap-2">
@@ -2136,14 +2207,14 @@
 
     function resetTarifForm() {
       $('tarif-id-tailor').value = '';
-      $('tarif-form-mode-badge').textContent = 'TAMBAH SKU & VARIASI JAHIT';
+      $('tarif-form-mode-badge').textContent = 'TAMBAH BARANG & ONGKOS JAHIT';
       $('tarif-barcode-sku').value = '';
       $('tarif-nama-produk').value = '';
       $('tarif-warna').value = '';
       $('tarif-ukuran').value = '';
       $('tarif-upah').value = '';
       $('tarif-status-aktif').checked = true;
-      $('btn-submit-tarif').textContent = 'Simpan Produk & Variasi Jahit';
+      $('btn-submit-tarif').textContent = 'Simpan Barang & Ongkos Jahit';
       rebuildTarifMatrixPreview();
     }
 
@@ -2163,10 +2234,10 @@
       const status_aktif = $('tarif-status-aktif').checked;
 
       if (!barcode_kategori || !nama_kategori) {
-        return toast('Kode SKU dan Nama Produk Jahit wajib diisi.', 'error');
+        return toast('Kode dan Nama Barang Jahit wajib diisi.', 'error');
       }
       if (isNaN(upah_per_pcs) || upah_per_pcs < 0 || $('tarif-upah').value === '') {
-        return toast('Masukkan tarif upah per pcs yang valid.', 'error');
+        return toast('Masukkan ongkos jahit per pcs yang valid.', 'error');
       }
 
       let payload = {
@@ -2196,7 +2267,7 @@
         payload.variants = selectedCombos;
       }
 
-      const res = await postApi('SAVE_MASTER_TAILOR', payload, $('btn-submit-tarif'), 'Menyimpan ke Master Tailor...');
+      const res = await postApi('SAVE_MASTER_TAILOR', payload, $('btn-submit-tarif'), 'Menyimpan daftar barang jahit...');
       if (res) {
         toast(res.message);
         resetTarifForm();
@@ -2221,9 +2292,9 @@
         );
       });
 
-      countBadge.textContent = `${filtered.length} VARIASI`;
+      countBadge.textContent = `${filtered.length} PILIHAN`;
       if (!filtered.length) {
-        box.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400">Belum ada produk jahit di Master Tailor.</p>';
+        box.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400">Belum ada barang jahit yang terdaftar.</p>';
         return;
       }
 
@@ -2258,10 +2329,10 @@
                 <p class="font-bold text-slate-800">${v.warna} · ${v.ukuran}
                   ${v.status_aktif ? '' : '<span class="ml-1 rounded bg-rose-100 px-1.5 py-0.5 text-[9px] text-rose-700">NONAKTIF</span>'}
                 </p>
-                <p class="text-[11px] text-slate-500">Upah: <span class="font-bold text-indigo-700">${formatRp(v.upah_per_pcs)}</span>/pcs · Stock Tailor: <span class="font-bold text-emerald-700">${stokVar} pcs</span></p>
+                <p class="text-[11px] text-slate-500">Ongkos: <span class="font-bold text-indigo-700">${formatRp(v.upah_per_pcs)}</span>/pcs · Di Penjahit: <span class="font-bold text-emerald-700">${stokVar} pcs</span></p>
               </div>
               <button type="button" data-edit-tailor="${v.id_tailor}"
-                class="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 shadow-xs ring-1 ring-slate-200">Edit</button>
+                class="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 shadow-xs ring-1 ring-slate-200">Ubah</button>
             </div>
           `;
         }).join('');
@@ -2272,10 +2343,10 @@
               <div>
                 <span class="rounded-md bg-indigo-50 px-2 py-0.5 font-mono text-[11px] font-extrabold text-indigo-700">${grp.barcode_kategori}</span>
                 <h4 class="mt-1 text-sm font-bold text-slate-900">${grp.nama_kategori}</h4>
-                <p class="text-[11px] text-slate-400">${grp.items.length} variasi · Total di penjahit: ${totalStokSku} pcs</p>
+                <p class="text-[11px] text-slate-400">${grp.items.length} pilihan · Siap setor: ${totalStokSku} pcs</p>
               </div>
               <button type="button" data-add-var-sku="${grp.barcode_kategori}"
-                class="rounded-xl bg-indigo-50 px-2.5 py-1.5 text-[11px] font-bold text-indigo-700">+ Variasi</button>
+                class="rounded-xl bg-indigo-50 px-2.5 py-1.5 text-[11px] font-bold text-indigo-700">+ Warna/Ukuran</button>
             </div>
             <div class="space-y-1.5">${rowsHtml}</div>
           </div>
@@ -2302,14 +2373,14 @@
           const item = STATE.masterTailor.find(m => m.id_tailor === btn.dataset.editTailor);
           if (!item) return;
           $('tarif-id-tailor').value = item.id_tailor;
-          $('tarif-form-mode-badge').textContent = 'EDIT VARIASI JAHIT';
+          $('tarif-form-mode-badge').textContent = 'UBAH DATA BARANG JAHIT';
           $('tarif-barcode-sku').value = item.barcode_kategori;
           $('tarif-nama-produk').value = item.nama_kategori;
           $('tarif-warna').value = item.warna;
           $('tarif-ukuran').value = item.ukuran;
           $('tarif-upah').value = item.upah_per_pcs;
           $('tarif-status-aktif').checked = item.status_aktif !== false;
-          $('btn-submit-tarif').textContent = 'Perbarui Variasi Jahit';
+          $('btn-submit-tarif').textContent = 'Simpan Perubahan';
           rebuildTarifMatrixPreview();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -2318,7 +2389,7 @@
 
     $('master-tailor-search').addEventListener('input', renderMasterTailorList);
 
-    // ===== MODUL STOK PENJAHIT & TERIMA QC KE GUDANG UTAMA =====
+    // ===== MODUL TERIMA SETORAN JAHITAN & QC =====
     async function loadStokTailorFresh() {
       $('qc-loading').classList.remove('hidden');
       try {
@@ -2328,7 +2399,7 @@
           STATE.stokTailor = json.data.items;
           updateHomeBadges();
         }
-      } catch (e) { }
+      } catch (e) {}
       $('qc-loading').classList.add('hidden');
       renderStokTailorList();
     }
@@ -2358,7 +2429,7 @@
       });
 
       if (!filtered.length) {
-        wrap.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-xs text-slate-400">Tidak ada stok siap setor di penjahit.</p>';
+        wrap.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-xs text-slate-400">Belum ada jahitan siap setor dari penjahit.</p>';
         return;
       }
 
@@ -2368,16 +2439,16 @@
             <div>
               <span class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">${it.nama_penjahit}</span>
               <h4 class="mt-1.5 text-sm font-bold text-slate-900">${it.nama_kategori} · ${it.warna} · ${it.ukuran}</h4>
-              <p class="mt-0.5 font-mono text-[11px] text-slate-400">SKU: ${it.barcode_kategori} · Tarif: ${formatRp(it.upah_per_pcs)}/pcs</p>
+              <p class="mt-0.5 font-mono text-[11px] text-slate-400">Kode: ${it.barcode_kategori} · Ongkos: ${formatRp(it.upah_per_pcs)}/pcs</p>
             </div>
             <div class="text-right">
               <p class="text-lg font-black text-emerald-700">${it.stok_ready} pcs</p>
-              <p class="text-[10px] font-semibold text-slate-400">Est. ${formatRp(it.estimasi_upah)}</p>
+              <p class="text-[10px] font-semibold text-slate-400">Upah ${formatRp(it.estimasi_upah)}</p>
             </div>
           </div>
           <button type="button" data-select-qc="${idx}"
             class="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-sm active:scale-[.98]">
-            Terima ke Gudang Utama & QC
+            Terima & Masukkan ke Rak
           </button>
         </div>
       `).join('');
@@ -2437,11 +2508,7 @@
     $('qc-lolos').addEventListener('input', updateQcWagePreview);
     $('qc-gagal').addEventListener('input', updateQcWagePreview);
 
-    $('btn-cancel-qc-form').addEventListener('click', () => {
-      $('form-qc').classList.add('hidden');
-      $('qc-list-wrap').classList.remove('hidden');
-      $('tailor-filter-wrap').classList.remove('hidden');
-    });
+    $('btn-cancel-qc-form').addEventListener('click', goBackInApp);
 
     $('btn-scan-wip').addEventListener('click', () => {
       STATE.scanContext = 'qc-target';
@@ -2499,12 +2566,12 @@
       const qty_gagal = Number($('qc-gagal').value) || 0;
       const nama_penerima = $('qc-nama').value.trim();
 
-      if (qty_lolos + qty_gagal <= 0) return toast('Jumlah lolos atau gagal minimal 1 pcs.', 'error');
-      if (qty_lolos + qty_gagal > it.stok_ready) return toast('Total melebihi stok ready di penjahit.', 'error');
+      if (qty_lolos + qty_gagal <= 0) return toast('Jumlah bagus atau rusak minimal 1 pcs.', 'error');
+      if (qty_lolos + qty_gagal > it.stok_ready) return toast('Total melebihi jumlah yang siap setor.', 'error');
       if (qty_lolos > 0 && (!STATE.qcTargetProduct || !STATE.qcTargetVariantId)) {
-        return toast('Pilih produk & variasi tujuan di gudang utama.', 'error');
+        return toast('Pilih produk & warna/ukuran tujuan di rak.', 'error');
       }
-      if (!nama_penerima) return toast('Isi nama admin penerima / QC.', 'error');
+      if (!nama_penerima) return toast('Isi nama petugas penerima.', 'error');
 
       localStorage.setItem(REPORTER_STORAGE_KEY, nama_penerima);
 
@@ -2519,7 +2586,7 @@
         id_variasi_tujuan: STATE.qcTargetVariantId,
         lokasi_tujuan: $('qc-lokasi-tujuan').value,
         nama_penerima
-      }, $('btn-submit-qc'), 'Memindahkan stok ke gudang & mencatat upah...');
+      }, $('btn-submit-qc'), 'Memasukkan ke rak & mencatat upah...');
 
       if (res) {
         toast(res.message);
@@ -2531,7 +2598,7 @@
       }
     });
 
-    // ===== MODUL REKAP UPAH & SLIP GAJI =====
+    // ===== MODUL BAYAR UPAH & SLIP GAJI =====
     async function loadUnpaidUpah() {
       $('upah-loading').classList.remove('hidden');
       try {
@@ -2540,7 +2607,7 @@
         if (json.success && json.data) {
           STATE.unpaidUpah = json.data;
         }
-      } catch (e) { }
+      } catch (e) {}
       $('upah-loading').classList.add('hidden');
       renderUnpaidUpahList();
     }
@@ -2554,7 +2621,7 @@
 
       const wrap = $('upah-list-wrap');
       if (!data.tailors || !data.tailors.length) {
-        wrap.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-xs text-slate-400">Semua upah penjahit sudah lunas (tidak ada tagihan UNPAID).</p>';
+        wrap.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-5 text-center text-xs text-slate-400">Semua upah penjahit sudah lunas.</p>';
         return;
       }
 
@@ -2563,7 +2630,7 @@
           <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
             <div>
               <h4 class="text-sm font-bold text-slate-900">${t.nama_penjahit}</h4>
-              <p class="text-[11px] text-slate-500">${t.total_qty_bagus} pcs bagus · ${t.jumlah_transaksi} setoran</p>
+              <p class="text-[11px] text-slate-500">${t.total_qty_bagus} pcs bagus · ${t.jumlah_transaksi} kali setor</p>
             </div>
             <p class="text-base font-black text-violet-700">${formatRp(t.total_upah)}</p>
           </div>
@@ -2597,14 +2664,14 @@
               selectedTotal += Number(chk.dataset.upah) || 0;
             }
           });
-          if (!selectedIds.length) return toast('Pilih minimal 1 rincian setoran untuk dilunasi.', 'error');
+          if (!selectedIds.length) return toast('Pilih minimal 1 setoran untuk dibayar.', 'error');
 
           STATE.pendingPaySlip = {
             nama_penjahit: tailor.nama_penjahit,
             log_ids: selectedIds,
             total_upah: selectedTotal
           };
-          $('pay-slip-desc').textContent = `Terbitkan slip gaji & tandai LUNAS untuk ${tailor.nama_penjahit} sejumlah ${formatRp(selectedTotal)} (${selectedIds.length} transaksi)?`;
+          $('pay-slip-desc').textContent = `Buat slip gaji & tandai LUNAS untuk ${tailor.nama_penjahit} sejumlah ${formatRp(selectedTotal)} (${selectedIds.length} setoran)?`;
           const savedAdmin = localStorage.getItem(REPORTER_STORAGE_KEY);
           if (savedAdmin) $('pay-slip-admin').value = savedAdmin;
           $('pay-slip-modal').classList.remove('hidden');
@@ -2627,7 +2694,7 @@
         nama_penjahit: STATE.pendingPaySlip.nama_penjahit,
         log_ids: STATE.pendingPaySlip.log_ids,
         nama_admin
-      }, $('btn-confirm-payslip'), 'Menerbitkan slip upah...');
+      }, $('btn-confirm-payslip'), 'Membuat slip upah...');
 
       if (res && res.data) {
         $('pay-slip-modal').classList.add('hidden');
@@ -2642,7 +2709,7 @@
       $('slip-receipt-body').innerHTML = `
         <div class="flex justify-between"><span class="text-slate-400">No. Slip</span><span class="font-mono font-bold">${slip.slip_id}</span></div>
         <div class="flex justify-between"><span class="text-slate-400">Penjahit</span><span class="font-bold">${slip.nama_penjahit}</span></div>
-        <div class="flex justify-between"><span class="text-slate-400">Admin</span><span>${slip.dibayar_oleh}</span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Petugas</span><span>${slip.dibayar_oleh}</span></div>
         <div class="border-t border-dashed border-slate-200 my-2 pt-2 space-y-1">
           ${(slip.rincian || []).map(r => `
             <div class="flex justify-between text-[11px]">
@@ -2667,7 +2734,7 @@
         `*SLIP UPAH PENJAHIT - INA BASIC STORE*`,
         `No. Slip: ${s.slip_id}`,
         `Penjahit: ${s.nama_penjahit}`,
-        `Status: LUNAS (PAID)`,
+        `Status: LUNAS`,
         `--------------------------------`,
         ...(s.rincian || []).map(r => `• ${r.detail_item} (${r.qty_bagus} pcs) = ${formatRp(r.total_upah)}`),
         `--------------------------------`,
@@ -2691,14 +2758,14 @@
       $('slip-receipt-modal').classList.remove('flex');
     });
 
-    // ===== MODUL ATUR HPP & HARGA JUAL =====
+    // ===== MODUL ATUR MODAL & HARGA JUAL =====
     $('btn-scan-pricing').addEventListener('click', () => {
       STATE.scanContext = 'pricing';
       startScanScreen('pricing');
     });
 
     async function loadProductForPricing(barcode) {
-      const res = await postApi('GET_PRODUCT', { barcode, include_inactive: false }, null, 'Memuat variasi harga...');
+      const res = await postApi('GET_PRODUCT', { barcode, include_inactive: false }, null, 'Memuat daftar harga...');
       if (!res || !res.data) return;
       STATE.pricingProduct = res.data;
 
@@ -2713,7 +2780,7 @@
           <p class="text-xs font-bold text-slate-900">${v.label || 'Standar'}</p>
           <div class="flex gap-2.5">
             <div class="flex-1">
-              <label class="block text-[10px] text-slate-400 font-semibold">HPP (Rp)</label>
+              <label class="block text-[10px] text-slate-400 font-semibold">Harga Modal (Rp)</label>
               <input type="number" min="0" class="price-hpp-${v.id} input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold" value="${v.hpp || 0}">
             </div>
             <div class="flex-1">
@@ -2722,7 +2789,7 @@
             </div>
           </div>
           <button type="button" data-save-var-price="${v.id}"
-            class="w-full rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white">Simpan Variasi Ini</button>
+            class="w-full rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white">Simpan Harga Varian Ini</button>
         </div>
       `).join('');
 
@@ -2750,7 +2817,7 @@
         hpp,
         harga_jual,
         nama_pelapor: localStorage.getItem(REPORTER_STORAGE_KEY) || 'Admin'
-      }, $('btn-apply-bulk-pricing'), 'Menerapkan harga ke semua variasi...');
+      }, $('btn-apply-bulk-pricing'), 'Menerapkan harga ke semua varian...');
       if (res) {
         toast(res.message);
         await loadProductForPricing(STATE.pricingProduct.barcode);
@@ -2820,12 +2887,16 @@
         window.__deferredInstallPrompt = null;
         btnInstall.classList.add('hidden');
         btnInstall.classList.remove('inline-flex');
-        toast('Aplikasi Warehouse Manager berhasil dipasang.');
+        toast('Aplikasi Gudang berhasil dipasang.');
       });
     }
 
     // ===== INISIALISASI AWAL =====
     document.addEventListener('DOMContentLoaded', () => {
+      try {
+        history.replaceState({ screen: 'home' }, '', '#home');
+      } catch (e) {}
+
       initPwaInstallButton();
 
       const savedReporter = localStorage.getItem(REPORTER_STORAGE_KEY);
@@ -2838,7 +2909,7 @@
       if (savedOpname) {
         try {
           STATE.activeOpname = JSON.parse(savedOpname);
-        } catch (e) { }
+        } catch (e) {}
       }
       syncBootstrap(true);
       setInterval(() => syncBootstrap(false), 25000);
