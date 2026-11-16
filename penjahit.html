@@ -160,7 +160,7 @@
         </div>
 
         <form id="form-lapor" class="space-y-3" novalidate>
-          <!-- Card 1: Scan QR Baju & Pilihan Warna/Ukuran -->
+          <!-- Card 1: Scan QR Baju, Ketik Kode Manual & Pilihan Warna/Ukuran -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div>
               <div class="mb-1.5 flex items-center justify-between">
@@ -171,16 +171,28 @@
                   class="text-xs font-semibold text-indigo-600 transition active:opacity-70">Segarkan Data</button>
               </div>
 
-              <!-- Tombol Scan QR Code -->
-              <button type="button" id="btn-scan-kategori"
-                class="mb-2.5 flex w-full items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-3 text-xs font-bold text-indigo-700 transition active:scale-[.98]">
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path
-                    d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
-                  <rect x="7" y="7" width="10" height="10" rx="1.5" />
-                </svg>
-                <span id="btn-scan-label">Scan QR Code Baju</span>
-              </button>
+              <!-- P2-2: Baris 2 Tombol Berdampingan (Scan QR Code + Ketik Kode Manual Mandiri) -->
+              <div class="mb-2.5 flex gap-2">
+                <button type="button" id="btn-scan-kategori"
+                  class="flex flex-1 items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-3.5 py-3 text-xs font-bold text-indigo-700 transition active:scale-[.98]">
+                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.2">
+                    <path
+                      d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <rect x="7" y="7" width="10" height="10" rx="1.5" />
+                  </svg>
+                  <span id="btn-scan-label">Scan QR Code</span>
+                </button>
+
+                <button type="button" id="btn-toggle-manual-code"
+                  class="flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-xs font-bold text-slate-700 transition active:scale-[.98]">
+                  <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                  </svg>
+                  <span>Ketik Kode</span>
+                </button>
+              </div>
 
               <!-- Viewport Kamera Scanner -->
               <div id="scanner-container"
@@ -199,20 +211,25 @@
                 <p id="camera-error-desc" class="mt-0.5 text-[11px] leading-relaxed"></p>
               </div>
 
+              <!-- Input Kode Manual Mandiri -->
+              <div id="manual-barcode-wrap" class="mb-2.5 hidden rounded-xl border border-slate-200 bg-slate-50 p-2.5">
+                <label for="lapor-barcode-manual"
+                  class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-500">Masukkan Kode
+                  Baju</label>
+                <div class="flex gap-2">
+                  <input id="lapor-barcode-manual" type="text"
+                    class="input-field flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-mono font-bold text-slate-800 uppercase"
+                    placeholder="Contoh: CROPTOP-01" autocomplete="off">
+                  <button type="button" id="btn-cari-barcode"
+                    class="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white transition active:scale-95">Cari</button>
+                </div>
+              </div>
+
               <!-- Pilihan Model Baju -->
               <select id="lapor-kategori-select"
                 class="input-field w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm font-bold text-slate-800">
                 <option value="">Memuat daftar baju...</option>
               </select>
-
-              <!-- Input Kode Manual (Cadangan) -->
-              <div id="manual-barcode-wrap" class="mt-2 hidden flex gap-2">
-                <input id="lapor-barcode-manual" type="text"
-                  class="input-field flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium text-slate-800 uppercase"
-                  placeholder="Ketik kode baju..." autocomplete="off">
-                <button type="button" id="btn-cari-barcode"
-                  class="rounded-xl bg-slate-800 px-3.5 py-2.5 text-xs font-bold text-white transition active:scale-95">Cari</button>
-              </div>
 
               <!-- Banner Hasil Validasi QR Code -->
               <div id="sku-validation-banner" class="mt-2.5 hidden rounded-xl border px-3 py-2.5 text-xs">
@@ -253,7 +270,7 @@
             </div>
           </div>
 
-          <!-- Card 2: Kuantitas Hasil Jahitan -->
+          <!-- Card 2: Kuantitas Hasil Jahitan + Quick-Qty -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="mb-3">
               <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Hasil Jahitan</p>
@@ -267,6 +284,18 @@
               <input id="lapor-qty" type="number" inputmode="numeric" min="1" step="1"
                 class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/60 px-3 py-3 text-center text-2xl font-bold text-emerald-800"
                 placeholder="0" required>
+
+              <!-- P2-2: Tombol Tambah Cepat (+1, +5, +10, Reset) -->
+              <div class="mt-2.5 grid grid-cols-4 gap-2">
+                <button type="button" data-quick-qty="1"
+                  class="quick-qty-btn rounded-xl border border-emerald-200 bg-emerald-50 py-2 text-xs font-extrabold text-emerald-800 transition active:scale-95">+1</button>
+                <button type="button" data-quick-qty="5"
+                  class="quick-qty-btn rounded-xl border border-emerald-200 bg-emerald-50 py-2 text-xs font-extrabold text-emerald-800 transition active:scale-95">+5</button>
+                <button type="button" data-quick-qty="10"
+                  class="quick-qty-btn rounded-xl border border-emerald-200 bg-emerald-50 py-2 text-xs font-extrabold text-emerald-800 transition active:scale-95">+10</button>
+                <button type="button" id="btn-reset-qty"
+                  class="rounded-xl border border-slate-200 bg-slate-50 py-2 text-xs font-bold text-slate-500 transition active:scale-95">Reset</button>
+              </div>
             </div>
 
             <div id="lapor-summary-box"
@@ -297,11 +326,30 @@
             </span>
             <div>
               <p class="text-sm font-semibold">Cara Mencatat Hasil Jahit</p>
-              <p class="mt-1 text-xs leading-relaxed text-slate-500">Scan QR Code pada label pola/baju, pilih warna dan
-                ukuran yang sudah selesai dijahit, lalu masukkan jumlah pcs untuk dicatat ke daftar siap setor gudang.
+              <p class="mt-1 text-xs leading-relaxed text-slate-500">Scan QR Code pada label pola/baju atau ketik kode
+                baju, pilih warna dan ukuran yang sudah selesai dijahit, lalu masukkan jumlah pcs untuk dicatat ke
+                daftar siap setor gudang.
               </p>
             </div>
           </div>
+        </div>
+
+        <!-- P2-1: Kartu Bukti "Catatan Terakhir Anda" (Anti-Double Entry oleh Manusia) -->
+        <div id="recent-logs-card" class="mt-4 hidden rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm">
+          <div class="mb-2.5 flex items-center justify-between gap-2">
+            <div>
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-emerald-600">Catatan Terakhir Anda</p>
+              <h3 class="text-xs font-bold text-slate-800">Baru Saja Dicatat</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span
+                class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-800">TERSIMPAN</span>
+              <button type="button" id="btn-clear-recent-logs"
+                class="text-[11px] font-semibold text-slate-400 underline decoration-slate-300 transition active:text-rose-600">Bersihkan
+                Riwayat</button>
+            </div>
+          </div>
+          <div id="recent-logs-list" class="space-y-2 text-xs"></div>
         </div>
 
         <!-- Ringkasan Stok Tersedia di Penjahit -->
@@ -353,6 +401,8 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec';
     const CACHE_STORAGE_KEY = 'IBS_TAILOR_CACHE_V6_0';
     const TAILOR_NAME_KEY = 'IBS_LAST_TAILOR_NAME';
+    const RECENT_LOGS_KEY = 'IBS_TAILOR_RECENT_LOGS';
+    const MAX_RECENT_LOGS = 5;
     const LARGE_QTY_CONFIRM_THRESHOLD = 100;
 
     let isMutating = false;
@@ -372,6 +422,15 @@
     let scannerHistoryPushed = false;
 
     const $ = id => document.getElementById(id);
+
+    function escapeHtml(str) {
+      return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     document.addEventListener('focusin', (e) => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) {
@@ -404,6 +463,136 @@
     }
 
     $('lapor-qty').addEventListener('input', updateTotalPreview);
+
+    // P2-2: Tombol Tambah Cepat (+1, +5, +10, Reset)
+    document.querySelectorAll('.quick-qty-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const delta = Number(btn.dataset.quickQty) || 0;
+        const raw = $('lapor-qty').value.trim();
+        const currentNum = Number(raw);
+        const base = (raw !== '' && Number.isFinite(currentNum) && currentNum > 0)
+          ? Math.floor(currentNum)
+          : 0;
+        $('lapor-qty').value = base + delta;
+        updateTotalPreview();
+      });
+    });
+
+    $('btn-reset-qty').addEventListener('click', () => {
+      $('lapor-qty').value = '';
+      updateTotalPreview();
+    });
+
+    // P2-2: Tombol "Ketik Kode" Manual Mandiri
+    function setManualBarcodeOpen(isOpen) {
+      const wrap = $('manual-barcode-wrap');
+      const toggleBtn = $('btn-toggle-manual-code');
+      if (!wrap || !toggleBtn) return;
+
+      if (isOpen) {
+        wrap.classList.remove('hidden');
+        toggleBtn.classList.remove('border-slate-200', 'bg-slate-50', 'text-slate-700');
+        toggleBtn.classList.add('border-slate-800', 'bg-slate-800', 'text-white');
+        $('lapor-barcode-manual').focus();
+      } else {
+        wrap.classList.add('hidden');
+        toggleBtn.classList.remove('border-slate-800', 'bg-slate-800', 'text-white');
+        toggleBtn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-700');
+      }
+    }
+
+    $('btn-toggle-manual-code').addEventListener('click', async () => {
+      if (isScannerRunning) {
+        await stopCategoryScanner(false);
+      }
+      const isCurrentlyHidden = $('manual-barcode-wrap').classList.contains('hidden');
+      setManualBarcodeOpen(isCurrentlyHidden);
+    });
+
+    // P2-1: Kartu Bukti "Catatan Terakhir Anda" (localStorage IBS_TAILOR_RECENT_LOGS)
+    function formatTimeHHMM(dateObj) {
+      const hh = String(dateObj.getHours()).padStart(2, '0');
+      const mm = String(dateObj.getMinutes()).padStart(2, '0');
+      return `${hh}:${mm}`;
+    }
+
+    function formatDateShort(dateObj) {
+      const dd = String(dateObj.getDate()).padStart(2, '0');
+      const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+      return `${dd}/${mm}`;
+    }
+
+    function getRecentTailorLogs() {
+      try {
+        const raw = localStorage.getItem(RECENT_LOGS_KEY);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveRecentTailorLog(entry) {
+      const now = new Date();
+      const newRecord = {
+        transaction_id: entry.transaction_id || ('LOG-' + Date.now()),
+        time: formatTimeHHMM(now),
+        dateStr: formatDateShort(now),
+        nama_kategori: entry.nama_kategori || entry.barcode_kategori || '-',
+        barcode_kategori: entry.barcode_kategori || '',
+        warna: entry.warna || '-',
+        ukuran: entry.ukuran || '-',
+        nama_penjahit: entry.nama_penjahit || '-',
+        qty: Number(entry.qty) || 0
+      };
+
+      const existing = getRecentTailorLogs();
+      const updated = [newRecord, ...existing].slice(0, MAX_RECENT_LOGS);
+      try {
+        localStorage.setItem(RECENT_LOGS_KEY, JSON.stringify(updated));
+      } catch (e) { }
+      renderRecentTailorLogs();
+    }
+
+    function renderRecentTailorLogs() {
+      const card = $('recent-logs-card');
+      const listEl = $('recent-logs-list');
+      if (!card || !listEl) return;
+
+      const logs = getRecentTailorLogs();
+      if (!logs.length) {
+        card.classList.add('hidden');
+        listEl.innerHTML = '';
+        return;
+      }
+
+      const todayStr = formatDateShort(new Date());
+      card.classList.remove('hidden');
+
+      listEl.innerHTML = logs.map((item, idx) => {
+        const timeLabel = item.dateStr === todayStr
+          ? `Pukul ${escapeHtml(item.time)}`
+          : `${escapeHtml(item.dateStr)} · ${escapeHtml(item.time)}`;
+        return `
+          <div class="flex items-center justify-between rounded-xl border ${idx === 0 ? 'border-emerald-200 bg-emerald-50/70' : 'border-slate-100 bg-slate-50'} px-3 py-2.5">
+            <div class="min-w-0 flex-1 pr-2">
+              <p class="truncate font-bold text-slate-900">${escapeHtml(item.nama_kategori)} · <span class="text-indigo-700">${escapeHtml(item.warna)} · ${escapeHtml(item.ukuran)}</span></p>
+              <p class="mt-0.5 text-[11px] text-slate-500">Penjahit: <span class="font-semibold text-slate-700">${escapeHtml(item.nama_penjahit)}</span> · ${timeLabel}</p>
+            </div>
+            <div class="shrink-0 text-right">
+              <span class="inline-block rounded-lg bg-emerald-600 px-2.5 py-1 text-xs font-extrabold text-white">+${Number(item.qty).toLocaleString('id-ID')} pcs</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    $('btn-clear-recent-logs').addEventListener('click', () => {
+      if (!window.confirm('Bersihkan riwayat catatan terakhir di perangkat ini?')) return;
+      localStorage.removeItem(RECENT_LOGS_KEY);
+      renderRecentTailorLogs();
+      toast('Riwayat catatan lokal dibersihkan.');
+    });
 
     // 1. VALIDASI LOADING & ANTI-DOUBLE SUBMIT
     async function submitWithLock(action, payload, btnElement, loadingText = 'Menyimpan ke server...') {
@@ -473,8 +662,7 @@
 
       const sel = $('lapor-kategori-select');
       const badge = $('kategori-count-badge');
-      const prevSelectVal = sel.value;
-      const activeSku = selectedBarcodeKategori || (prevSelectVal !== '__MANUAL__' ? prevSelectVal : '');
+      const activeSku = selectedBarcodeKategori || sel.value;
 
       const uniqueMap = new Map();
       MASTER_TAILOR_LIST.forEach(item => {
@@ -484,26 +672,7 @@
         }
       });
 
-      // Pertahankan mode input manual jika sedang terbuka
-      if (prevSelectVal === '__MANUAL__' && !$('manual-barcode-wrap').classList.contains('hidden')) {
-        sel.innerHTML = '<option value="">-- Pilih atau Scan QR Baju --</option>';
-        uniqueMap.forEach((namaKat, barcodeKat) => {
-          const opt = document.createElement('option');
-          opt.value = barcodeKat;
-          opt.textContent = `${namaKat} (${barcodeKat})`;
-          sel.appendChild(opt);
-        });
-        const optManual = document.createElement('option');
-        optManual.value = '__MANUAL__';
-        optManual.textContent = '+ Ketik Kode Baju Manual';
-        sel.appendChild(optManual);
-        sel.value = '__MANUAL__';
-        badge.textContent = uniqueMap.size ? `${uniqueMap.size} MODEL BAJU` : 'BELUM ADA MODEL';
-        renderTailorActiveStockList();
-        return;
-      }
-
-      sel.innerHTML = '<option value="">-- Pilih atau Scan QR Baju --</option>';
+      sel.innerHTML = '<option value="">-- Pilih Model Baju --</option>';
       uniqueMap.forEach((namaKat, barcodeKat) => {
         const opt = document.createElement('option');
         opt.value = barcodeKat;
@@ -511,20 +680,13 @@
         sel.appendChild(opt);
       });
 
-      const optManual = document.createElement('option');
-      optManual.value = '__MANUAL__';
-      optManual.textContent = '+ Ketik Kode Baju Manual';
-      sel.appendChild(optManual);
-
       badge.textContent = uniqueMap.size ? `${uniqueMap.size} MODEL BAJU` : 'BELUM ADA MODEL';
 
       if (activeSku) {
         if (uniqueMap.has(activeSku)) {
           sel.value = activeSku;
-          // Sinkronkan pilihan tanpa merusak tombol jika daftar variasi tidak berubah
           syncActiveCategorySelection(activeSku);
         } else {
-          // P1: Model dinonaktifkan admin saat penjahit membuka halaman -> reset bersih & beri peringatan
           const deactivatedCode = activeSku;
           resetCategorySelection(false);
           showSkuValidationBanner(
@@ -554,7 +716,6 @@
         .sort()
         .join(';;');
 
-      // Cek apakah variasi yang sedang dipilih penjahit masih aktif
       const stillValidRecord = matches.find(
         m => String(m.warna || '-').trim() === selectedWarna &&
           String(m.ukuran || '-').trim() === selectedUkuran
@@ -563,7 +724,6 @@
       if (signature !== lastRenderedVariationSignature || !stillValidRecord) {
         renderVariationChoices(matches);
       } else {
-        // Cukup perbarui info stok siap setor tanpa menghancurkan DOM tombol pilihan
         selectedTailorRecord = stillValidRecord;
         updateSelectedItemStockBanner();
       }
@@ -591,15 +751,15 @@
       badge.textContent = `${totalPcs.toLocaleString('id-ID')} PCS`;
 
       if (!filtered.length) {
-        container.innerHTML = `<p class="py-2 text-center text-slate-400">${filterSku ? 'Belum ada stok siap setor untuk kode ' + filterSku + '.' : 'Belum ada stok jahitan yang menunggu setor.'}</p>`;
+        container.innerHTML = `<p class="py-2 text-center text-slate-400">${filterSku ? 'Belum ada stok siap setor untuk kode ' + escapeHtml(filterSku) + '.' : 'Belum ada stok jahitan yang menunggu setor.'}</p>`;
         return;
       }
 
       container.innerHTML = filtered.map(it => `
         <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
           <div class="min-w-0 flex-1 pr-2">
-            <p class="truncate font-bold text-slate-800">${it.nama_kategori} · <span class="text-indigo-700">${it.warna} · ${it.ukuran}</span></p>
-            <p class="text-[11px] text-slate-500">Penjahit: <span class="font-semibold text-slate-700">${it.nama_penjahit}</span> · <span class="font-mono">${it.barcode_kategori}</span></p>
+            <p class="truncate font-bold text-slate-800">${escapeHtml(it.nama_kategori)} · <span class="text-indigo-700">${escapeHtml(it.warna)} · ${escapeHtml(it.ukuran)}</span></p>
+            <p class="text-[11px] text-slate-500">Penjahit: <span class="font-semibold text-slate-700">${escapeHtml(it.nama_penjahit)}</span> · <span class="font-mono">${escapeHtml(it.barcode_kategori)}</span></p>
           </div>
           <span class="shrink-0 rounded-lg bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-800">${Number(it.stok_ready).toLocaleString('id-ID')} pcs</span>
         </div>
@@ -646,7 +806,7 @@
     // P1: Filter varian aktif saat fetch GET_TAILOR_SKU agar item nonaktif tidak masuk ke pilihan
     async function validateAndSelectSku(barcodeInput, notify = true) {
       const code = extractSkuFromQr(barcodeInput);
-      if (!code || code === '__MANUAL__') {
+      if (!code) {
         hideSkuValidationBanner();
         return selectCategoryByBarcode('', false);
       }
@@ -697,7 +857,7 @@
       const code = extractSkuFromQr(barcodeInput);
       const wrap = $('variasi-picker-wrap');
 
-      if (!code || code === '__MANUAL__') {
+      if (!code) {
         resetCategorySelection(true);
         renderTailorActiveStockList();
         return false;
@@ -725,7 +885,7 @@
       const resolvedBarcode = String(matches[0].barcode_kategori).trim();
       selectedBarcodeKategori = resolvedBarcode;
       $('lapor-kategori-select').value = resolvedBarcode;
-      $('manual-barcode-wrap').classList.add('hidden');
+      setManualBarcodeOpen(false);
 
       const colors = [...new Set(matches.map(m => String(m.warna || '-').trim()))];
       if (!colors.includes(selectedWarna)) {
@@ -861,11 +1021,12 @@
       if (/NotReadableError|TrackStartError/i.test(rawMsg)) {
         return 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi kamera lain lalu coba lagi.';
       }
-      return `Gagal membuka kamera (${rawMsg || 'Error tidak diketahui'}). Anda tetap bisa memilih model baju lewat daftar di bawah.`;
+      return `Gagal membuka kamera (${rawMsg || 'Error tidak diketahui'}). Anda tetap bisa mengetik kode baju atau memilih lewat daftar di bawah.`;
     }
 
     async function startCategoryScanner() {
       hideCameraError();
+      setManualBarcodeOpen(false);
 
       if (!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         const msg = 'Browser memblokir kamera karena halaman tidak dibuka lewat koneksi HTTPS yang aman.';
@@ -915,7 +1076,7 @@
           await html5QrScanner.start(backCam.id, scanConfig, onScanSuccess, () => { });
         }
 
-        $('btn-scan-label').textContent = 'Kamera Aktif · Ketuk untuk Tutup';
+        $('btn-scan-label').textContent = 'Kamera Aktif · Tutup';
         if (!scannerHistoryPushed) {
           history.pushState({ scannerOpen: true }, '');
           scannerHistoryPushed = true;
@@ -923,7 +1084,7 @@
       } catch (err) {
         isScannerRunning = false;
         container.classList.add('hidden');
-        $('btn-scan-label').textContent = 'Scan QR Code Baju';
+        $('btn-scan-label').textContent = 'Scan QR Code';
         const friendlyErr = formatCameraErrorMessage(err);
         showCameraError(friendlyErr);
         toast('Kamera gagal dibuka. Lihat keterangan di layar.', 'error');
@@ -933,7 +1094,7 @@
     async function stopCategoryScanner(fromPopState = false) {
       const container = $('scanner-container');
       container.classList.add('hidden');
-      $('btn-scan-label').textContent = 'Scan QR Code Baju';
+      $('btn-scan-label').textContent = 'Scan QR Code';
       if (html5QrScanner && isScannerRunning) {
         try {
           await html5QrScanner.stop();
@@ -994,16 +1155,8 @@
 
     $('lapor-kategori-select').addEventListener('change', (e) => {
       const val = e.target.value;
-      const manualWrap = $('manual-barcode-wrap');
-      if (val === '__MANUAL__') {
-        manualWrap.classList.remove('hidden');
-        resetCategorySelection(true);
-        $('lapor-kategori-select').value = '__MANUAL__';
-        $('lapor-barcode-manual').focus();
-      } else {
-        manualWrap.classList.add('hidden');
-        selectCategoryByBarcode(val, false);
-      }
+      setManualBarcodeOpen(false);
+      selectCategoryByBarcode(val, false);
     });
 
     $('btn-cari-barcode').addEventListener('click', async () => {
@@ -1028,12 +1181,25 @@
 
     $('btn-refresh-data').addEventListener('click', () => syncAppData(true));
 
-    // 5. SIMPAN HASIL JAHITAN (P1: Validasi ketat bilangan bulat & konfirmasi jumlah besar)
+    // 5. SIMPAN HASIL JAHITAN (P1: Validasi ketat bilangan bulat & konfirmasi jumlah besar + P2-1: Catatan Terakhir)
     async function executeSubmitSetoran(payload) {
       const btn = $('btn-submit-lapor');
+      const kategoriNameSnapshot = selectedTailorRecord
+        ? selectedTailorRecord.nama_kategori
+        : payload.barcode_kategori;
+
       const result = await submitWithLock('SUBMIT_STOK_TAILOR', payload, btn, 'Menyimpan Hasil Jahitan...');
       if (result && result.success) {
         localStorage.setItem(TAILOR_NAME_KEY, payload.nama_penjahit);
+        saveRecentTailorLog({
+          transaction_id: payload.transaction_id,
+          nama_kategori: kategoriNameSnapshot,
+          barcode_kategori: payload.barcode_kategori,
+          warna: payload.warna,
+          ukuran: payload.ukuran,
+          nama_penjahit: payload.nama_penjahit,
+          qty: payload.qty
+        });
         toast(result.message || 'Hasil jahitan berhasil disimpan!');
         $('lapor-qty').value = '';
         updateTotalPreview();
@@ -1100,7 +1266,7 @@
       if (qty >= LARGE_QTY_CONFIRM_THRESHOLD) {
         pendingSubmitPayload = payload;
         $('confirm-qty-desc').innerHTML =
-          `Anda akan mencatat <strong>${qty.toLocaleString('id-ID')} pcs</strong> untuk <strong>${selectedTailorRecord.nama_kategori} (${selectedWarna} · ${selectedUkuran})</strong> atas nama <strong>${nama}</strong>. Pastikan jumlah ini tidak salah ketik.`;
+          `Anda akan mencatat <strong>${qty.toLocaleString('id-ID')} pcs</strong> untuk <strong>${escapeHtml(selectedTailorRecord.nama_kategori)} (${escapeHtml(selectedWarna)} · ${escapeHtml(selectedUkuran)})</strong> atas nama <strong>${escapeHtml(nama)}</strong>. Pastikan jumlah ini tidak salah ketik.`;
         $('confirm-qty-modal').classList.remove('hidden');
         $('confirm-qty-modal').classList.add('flex');
         return;
@@ -1115,6 +1281,7 @@
       if (savedName) {
         $('lapor-nama').value = savedName;
       }
+      renderRecentTailorLogs();
       await syncAppData(true);
 
       const urlParams = new URLSearchParams(window.location.search);

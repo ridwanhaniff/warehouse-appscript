@@ -181,14 +181,19 @@
     <main class="flex-1 px-4 py-5 safe-bottom">
       <!-- HOME / MENU UTAMA -->
       <section id="screen-home" class="screen-enter space-y-5">
-        <!-- Banner Sesi Opname Aktif -->
+        <!-- Banner Sesi Opname Aktif (P2-4: Dilengkapi penghitung progres lokal) -->
         <div id="home-opname-banner" class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
           <div class="flex items-center justify-between gap-2">
-            <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Sedang Hitung Stok</p>
-              <p id="home-opname-title" class="text-xs font-extrabold text-amber-950 mt-0.5"></p>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5">
+                <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Sedang Hitung Stok</p>
+                <span id="home-opname-progress-badge"
+                  class="rounded-full bg-amber-200/80 px-2 py-0.5 text-[10px] font-extrabold text-amber-900">Tercatat: 0
+                  varian</span>
+              </div>
+              <p id="home-opname-title" class="text-xs font-extrabold text-amber-950 mt-0.5 truncate"></p>
             </div>
-            <div class="flex gap-1.5">
+            <div class="flex shrink-0 gap-1.5">
               <button type="button" id="btn-scan-opname-now"
                 class="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold text-white shadow-sm">Scan</button>
               <button type="button" id="btn-exit-opname"
@@ -552,21 +557,29 @@
             <h2 id="scan-title" class="text-base font-bold"></h2>
             <p id="scan-subtitle" class="text-xs text-slate-400">Arahkan kamera ke barcode atau QR barang</p>
           </div>
-          <button id="btn-torch"
-            class="hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-amber-500 shadow-sm ring-1 ring-slate-200"
-            title="Lampu"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <!-- P2-3: Tombol Lampu / Flash Kamera -->
+          <button id="btn-torch" type="button" aria-pressed="false"
+            class="hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 transition active:scale-95"
+            title="Nyalakan Lampu"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
               <path d="M13 3 4 14h7l-1 7 10-12h-7z" />
             </svg></button>
         </div>
 
+        <!-- P2-4: Indikator Sesi Opname + Penghitung Progres Scan Lokal -->
         <div id="scan-opname-indicator"
-          class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2 border border-amber-200 flex items-center gap-2">
-          <span
-            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">!</span>
-          <div>
-            <p class="text-[10px] font-bold text-amber-600 uppercase">Sedang Hitung Stok</p>
-            <p id="scan-opname-info" class="text-xs font-medium text-amber-800"></p>
+          class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2.5 border border-amber-200 flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span
+              class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-bold">!</span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-bold text-amber-600 uppercase">Sedang Hitung Stok</p>
+              <p id="scan-opname-info" class="text-xs font-medium text-amber-800 truncate"></p>
+            </div>
           </div>
+          <span id="scan-opname-progress-badge"
+            class="shrink-0 rounded-full bg-amber-200 px-2.5 py-1 text-[10px] font-extrabold text-amber-950">Tercatat: 0
+            varian</span>
         </div>
 
         <div class="relative overflow-hidden rounded-2xl bg-black shadow-xl">
@@ -610,8 +623,15 @@
         </div>
 
         <div id="form-opname-alert" class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2 border border-amber-200">
-          <p class="text-xs font-bold text-amber-800">Sesi Hitung: <span id="form-opname-session-name"></span></p>
-          <p class="text-[10px] text-amber-600">Lokasi Rak: <span id="form-opname-location"></span></p>
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <p class="text-xs font-bold text-amber-800">Sesi Hitung: <span id="form-opname-session-name"></span></p>
+              <p class="text-[10px] text-amber-600">Lokasi Rak: <span id="form-opname-location"></span></p>
+            </div>
+            <span id="form-opname-progress-badge"
+              class="rounded-full bg-amber-200/80 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-900">Tercatat: 0
+              varian</span>
+          </div>
         </div>
 
         <form id="main-form" class="space-y-3" novalidate>
@@ -1117,6 +1137,7 @@
     const GAS_URL = APP_CONFIG.GAS_URL;
     const ADMIN_CACHE_KEY = 'IBS_ADMIN_BOOTSTRAP_V6_2';
     const OPNAME_SESSION_KEY = 'IBS_ACTIVE_OPNAME_SESSION';
+    const OPNAME_SCANNED_MAP_KEY = 'IBS_OPNAME_SCANNED_ITEMS_V1';
     const REPORTER_STORAGE_KEY = 'IBS_LAST_ADMIN_NAME';
 
     let isMutating = false;
@@ -1130,6 +1151,7 @@
       unpaidUpah: { tailors: [], grand_total_upah: 0, total_penjahit: 0 },
       opnameSessions: [],
       activeOpname: null,
+      opnameScannedItems: {},
       currentActivity: 'Masuk',
       scanContext: 'main',
       currentProduct: null,
@@ -1150,6 +1172,7 @@
 
     let html5Scanner = null;
     let isCameraActive = false;
+    let isTorchOn = false;
 
     document.addEventListener('focusin', e => {
       if (['INPUT', 'SELECT', 'TEXTAREA'].includes(e.target.tagName)) isUserTyping = true;
@@ -1183,6 +1206,76 @@
       el.append(mark, txt);
       $('toast-root').appendChild(el);
       setTimeout(() => el.remove(), 3500);
+    }
+
+    // ===== P2-4: HELPER PENGHITUNG PROGRES SCAN LOKAL SESI OPNAME =====
+    function loadOpnameScannedStore() {
+      try {
+        const raw = localStorage.getItem(OPNAME_SCANNED_MAP_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        STATE.opnameScannedItems = (parsed && typeof parsed === 'object') ? parsed : {};
+      } catch (e) {
+        STATE.opnameScannedItems = {};
+      }
+    }
+
+    function saveOpnameScannedStore() {
+      try {
+        localStorage.setItem(OPNAME_SCANNED_MAP_KEY, JSON.stringify(STATE.opnameScannedItems));
+      } catch (e) { }
+    }
+
+    function recordOpnameScannedItem(sessionId, barcode, variantId, productName = '', variantLabel = '', qty = 0) {
+      if (!sessionId) return;
+      if (!STATE.opnameScannedItems[sessionId] || typeof STATE.opnameScannedItems[sessionId] !== 'object') {
+        STATE.opnameScannedItems[sessionId] = {};
+      }
+      const key = `${String(barcode || '').trim().toUpperCase()}::${String(variantId || 'DEFAULT').trim()}`;
+      STATE.opnameScannedItems[sessionId][key] = {
+        barcode: String(barcode || '').trim().toUpperCase(),
+        variant_id: String(variantId || '').trim(),
+        nama: productName || barcode,
+        label: variantLabel || 'Standar',
+        qty: Number(qty) || 0,
+        updated_at: Date.now()
+      };
+      saveOpnameScannedStore();
+      updateOpnameProgressBadges();
+    }
+
+    function getOpnameSessionProgress(sessionId) {
+      if (!sessionId || !STATE.opnameScannedItems[sessionId]) {
+        return { variantCount: 0, totalQty: 0, items: [] };
+      }
+      const items = Object.values(STATE.opnameScannedItems[sessionId]);
+      const totalQty = items.reduce((sum, it) => sum + (Number(it.qty) || 0), 0);
+      return {
+        variantCount: items.length,
+        totalQty,
+        items
+      };
+    }
+
+    function clearOpnameSessionProgress(sessionId) {
+      if (!sessionId || !STATE.opnameScannedItems[sessionId]) return;
+      delete STATE.opnameScannedItems[sessionId];
+      saveOpnameScannedStore();
+    }
+
+    function updateOpnameProgressBadges() {
+      const activeId = STATE.activeOpname ? STATE.activeOpname.session_id : '';
+      const prog = getOpnameSessionProgress(activeId);
+      const badgeText = `Tercatat: ${prog.variantCount} varian`;
+
+      if ($('home-opname-progress-badge')) {
+        $('home-opname-progress-badge').textContent = badgeText;
+      }
+      if ($('scan-opname-progress-badge')) {
+        $('scan-opname-progress-badge').textContent = badgeText;
+      }
+      if ($('form-opname-progress-badge')) {
+        $('form-opname-progress-badge').textContent = badgeText;
+      }
     }
 
     async function postApi(action, payload = {}, btn = null, lockText = 'Memproses data...') {
@@ -1437,6 +1530,7 @@
       if (STATE.activeOpname) {
         $('home-opname-banner').classList.remove('hidden');
         $('home-opname-title').textContent = `${STATE.activeOpname.nama_sesi} (${STATE.activeOpname.lokasi})`;
+        updateOpnameProgressBadges();
       } else {
         $('home-opname-banner').classList.add('hidden');
       }
@@ -1488,6 +1582,75 @@
     $('btn-back-upah').addEventListener('click', goBackInApp);
     $('btn-back-pricing').addEventListener('click', goBackInApp);
 
+    // ===== P2-3: KONTROL LAMPU / FLASH KAMERA (#btn-torch) =====
+    function updateTorchButtonUI(active) {
+      const btn = $('btn-torch');
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      if (active) {
+        btn.classList.remove('bg-white', 'text-slate-600', 'ring-slate-200');
+        btn.classList.add('bg-amber-400', 'text-slate-950', 'ring-amber-500');
+        btn.title = 'Matikan Lampu';
+      } else {
+        btn.classList.remove('bg-amber-400', 'text-slate-950', 'ring-amber-500');
+        btn.classList.add('bg-white', 'text-slate-600', 'ring-slate-200');
+        btn.title = 'Nyalakan Lampu';
+      }
+    }
+
+    function resetTorchState() {
+      isTorchOn = false;
+      const btn = $('btn-torch');
+      if (btn) {
+        btn.classList.add('hidden');
+        btn.classList.remove('inline-flex');
+        updateTorchButtonUI(false);
+      }
+    }
+
+    function setupScannerTorch() {
+      const btn = $('btn-torch');
+      if (!btn || !html5Scanner || !isCameraActive) return;
+      try {
+        const capabilities = html5Scanner.getRunningTrackCameraCapabilities();
+        const torch = capabilities && typeof capabilities.torchFeature === 'function'
+          ? capabilities.torchFeature()
+          : null;
+        if (torch && torch.isSupported()) {
+          isTorchOn = false;
+          updateTorchButtonUI(false);
+          btn.classList.remove('hidden');
+          btn.classList.add('inline-flex');
+        } else {
+          resetTorchState();
+        }
+      } catch (e) {
+        resetTorchState();
+      }
+    }
+
+    if ($('btn-torch')) {
+      $('btn-torch').addEventListener('click', async () => {
+        if (!html5Scanner || !isCameraActive) return;
+        try {
+          const capabilities = html5Scanner.getRunningTrackCameraCapabilities();
+          const torch = capabilities && typeof capabilities.torchFeature === 'function'
+            ? capabilities.torchFeature()
+            : null;
+          if (!torch || !torch.isSupported()) {
+            resetTorchState();
+            return toast('Perangkat ini tidak mendukung lampu kamera.', 'error');
+          }
+          const nextState = !isTorchOn;
+          await torch.apply(nextState);
+          isTorchOn = nextState;
+          updateTorchButtonUI(isTorchOn);
+        } catch (err) {
+          toast('Gagal mengatur lampu kamera.', 'error');
+        }
+      });
+    }
+
     // ===== SCANNER KAMERA & INPUT MANUAL =====
     function startScanScreen(activityLabel) {
       const titles = {
@@ -1504,10 +1667,12 @@
       $('scan-title').textContent = titles[activityLabel] || 'Scan Barcode / QR';
       $('manual-barcode').value = '';
       $('manual-form').classList.add('hidden');
+      resetTorchState();
 
       if (STATE.activeOpname && activityLabel === 'Opname') {
         $('scan-opname-indicator').classList.remove('hidden');
         $('scan-opname-info').textContent = `${STATE.activeOpname.nama_sesi} · Rak: ${STATE.activeOpname.lokasi}`;
+        updateOpnameProgressBadges();
       } else {
         $('scan-opname-indicator').classList.add('hidden');
       }
@@ -1534,19 +1699,33 @@
           },
           () => { }
         );
+        setupScannerTorch();
       } catch (err) {
         isCameraActive = false;
+        resetTorchState();
         $('manual-form').classList.remove('hidden');
       }
     }
 
     async function stopScanner() {
       if (html5Scanner && isCameraActive) {
+        if (isTorchOn) {
+          try {
+            const capabilities = html5Scanner.getRunningTrackCameraCapabilities();
+            const torch = capabilities && typeof capabilities.torchFeature === 'function'
+              ? capabilities.torchFeature()
+              : null;
+            if (torch && torch.isSupported()) {
+              await torch.apply(false);
+            }
+          } catch (e) { }
+        }
         try {
           await html5Scanner.stop();
         } catch (e) { }
       }
       isCameraActive = false;
+      resetTorchState();
     }
 
     $('btn-cancel-scan').addEventListener('click', goBackInApp);
@@ -1685,6 +1864,7 @@
         $('form-opname-alert').classList.remove('hidden');
         $('form-opname-session-name').textContent = STATE.activeOpname.nama_sesi;
         $('form-opname-location').textContent = STATE.activeOpname.lokasi;
+        updateOpnameProgressBadges();
       } else {
         $('form-opname-alert').classList.add('hidden');
       }
@@ -2198,14 +2378,21 @@
           }
         }
         localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+        const sessionId = STATE.activeOpname.session_id;
+        const variantId = STATE.selectedVariant.id;
+        const productName = STATE.currentProduct ? STATE.currentProduct.nama : barcode;
+        const variantLabel = STATE.selectedVariant.label || 'Standar';
+
         const res = await postApi('SUBMIT_OPNAME_COUNT', {
-          session_id: STATE.activeOpname.session_id,
+          session_id: sessionId,
           barcode,
-          variant_id: STATE.selectedVariant.id,
+          variant_id: variantId,
           qty,
           nama_pelapor: pelapor
         }, btn, 'Menyimpan hitungan stok...');
         if (res) {
+          // P2-4: Catat progres scan lokal untuk sesi opname aktif
+          recordOpnameScannedItem(sessionId, barcode, variantId, productName, variantLabel, qty);
           toast(res.message);
           startScanScreen('Opname');
         }
@@ -2273,23 +2460,30 @@
         box.innerHTML = '<p class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs text-slate-400">Belum ada sesi hitung stok yang aktif.</p>';
         return;
       }
-      box.innerHTML = STATE.opnameSessions.map(s => `
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
-          <div class="flex items-start justify-between">
-            <div>
-              <p class="text-sm font-bold text-slate-900">${escapeHtml(s.nama_sesi)}</p>
-              <p class="text-xs text-slate-500">Rak: <span class="font-bold text-slate-700">${escapeHtml(s.lokasi)}</span> · Petugas: ${escapeHtml(s.dibuat_oleh)}</p>
+      box.innerHTML = STATE.opnameSessions.map(s => {
+        const prog = getOpnameSessionProgress(s.session_id);
+        const progLabel = prog.variantCount > 0
+          ? `Tercatat di perangkat ini: ${prog.variantCount} varian (${prog.totalQty.toLocaleString('id-ID')} pcs)`
+          : 'Belum ada scan di perangkat ini';
+        return `
+          <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <p class="text-sm font-bold text-slate-900">${escapeHtml(s.nama_sesi)}</p>
+                <p class="text-xs text-slate-500">Rak: <span class="font-bold text-slate-700">${escapeHtml(s.lokasi)}</span> · Petugas: ${escapeHtml(s.dibuat_oleh)}</p>
+                <p class="mt-1 inline-block rounded-md bg-indigo-50 px-2 py-0.5 text-[11px] font-bold text-indigo-700">${progLabel}</p>
+              </div>
+              <span class="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">BERJALAN</span>
             </div>
-            <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">BERJALAN</span>
+            <div class="flex gap-2">
+              <button type="button" data-use-opname="${escapeHtml(s.session_id)}"
+                class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white">Mulai Scan Barang</button>
+              <button type="button" data-approve-opname="${escapeHtml(s.session_id)}"
+                class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2.5 text-xs font-bold text-emerald-700">Selesai</button>
+            </div>
           </div>
-          <div class="flex gap-2">
-            <button type="button" data-use-opname="${escapeHtml(s.session_id)}"
-              class="flex-1 rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white">Mulai Scan Barang</button>
-            <button type="button" data-approve-opname="${escapeHtml(s.session_id)}"
-              class="rounded-xl bg-emerald-50 border border-emerald-200 px-3 py-2.5 text-xs font-bold text-emerald-700">Selesai</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
 
       box.querySelectorAll('button[data-use-opname]').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -2306,30 +2500,43 @@
 
       box.querySelectorAll('button[data-approve-opname]').forEach(btn => {
         btn.addEventListener('click', async () => {
-          const sesi = STATE.opnameSessions.find(x => x.session_id === btn.dataset.approveOpname);
+          const sessionId = btn.dataset.approveOpname;
+          const sesi = STATE.opnameSessions.find(x => x.session_id === sessionId);
           const pelapor = $('opname-session-user').value.trim() || $('reporter-input').value.trim();
           if (!pelapor) {
             $('opname-session-user').focus();
             return toast('Isi Nama Petugas terlebih dahulu sebelum menyelesaikan sesi.', 'error');
           }
 
-          const labelSesi = sesi ? `${sesi.nama_sesi} (Rak: ${sesi.lokasi})` : btn.dataset.approveOpname;
+          // P2-4: Sertakan rekap progres scan lokal pada dialog konfirmasi Selesai
+          const prog = getOpnameSessionProgress(sessionId);
+          const previewList = prog.items.slice(0, 5)
+            .map(it => `• ${it.nama} (${it.label}): ${it.qty} pcs`)
+            .join('\n');
+          const moreNote = prog.items.length > 5 ? `\n...dan ${prog.items.length - 5} varian lainnya.` : '';
+          const progressSummaryText = prog.variantCount > 0
+            ? `Progres Tercatat di Perangkat Ini: ${prog.variantCount} varian (Total ${prog.totalQty.toLocaleString('id-ID')} pcs)\n${previewList}${moreNote}\n\n`
+            : `Catatan Progres Lokal: 0 varian discan dari perangkat ini.\n\n`;
+
+          const labelSesi = sesi ? `${sesi.nama_sesi} (Rak: ${sesi.lokasi})` : sessionId;
           const okClose = window.confirm(
             `Selesaikan & Tutup Sesi Hitung Stok?\n\n` +
             `Sesi: ${labelSesi}\n` +
             `Petugas Penutup: ${pelapor}\n\n` +
+            progressSummaryText +
             `Pastikan seluruh barang di rak tersebut sudah selesai dihitung. Sesi yang ditutup tidak dapat dibuka kembali.`
           );
           if (!okClose) return;
 
           localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
           const res = await postApi('APPROVE_OPNAME_SESSION', {
-            session_id: btn.dataset.approveOpname,
+            session_id: sessionId,
             nama_pelapor: pelapor
           }, btn, 'Menyelesaikan sesi hitung stok...');
           if (res) {
             toast(res.message);
-            if (STATE.activeOpname && STATE.activeOpname.session_id === btn.dataset.approveOpname) {
+            clearOpnameSessionProgress(sessionId);
+            if (STATE.activeOpname && STATE.activeOpname.session_id === sessionId) {
               STATE.activeOpname = null;
               localStorage.removeItem(OPNAME_SESSION_KEY);
             }
@@ -3311,6 +3518,7 @@
       } catch (e) { }
 
       initPwaInstallButton();
+      loadOpnameScannedStore();
 
       const savedReporter = localStorage.getItem(REPORTER_STORAGE_KEY);
       if (savedReporter) {
