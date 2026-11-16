@@ -26,7 +26,7 @@
       }
     });
     if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
-      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function () {});
+      navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).catch(function () { });
     }
   </script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -182,8 +182,7 @@
       <!-- HOME / MENU UTAMA -->
       <section id="screen-home" class="screen-enter space-y-5">
         <!-- Banner Sesi Opname Aktif -->
-        <div id="home-opname-banner"
-          class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
+        <div id="home-opname-banner" class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
           <div class="flex items-center justify-between gap-2">
             <div>
               <p class="text-[10px] font-bold uppercase tracking-wider text-amber-700">Sedang Hitung Stok</p>
@@ -202,7 +201,8 @@
         <div>
           <div class="mb-2.5 flex items-center justify-between">
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Stok Barang Gudang</h2>
-            <span id="home-badge-locations" class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">LOKASI RAK</span>
+            <span id="home-badge-locations"
+              class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">LOKASI RAK</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <button type="button" data-activity="Masuk"
@@ -264,7 +264,8 @@
                   <span class="text-[11px] text-slate-400">Scan barang untuk lihat jumlah stok di rak</span>
                 </div>
               </div>
-              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5">
                 <path d="m9 18 6-6-6-6" />
               </svg>
             </button>
@@ -283,7 +284,8 @@
               <div class="flex items-center gap-3">
                 <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
                   <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                     <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" />
                   </svg>
                 </span>
@@ -402,11 +404,13 @@
             </div>
           </div>
           <button type="submit" id="btn-create-opname"
-            class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mulai Hitung Stok</button>
+            class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mulai Hitung
+            Stok</button>
         </form>
 
         <div>
-          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Sesi Hitung yang Sedang Berjalan</h3>
+          <h3 class="mb-2 text-xs font-bold uppercase tracking-wider text-slate-500">Sesi Hitung yang Sedang Berjalan
+          </h3>
           <div id="opname-session-list" class="space-y-2.5">
             <p class="text-center text-xs text-slate-400 py-4">Memuat daftar sesi...</p>
           </div>
@@ -435,17 +439,20 @@
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex items-center justify-between">
               <span id="tarif-form-mode-badge"
-                class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">TAMBAH BARANG & ONGKOS JAHIT</span>
+                class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">TAMBAH BARANG &
+                ONGKOS JAHIT</span>
               <input type="hidden" id="tarif-id-tailor" value="">
             </div>
 
             <div>
               <div class="mb-1 flex items-center justify-between">
-                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode Barang Jahit (QR)</label>
+                <label class="block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kode Barang Jahit
+                  (QR)</label>
                 <button type="button" id="btn-scan-tarif-target"
                   class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600">
                   <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <path
+                      d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
                     <rect x="7" y="7" width="10" height="10" rx="1.5" />
                   </svg>
                   <span>Scan QR Kode</span>
@@ -457,7 +464,8 @@
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Barang Jahit</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Barang
+                Jahit</label>
               <input id="tarif-nama-produk"
                 class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm font-semibold"
                 placeholder="Contoh: Croptop Rib Knit" required>
@@ -465,13 +473,14 @@
 
             <div class="grid grid-cols-2 gap-2.5">
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Warna (Pisah Koma)</label>
-                <input id="tarif-warna"
-                  class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
+                  Warna (Pisah Koma)</label>
+                <input id="tarif-warna" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
                   placeholder="Hitam, Putih, Cream" required>
               </div>
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Ukuran (Pisah Koma)</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan
+                  Ukuran (Pisah Koma)</label>
                 <input id="tarif-ukuran"
                   class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm uppercase"
                   placeholder="S, M, L, XL" required>
@@ -479,7 +488,8 @@
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Ongkos Jahit per
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Ongkos Jahit
+                per
                 Pcs (Rp)</label>
               <input id="tarif-upah" type="number" inputmode="numeric" min="0"
                 class="input-field w-full rounded-xl border border-indigo-200 bg-indigo-50/40 p-3 text-base font-bold text-indigo-800"
@@ -612,7 +622,8 @@
                 class="hidden rounded-full bg-emerald-50 px-2.5 py-1 text-[10px] font-bold text-emerald-700">AKTIF</span>
             </div>
             <div id="product-fields" class="mt-4 hidden border-t border-slate-100 pt-3">
-              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Produk</label>
+              <label class="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama
+                Produk</label>
               <input id="product-name" class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm"
                 placeholder="Contoh: Kaos Polos">
               <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"><input id="product-active"
@@ -654,8 +665,10 @@
               <div>
                 <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilihan Varian</p>
                 <h3 class="mt-1 text-sm font-bold">Atur Warna & Ukuran</h3>
-                <p class="mt-1 text-xs leading-relaxed text-slate-500">Masukkan pilihan seperti Warna atau Ukuran. Pisahkan dengan tanda koma.</p>
-              </div><span class="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">OTOMATIS</span>
+                <p class="mt-1 text-xs leading-relaxed text-slate-500">Masukkan pilihan seperti Warna atau Ukuran.
+                  Pisahkan dengan tanda koma.</p>
+              </div><span
+                class="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700">OTOMATIS</span>
             </div>
             <label class="mt-3 flex items-center gap-2 text-xs text-slate-600"><input id="simple-product"
                 type="checkbox" class="h-4 w-4 accent-indigo-600"> Produk tanpa varian (1 jenis saja)</label>
@@ -685,7 +698,8 @@
                   class="text-[11px] font-bold text-indigo-600 active:opacity-70">Perbarui</button>
               </div>
             </div>
-            <div id="quick-add-location-box" class="hidden rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
+            <div id="quick-add-location-box"
+              class="hidden rounded-xl border border-emerald-200 bg-emerald-50/70 p-3 space-y-2">
               <p class="text-[10px] font-bold uppercase text-emerald-700">Tambah Nama Rak Baru</p>
               <div class="flex gap-2">
                 <input id="quick-new-loc-name" type="text"
@@ -709,7 +723,8 @@
 
           <div id="qty-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <label id="qty-label"
-              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jumlah Barang (Pcs)</label>
+              class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jumlah Barang
+              (Pcs)</label>
             <input id="qty-input" type="number" inputmode="numeric" min="0" step="1" placeholder="0"
               class="input-field w-full border-0 bg-transparent text-3xl font-bold text-slate-800 outline-none">
             <p id="qty-hint" class="mt-1 text-xs text-slate-400"></p>
@@ -785,7 +800,8 @@
               class="inline-flex items-center gap-1 text-xs font-bold text-slate-500">
               ← Kembali ke Daftar Setoran
             </button>
-            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">TERIMA BARANG</span>
+            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">TERIMA
+              BARANG</span>
           </div>
 
           <!-- Info Item Penjahit Terpilih -->
@@ -808,13 +824,15 @@
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex gap-3">
               <div class="flex-1">
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Bagus (Masuk Stok)</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Bagus
+                  (Masuk Stok)</label>
                 <input id="qc-lolos" type="number" inputmode="numeric" min="0"
                   class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 text-center text-lg font-bold text-emerald-800"
                   required>
               </div>
               <div class="flex-1">
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Rusak / Reject</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Rusak /
+                  Reject</label>
                 <input id="qc-gagal" type="number" inputmode="numeric" min="0"
                   class="input-field w-full rounded-xl border border-rose-200 bg-rose-50/40 p-3 text-center text-lg font-bold text-rose-700"
                   value="0" required>
@@ -822,7 +840,8 @@
             </div>
 
             <div id="qc-reject-reason-wrap" class="hidden">
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Catatan Kerusakan</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-rose-600">Catatan
+                Kerusakan</label>
               <input id="qc-alasan-gagal" type="text"
                 class="input-field w-full rounded-xl border border-rose-200 px-3 py-2 text-xs"
                 placeholder="Contoh: Jahitan miring, noda kain...">
@@ -838,7 +857,8 @@
           </div>
 
           <!-- Card Produk & Lokasi Tujuan Gudang Utama -->
-          <div id="qc-target-warehouse-card" class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+          <div id="qc-target-warehouse-card"
+            class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div>
               <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan ke Stok Jual</p>
               <h3 class="text-sm font-bold text-slate-800 mt-0.5">Pilih Produk & Rak Tujuan</h3>
@@ -848,7 +868,8 @@
               <button type="button" id="btn-scan-wip"
                 class="flex-1 rounded-xl bg-slate-800 px-3 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+                  <path
+                    d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
                   <rect x="7" y="7" width="10" height="10" rx="1.5" />
                 </svg>
                 <span>Scan Produk</span>
@@ -866,19 +887,22 @@
                 <span id="qc-wip-prod-code" class="font-mono text-[10px] text-slate-400"></span>
               </div>
               <div>
-                <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk Stok</label>
+                <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk
+                  Stok</label>
                 <div id="qc-wip-variants"></div>
               </div>
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di Rak Mana</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di Rak
+                Mana</label>
               <select id="qc-lokasi-tujuan"
                 class="input-field w-full rounded-xl border border-slate-200 p-2.5 text-sm font-semibold bg-white"></select>
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas Penerima</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas
+                Penerima</label>
               <input id="qc-nama" class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm"
                 placeholder="Ketik nama Anda..." required>
             </div>
@@ -915,8 +939,8 @@
               <p class="text-[10px] font-bold uppercase tracking-wider text-violet-200">Total Upah Belum Dibayar</p>
               <p id="upah-grand-total" class="mt-0.5 text-2xl font-black">Rp 0</p>
             </div>
-            <span id="upah-tailor-count-badge"
-              class="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">0 Penjahit</span>
+            <span id="upah-tailor-count-badge" class="rounded-full bg-white/15 px-3 py-1 text-xs font-bold text-white">0
+              Penjahit</span>
           </div>
         </div>
 
@@ -931,7 +955,8 @@
             <p id="pay-slip-desc" class="mt-1.5 text-xs leading-relaxed text-slate-600"></p>
             <div class="mt-4 space-y-3">
               <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas Pembayar</label>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas
+                  Pembayar</label>
                 <input id="pay-slip-admin"
                   class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-medium"
                   placeholder="Ketik nama Anda...">
@@ -992,7 +1017,8 @@
           <button type="button" id="btn-scan-pricing"
             class="w-full rounded-xl bg-slate-800 p-3 text-sm font-bold text-white shadow-sm flex items-center justify-center gap-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-              <path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
+              <path
+                d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
               <rect x="7" y="7" width="10" height="10" rx="1.5" />
             </svg>
             <span>Scan Barcode Barang</span>
@@ -1049,7 +1075,8 @@
           <p class="text-[11px] text-slate-500">Buka lebih cepat langsung dari layar utama HP</p>
         </div>
       </div>
-      <div id="install-guide-steps" class="rounded-xl bg-slate-50 p-3.5 text-xs text-slate-700 space-y-2 leading-relaxed"></div>
+      <div id="install-guide-steps"
+        class="rounded-xl bg-slate-50 p-3.5 text-xs text-slate-700 space-y-2 leading-relaxed"></div>
       <button type="button" id="btn-close-install-guide"
         class="w-full rounded-xl bg-indigo-600 py-3 text-xs font-bold text-white shadow-md">Mengerti</button>
     </div>
@@ -1075,7 +1102,7 @@
     // ===== HELPER & KONFIGURASI =====
     const $ = id => document.getElementById(id);
 
-    const APP_CONFIG = { GAS_URL: 'https://script.google.com/macros/s/AKfycbyrTPpdKPyFI4EB5_vIPaq7oTyEQ7QLklzcY0f-BJi8KYATw0mq2NV107vwdjp4KDhc/exec' };
+    const APP_CONFIG = { GAS_URL: 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec' };
     const GAS_URL = APP_CONFIG.GAS_URL;
     const ADMIN_CACHE_KEY = 'IBS_ADMIN_BOOTSTRAP_V6_2';
     const OPNAME_SESSION_KEY = 'IBS_ACTIVE_OPNAME_SESSION';
@@ -1210,7 +1237,7 @@
           } else {
             history.pushState({ screen: name }, '', '#' + name);
           }
-        } catch (e) {}
+        } catch (e) { }
       }
       renderScreenUI(name);
     }
@@ -1316,7 +1343,7 @@
         try {
           applyBootstrapData(JSON.parse(cached));
           window.__adminInitialRendered = true;
-        } catch (e) {}
+        } catch (e) { }
       }
 
       isFetching = true;
@@ -1484,7 +1511,7 @@
             await stopScanner();
             handleScannedBarcode(decodedText);
           },
-          () => {}
+          () => { }
         );
       } catch (err) {
         isCameraActive = false;
@@ -1496,7 +1523,7 @@
       if (html5Scanner && isCameraActive) {
         try {
           await html5Scanner.stop();
-        } catch (e) {}
+        } catch (e) { }
       }
       isCameraActive = false;
     }
@@ -2399,7 +2426,7 @@
           STATE.stokTailor = json.data.items;
           updateHomeBadges();
         }
-      } catch (e) {}
+      } catch (e) { }
       $('qc-loading').classList.add('hidden');
       renderStokTailorList();
     }
@@ -2607,7 +2634,7 @@
         if (json.success && json.data) {
           STATE.unpaidUpah = json.data;
         }
-      } catch (e) {}
+      } catch (e) { }
       $('upah-loading').classList.add('hidden');
       renderUnpaidUpahList();
     }
@@ -2895,7 +2922,7 @@
     document.addEventListener('DOMContentLoaded', () => {
       try {
         history.replaceState({ screen: 'home' }, '', '#home');
-      } catch (e) {}
+      } catch (e) { }
 
       initPwaInstallButton();
 
@@ -2909,7 +2936,7 @@
       if (savedOpname) {
         try {
           STATE.activeOpname = JSON.parse(savedOpname);
-        } catch (e) {}
+        } catch (e) { }
       }
       syncBootstrap(true);
       setInterval(() => syncBootstrap(false), 25000);
