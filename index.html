@@ -181,7 +181,23 @@
     <main class="flex-1 px-4 py-5 safe-bottom">
       <!-- HOME / MENU UTAMA -->
       <section id="screen-home" class="screen-enter space-y-5">
-        <!-- Banner Sesi Opname Aktif (P2-4: Dilengkapi penghitung progres lokal) -->
+        <!-- Banner Keranjang Keluar Belum Diproses -->
+        <div id="home-cart-banner" class="hidden rounded-2xl border border-rose-300 bg-rose-50 p-3.5 shadow-sm">
+          <div class="flex items-center justify-between gap-2">
+            <div class="min-w-0 flex-1">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-rose-700">Keranjang Barang Keluar Aktif</p>
+              <p id="home-cart-summary" class="mt-0.5 truncate text-xs font-extrabold text-rose-950">0 Item · 0 Pcs</p>
+            </div>
+            <div class="flex shrink-0 gap-1.5">
+              <button type="button" id="btn-resume-keluar-cart"
+                class="rounded-xl bg-rose-600 px-3 py-2 text-xs font-bold text-white shadow-sm">Lanjutkan</button>
+              <button type="button" id="btn-clear-home-cart"
+                class="rounded-xl bg-white px-2.5 py-2 text-xs font-bold text-rose-800 ring-1 ring-rose-200">Hapus</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Banner Sesi Opname Aktif -->
         <div id="home-opname-banner" class="hidden rounded-2xl border border-amber-300 bg-amber-50 p-3.5 shadow-sm">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0 flex-1">
@@ -202,34 +218,24 @@
           </div>
         </div>
 
-        <!-- Operasional Gudang Utama -->
+        <!-- Operasional Gudang & Pesanan (Tanpa Menu Barang Masuk) -->
         <div>
           <div class="mb-2.5 flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Stok Barang Gudang</h2>
-            <span id="home-badge-locations"
-              class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">LOKASI RAK</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Pesanan & Stok Gudang</h2>
+            <span id="home-badge-gudang-polos"
+              class="rounded-full bg-teal-100 px-2.5 py-0.5 text-[10px] font-extrabold text-teal-800">POLOS: 0
+              PCS</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
-            <button type="button" data-activity="Masuk"
-              class="menu-btn flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition active:scale-[.98]">
-              <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                  <path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16" />
-                </svg>
-              </span>
-              <span class="mt-3 text-sm font-bold text-slate-900">Barang Masuk</span>
-              <span class="mt-0.5 text-[11px] text-slate-400">Tambah stok ke rak</span>
-            </button>
-
             <button type="button" data-activity="Keluar"
-              class="menu-btn flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition active:scale-[.98]">
+              class="menu-btn flex flex-col items-start rounded-2xl border border-rose-200 bg-white p-4 text-left shadow-sm transition active:scale-[.98]">
               <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
                   <path d="M12 16V4m0 0-4 4m4-4 4 4M4 20h16" />
                 </svg>
               </span>
               <span class="mt-3 text-sm font-bold text-slate-900">Barang Keluar</span>
-              <span class="mt-0.5 text-[11px] text-slate-400">Kirim pesanan / terjual</span>
+              <span class="mt-0.5 text-[11px] text-slate-400">Pesanan Shopee / bulk</span>
             </button>
 
             <button type="button" data-activity="Mutasi"
@@ -256,32 +262,24 @@
             </button>
 
             <button type="button" data-activity="CekStok"
-              class="menu-btn col-span-2 flex items-center justify-between rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition active:scale-[.98]">
-              <div class="flex items-center gap-3">
-                <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
-                  <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <circle cx="11" cy="11" r="7" />
-                    <path d="m20 20-3.5-3.5" />
-                  </svg>
-                </span>
-                <div>
-                  <span class="block text-sm font-bold text-slate-900">Cek Sisa Stok</span>
-                  <span class="text-[11px] text-slate-400">Scan barang untuk lihat jumlah stok di rak</span>
-                </div>
-              </div>
-              <svg class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2.5">
-                <path d="m9 18 6-6-6-6" />
-              </svg>
+              class="menu-btn flex flex-col items-start rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition active:scale-[.98]">
+              <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-3.5-3.5" />
+                </svg>
+              </span>
+              <span class="mt-3 text-sm font-bold text-slate-900">Cek Sisa Stok</span>
+              <span class="mt-0.5 text-[11px] text-slate-400">Lihat stok rak & polos</span>
             </button>
           </div>
         </div>
 
-        <!-- Penjahit & Upah Jahit -->
+        <!-- Penjahit, Gudang Polos & Upah Jahit -->
         <div>
           <div class="mb-2.5 flex items-center justify-between">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Penjahit & Upah Jahit</h2>
-            <span class="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">PENJAHIT</span>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Penjahit & Gudang Polos</h2>
+            <span class="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">PRODUKSI</span>
           </div>
           <div class="space-y-2.5">
             <button type="button" data-nav="qc"
@@ -296,7 +294,7 @@
                 </span>
                 <div>
                   <span class="block text-sm font-bold text-slate-900">Terima Setoran Jahitan</span>
-                  <span class="text-[11px] text-slate-500">Cek kualitas barang penjahit & masukkan ke rak</span>
+                  <span class="text-[11px] text-slate-500">Terima kaos polos ke Gudang Polos & catat upah</span>
                 </div>
               </div>
               <span id="home-badge-tailor-stok"
@@ -315,7 +313,7 @@
                 </span>
                 <div>
                   <span class="block text-sm font-bold text-slate-900">Daftar Barang & Ongkos Jahit</span>
-                  <span class="text-[11px] text-slate-500">Atur kode barang jahit, warna, ukuran & upah/pcs</span>
+                  <span class="text-[11px] text-slate-500">Atur kode kaos polos, warna, ukuran & upah/pcs</span>
                 </div>
               </div>
               <span id="home-badge-master-tailor"
@@ -337,15 +335,17 @@
                 </div>
               </div>
               <span id="home-badge-unpaid-upah"
-                class="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-extrabold text-violet-800">Slip</span>
+                class="rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-extrabold text-violet-800">Lunas</span>
             </button>
           </div>
         </div>
 
         <!-- Data Produk & Harga Jual -->
         <div>
-          <div class="mb-2.5">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Data Produk & Harga</h2>
+          <div class="mb-2.5 flex items-center justify-between">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500">Data Produk & Tautan Polos</h2>
+            <span id="home-badge-locations"
+              class="rounded-full bg-slate-200 px-2.5 py-0.5 text-[10px] font-bold text-slate-600">LOKASI RAK</span>
           </div>
           <div class="grid grid-cols-2 gap-3">
             <button type="button" data-activity="KelolaData"
@@ -355,8 +355,8 @@
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </span>
-              <span class="mt-2.5 text-xs font-bold text-slate-900">Tambah / Edit Produk</span>
-              <span class="mt-0.5 text-[10px] text-slate-400">Daftar barang & warna baru</span>
+              <span class="mt-2.5 text-xs font-bold text-slate-900">Kelola Data Produk</span>
+              <span class="mt-0.5 text-[10px] text-slate-400">Produk, varian & tautan polos</span>
             </button>
 
             <button type="button" data-nav="pricing"
@@ -433,7 +433,7 @@
             </svg></button>
           <div class="min-w-0 flex-1">
             <h2 class="text-base font-bold">Daftar Barang & Ongkos Jahit</h2>
-            <p class="text-xs text-slate-400">Atur kode barang jahit, pilihan warna/ukuran & upah</p>
+            <p class="text-xs text-slate-400">Atur kode kaos polos, warna/ukuran & upah per pcs</p>
           </div>
           <button type="button" id="btn-reset-tarif-form"
             class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-indigo-600 shadow-sm ring-1 ring-slate-200">+
@@ -465,15 +465,15 @@
               </div>
               <input id="tarif-barcode-sku"
                 class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm font-mono font-bold uppercase"
-                placeholder="Contoh: CROPTOP-01" required>
+                placeholder="Contoh: IBS-CRP-01" required>
             </div>
 
             <div>
-              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Barang
-                Jahit</label>
+              <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Kaos /
+                Croptop Polos</label>
               <input id="tarif-nama-produk"
                 class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm font-semibold"
-                placeholder="Contoh: Croptop Rib Knit" required>
+                placeholder="Contoh: Croptop Rib Knit Polos" required>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
@@ -490,14 +490,13 @@
                   Ukuran (Pisah Koma)</label>
                 <input id="tarif-ukuran"
                   class="input-field w-full rounded-xl border border-slate-200 p-3 text-sm uppercase"
-                  placeholder="S, M, L, XL" required>
+                  placeholder="ALLSIZE, L, XL" required>
               </div>
             </div>
 
             <div>
               <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-indigo-600">Ongkos Jahit
-                per
-                Pcs (Rp)</label>
+                per Pcs (Rp)</label>
               <input id="tarif-upah" type="number" inputmode="numeric" min="0"
                 class="input-field w-full rounded-xl border border-indigo-200 bg-indigo-50/40 p-3 text-base font-bold text-indigo-800"
                 placeholder="3500" required>
@@ -557,7 +556,7 @@
             <h2 id="scan-title" class="text-base font-bold"></h2>
             <p id="scan-subtitle" class="text-xs text-slate-400">Arahkan kamera ke barcode atau QR barang</p>
           </div>
-          <!-- P2-3: Tombol Lampu / Flash Kamera -->
+          <!-- Tombol Lampu / Flash Kamera -->
           <button id="btn-torch" type="button" aria-pressed="false"
             class="hidden h-10 w-10 items-center justify-center rounded-xl bg-white text-slate-600 shadow-sm ring-1 ring-slate-200 transition active:scale-95"
             title="Nyalakan Lampu"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -566,7 +565,19 @@
             </svg></button>
         </div>
 
-        <!-- P2-4: Indikator Sesi Opname + Penghitung Progres Scan Lokal -->
+        <!-- Indikator Keranjang Keluar Aktif saat Scan Produk Lain -->
+        <div id="scan-keluar-cart-bar"
+          class="hidden mb-3 rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold uppercase text-rose-600">Keranjang Barang Keluar</p>
+            <p id="scan-keluar-cart-info" class="text-xs font-bold text-rose-900 truncate">0 Item · 0 Pcs</p>
+          </div>
+          <button type="button" id="btn-view-keluar-cart-from-scan"
+            class="shrink-0 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs">Lihat
+            Keranjang</button>
+        </div>
+
+        <!-- Indikator Sesi Opname + Penghitung Progres Scan -->
         <div id="scan-opname-indicator"
           class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2.5 border border-amber-200 flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0">
@@ -607,7 +618,7 @@
         </div>
       </section>
 
-      <!-- FORM / PRODUCT DETAIL -->
+      <!-- FORM / PRODUCT DETAIL / BULK KELUAR / MAPPING POLOS -->
       <section id="screen-form" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back"
@@ -620,6 +631,10 @@
             <h2 id="form-title" class="text-base font-bold"></h2>
             <p id="form-subtitle" class="text-xs text-slate-400">Lengkapi rincian barang</p>
           </div>
+          <button type="button" id="btn-scan-another-top"
+            class="hidden shrink-0 rounded-xl bg-slate-900 px-3 py-2 text-xs font-bold text-white shadow-sm active:scale-95">
+            + Scan Lain
+          </button>
         </div>
 
         <div id="form-opname-alert" class="hidden mb-3 rounded-xl bg-amber-50 px-3 py-2 border border-amber-200">
@@ -635,6 +650,7 @@
         </div>
 
         <form id="main-form" class="space-y-3" novalidate>
+          <!-- Kartu Identitas Barcode & Nama Produk -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between gap-2">
               <div>
@@ -648,12 +664,61 @@
                 Produk</label>
               <input id="product-name"
                 class="input-field w-full rounded-xl border border-slate-200 px-3 py-3 text-sm disabled:bg-slate-100 disabled:text-slate-500"
-                placeholder="Contoh: Kaos Polos">
+                placeholder="Contoh: Croptop It Will Get Better">
               <label class="mt-3 flex items-center gap-2 text-sm text-slate-700"><input id="product-active"
                   type="checkbox" class="h-4 w-4 accent-indigo-600" checked> Produk aktif</label>
             </div>
           </div>
 
+          <!-- Kartu Pengaturan Mapping Kaos Polos (Tampil di Kelola Data Produk untuk Produk Existing) -->
+          <div id="polos-mapping-card"
+            class="hidden rounded-2xl border border-teal-200 bg-white p-4 shadow-sm space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-teal-600">Integrasi Gudang Polos</p>
+                <h3 class="mt-0.5 text-sm font-bold text-slate-900">Tautkan Kaos Polos Gudang Penjahit</h3>
+                <p class="mt-0.5 text-[11px] leading-relaxed text-slate-500">Pilih bahan kaos/croptop polos yang
+                  otomatis terpotong saat pesanan produk ini diproses.</p>
+              </div>
+              <span class="rounded-lg bg-teal-50 px-2 py-1 text-[10px] font-bold text-teal-700">STOK POLOS</span>
+            </div>
+
+            <div class="space-y-2.5 border-t border-slate-100 pt-3">
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Target
+                  Variasi Produk</label>
+                <select id="mapping-target-variant"
+                  class="input-field w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-bold text-slate-800"></select>
+              </div>
+
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jenis
+                  Kaos/Croptop Polos (Master Tailor)</label>
+                <select id="mapping-tailor-id"
+                  class="input-field w-full rounded-xl border border-slate-200 bg-white p-2.5 text-xs font-semibold text-slate-800"></select>
+              </div>
+
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Kebutuhan
+                  Polos per 1 Pcs Pesanan</label>
+                <input id="mapping-qty-per-unit" type="number" inputmode="numeric" min="1" step="1" value="1"
+                  class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-bold text-slate-800">
+              </div>
+
+              <button type="button" id="btn-save-polos-mapping"
+                class="w-full rounded-xl bg-teal-600 py-2.5 text-xs font-bold text-white shadow-sm active:scale-[.98]">
+                Simpan Tautan Kaos Polos
+              </button>
+            </div>
+
+            <div class="border-t border-slate-100 pt-2.5">
+              <p class="mb-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Tautan Kaos Polos Aktif
+                Produk Ini</p>
+              <div id="polos-mapping-active-list" class="space-y-1.5"></div>
+            </div>
+          </div>
+
+          <!-- Kartu Pilih Varian -->
           <div id="variant-select-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="mb-3">
               <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Pilih Warna / Ukuran</p>
@@ -666,9 +731,12 @@
               <p class="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">Varian terpilih</p>
               <p id="variant-selected-label" class="mt-1 font-bold"></p>
               <p id="variant-stock-summary" class="mt-1 text-xs text-indigo-700"></p>
+              <p id="variant-polos-mapping-info"
+                class="mt-1.5 hidden rounded-lg bg-teal-600/10 px-2.5 py-1.5 text-[11px] font-bold text-teal-900"></p>
             </div>
           </div>
 
+          <!-- Kartu Kelola Varian (Mode KelolaData) -->
           <div id="variant-manage-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-center justify-between">
               <div>
@@ -683,6 +751,7 @@
               Tambah Warna / Ukuran Baru</button>
           </div>
 
+          <!-- Kartu Pembuat Varian & Harga Awal -->
           <div id="attribute-builder-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <div class="flex items-start justify-between gap-2">
               <div>
@@ -699,6 +768,25 @@
             <button id="btn-add-attribute" type="button"
               class="mt-3 w-full rounded-xl border border-dashed border-slate-300 px-3 py-2.5 text-sm font-semibold text-slate-600">+
               Tambah Kategori Pilihan</button>
+
+            <!-- Input HPP & Harga Jual Awal (Opsional) -->
+            <div class="mt-4 grid grid-cols-2 gap-2.5 border-t border-slate-100 pt-3">
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Modal / HPP
+                  Awal (Rp)</label>
+                <input id="product-default-hpp" type="number" inputmode="numeric" min="0"
+                  class="input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold"
+                  placeholder="Opsional (0)">
+              </div>
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Harga Jual
+                  Awal (Rp)</label>
+                <input id="product-default-harga-jual" type="number" inputmode="numeric" min="0"
+                  class="input-field w-full rounded-xl border border-slate-200 px-3 py-2 text-xs font-bold"
+                  placeholder="Opsional (0)">
+              </div>
+            </div>
+
             <div id="matrix-wrap" class="mt-4 hidden border-t border-slate-100 pt-3">
               <div class="mb-2 flex items-center justify-between">
                 <div>
@@ -711,6 +799,7 @@
             </div>
           </div>
 
+          <!-- Kartu Lokasi Rak (Untuk Mutasi & Keluar item tanpa mapping polos) -->
           <div id="location-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
               <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Lokasi Rak Gudang</span>
@@ -744,6 +833,77 @@
             </div>
           </div>
 
+          <!-- Kartu Input Item ke Keranjang Keluar (Khusus Mode Keluar / Bulk Multi-Produk) -->
+          <div id="keluar-item-entry-card"
+            class="hidden rounded-2xl border border-rose-200 bg-white p-4 shadow-sm space-y-3">
+            <div class="grid grid-cols-2 gap-2.5">
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jumlah
+                  Keluar (Pcs)</label>
+                <input id="keluar-qty-input" type="number" inputmode="numeric" min="1" step="1" value="1"
+                  class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-base font-bold text-slate-800">
+              </div>
+              <div>
+                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Harga Jual
+                  / Pcs (Rp)</label>
+                <input id="keluar-price-input" type="number" inputmode="numeric" min="0"
+                  class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-base font-bold text-slate-800">
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button type="button" id="btn-add-keluar-item"
+                class="flex-1 rounded-xl bg-indigo-600 px-3 py-3 text-xs font-bold text-white shadow-sm active:scale-[.98]">
+                + Tambah ke Daftar Keluar
+              </button>
+              <button type="button" id="btn-scan-more-keluar"
+                class="rounded-xl bg-slate-800 px-3.5 py-3 text-xs font-bold text-white shadow-sm active:scale-[.98]">
+                Scan Produk Lain
+              </button>
+            </div>
+          </div>
+
+          <!-- Kartu Keranjang Bulk Barang Keluar Multi-Produk -->
+          <div id="keluar-cart-card"
+            class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div>
+                <p class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Keranjang Barang Keluar</p>
+                <h3 class="text-sm font-bold text-slate-900">Daftar Pesanan Multi-Produk</h3>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="keluar-cart-badge"
+                  class="rounded-full bg-rose-100 px-2.5 py-0.5 text-[10px] font-extrabold text-rose-800">0 Item</span>
+                <button type="button" id="btn-clear-keluar-cart"
+                  class="hidden text-[11px] font-bold text-slate-400 hover:text-rose-600">Kosongkan</button>
+              </div>
+            </div>
+
+            <div id="keluar-cart-list" class="space-y-2">
+              <p class="rounded-xl bg-slate-50 p-3 text-center text-xs text-slate-400">Belum ada item di keranjang.
+                Pilih varian di atas lalu klik <strong>+ Tambah ke Daftar Keluar</strong>.</p>
+            </div>
+
+            <!-- Ringkasan Total Pemotongan Gudang Polos Real-Time -->
+            <div id="keluar-polos-summary"
+              class="hidden rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-1.5">
+              <p class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Ringkasan Total Pemotongan Gudang
+                Polos</p>
+              <div id="keluar-polos-summary-rows" class="space-y-1 text-xs"></div>
+            </div>
+
+            <!-- Peringatan Kekurangan Stok -->
+            <div id="keluar-shortage-alert"
+              class="hidden rounded-xl border border-rose-300 bg-rose-50 p-3 text-xs font-semibold text-rose-800"></div>
+
+            <!-- Total Omzet Keranjang -->
+            <div id="keluar-cart-total-bar"
+              class="hidden flex items-center justify-between border-t border-slate-100 pt-2.5 text-xs">
+              <span class="font-semibold text-slate-500">Estimasi Total Omzet</span>
+              <span id="keluar-cart-total-omzet" class="text-sm font-black text-slate-900">Rp 0</span>
+            </div>
+          </div>
+
+          <!-- Kartu Qty Tunggal (Untuk Mutasi & Opname) -->
           <div id="qty-card" class="hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
             <label id="qty-label"
               class="mb-2 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Jumlah Barang
@@ -772,7 +932,7 @@
         </form>
       </section>
 
-      <!-- TERIMA SETORAN JAHITAN & CEK KUALITAS (QC) -->
+      <!-- TERIMA SETORAN JAHITAN KE GUDANG POLOS -->
       <section id="screen-qc" class="hidden">
         <div class="mb-4 flex items-center gap-3">
           <button id="btn-back-qc"
@@ -783,7 +943,7 @@
             </svg></button>
           <div class="min-w-0 flex-1">
             <h2 class="text-base font-bold">Terima Setoran Jahitan</h2>
-            <p class="text-xs text-slate-400">Cek hasil penjahit & masukkan ke rak gudang</p>
+            <p class="text-xs text-slate-400">Terima hasil jahitan ke Gudang Polos & catat upah</p>
           </div>
           <button type="button" id="btn-refresh-tailor-stock"
             class="rounded-xl bg-white px-3 py-2 text-xs font-bold text-emerald-700 shadow-sm ring-1 ring-slate-200 active:scale-95">Perbarui</button>
@@ -794,7 +954,7 @@
           class="mb-3 rounded-2xl border border-emerald-200 bg-gradient-to-br from-emerald-600 to-teal-700 p-4 text-white shadow-sm">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Total Jahitan Siap Disetor</p>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Total Jahitan di Penjahit</p>
               <p id="tailor-total-pcs" class="mt-0.5 text-2xl font-black">0 pcs</p>
             </div>
             <div class="text-right">
@@ -804,11 +964,28 @@
           </div>
         </div>
 
+        <!-- Ringkasan Stok Kaos Polos Siap Pakai (GUDANG POLOS di STOK_TAILOR) -->
+        <div id="gudang-polos-summary-card"
+          class="mb-3 rounded-2xl border border-teal-200 bg-white p-3.5 shadow-sm space-y-2">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[10px] font-bold uppercase tracking-wider text-teal-600">Gudang Polos Siap Pakai</p>
+              <p id="gudang-polos-total-pcs" class="text-sm font-black text-slate-900">0 pcs siap pesanan</p>
+            </div>
+            <button type="button" id="btn-toggle-polos-detail"
+              class="rounded-lg bg-teal-50 px-2.5 py-1.5 text-[11px] font-bold text-teal-700">
+              Lihat Rincian
+            </button>
+          </div>
+          <div id="gudang-polos-stock-list"
+            class="hidden max-h-40 space-y-1 overflow-y-auto border-t border-slate-100 pt-2 text-xs muted-scroll"></div>
+        </div>
+
         <!-- Filter Pencarian Penjahit / Kategori -->
         <div id="tailor-filter-wrap" class="mb-3">
           <input id="tailor-stock-search" type="text"
             class="input-field w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-medium"
-            placeholder="Cari nama penjahit, nama barang, atau warna...">
+            placeholder="Cari nama penjahit, nama kaos polos, atau warna...">
         </div>
 
         <!-- Daftar Stok Penjahit -->
@@ -816,15 +993,15 @@
           <p class="text-center text-xs text-slate-500 py-4" id="qc-loading">Memuat daftar jahitan siap setor...</p>
         </div>
 
-        <!-- Form Terima ke Gudang Utama & QC -->
+        <!-- Form Konfirmasi Terima Setoran ke Gudang Polos (Tanpa Scan Produk Jadi) -->
         <form id="form-qc" class="space-y-3 hidden mt-2" novalidate>
           <div class="flex items-center justify-between">
             <button type="button" id="btn-cancel-qc-form"
               class="inline-flex items-center gap-1 text-xs font-bold text-slate-500">
               ← Kembali ke Daftar Setoran
             </button>
-            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">TERIMA
-              BARANG</span>
+            <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800">GUDANG
+              POLOS</span>
           </div>
 
           <!-- Info Item Penjahit Terpilih -->
@@ -843,12 +1020,12 @@
             </div>
           </div>
 
-          <!-- Card Kuantitas QC & Kalkulasi Upah Otomatis -->
+          <!-- Card Kuantitas Bagus/Rusak & Petugas Penerima -->
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
             <div class="flex gap-3">
               <div class="flex-1">
                 <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-emerald-700">Bagus
-                  (Masuk Stok)</label>
+                  (Masuk Gudang Polos)</label>
                 <input id="qc-lolos" type="number" inputmode="numeric" min="0"
                   class="input-field w-full rounded-xl border border-emerald-200 bg-emerald-50/50 p-3 text-center text-lg font-bold text-emerald-800"
                   required>
@@ -870,65 +1047,15 @@
                 placeholder="Contoh: Jahitan miring, noda kain...">
             </div>
 
-            <div class="rounded-xl bg-indigo-50 px-3 py-2.5 flex items-center justify-between text-xs">
-              <div>
+            <div class="rounded-xl bg-indigo-50 px-3 py-2.5 space-y-1 text-xs">
+              <div class="flex items-center justify-between">
                 <p class="font-semibold text-indigo-700">Upah Penjahit (Belum Dibayar)</p>
-                <p id="qc-sisa-stok-text" class="text-[10px] text-indigo-500">Sisa di penjahit: 0 pcs</p>
+                <p id="qc-upah-preview" class="text-sm font-black text-indigo-900">Rp 0</p>
               </div>
-              <p id="qc-upah-preview" class="text-sm font-black text-indigo-900">Rp 0</p>
-            </div>
-          </div>
-
-          <!-- Card Produk & Lokasi Tujuan Gudang Utama -->
-          <div id="qc-target-warehouse-card"
-            class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-3">
-            <div id="qc-warehouse-target-fields" class="space-y-3">
-              <div>
-                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan ke Stok Jual</p>
-                <h3 class="text-sm font-bold text-slate-800 mt-0.5">Pilih Produk & Rak Tujuan</h3>
+              <div class="flex items-center justify-between text-[10px] text-indigo-600">
+                <span id="qc-sisa-stok-text">Sisa di penjahit: 0 pcs</span>
+                <span id="qc-gudang-polos-after-text" class="font-bold text-teal-700">Gudang Polos: +0 pcs</span>
               </div>
-
-              <div class="flex gap-2">
-                <button type="button" id="btn-scan-wip"
-                  class="flex-1 rounded-xl bg-slate-800 px-3 py-2.5 text-xs font-bold text-white shadow-sm flex items-center justify-center gap-1.5 active:scale-95">
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-                    <path
-                      d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
-                    <rect x="7" y="7" width="10" height="10" rx="1.5" />
-                  </svg>
-                  <span>Scan Produk</span>
-                </button>
-                <input id="qc-manual-barcode" type="text"
-                  class="input-field w-32 rounded-xl border border-slate-200 px-2.5 py-2 text-xs font-mono"
-                  placeholder="Barcode...">
-                <button type="button" id="btn-cari-qc-barcode"
-                  class="rounded-xl bg-indigo-50 border border-indigo-200 px-3 py-2 text-xs font-bold text-indigo-700">Cari</button>
-              </div>
-
-              <div id="qc-wip-detail" class="hidden bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
-                <div class="flex items-center justify-between">
-                  <p id="qc-wip-prod-name" class="text-xs font-bold text-slate-800"></p>
-                  <span id="qc-wip-prod-code" class="font-mono text-[10px] text-slate-400"></span>
-                </div>
-                <div>
-                  <label class="mb-1 block text-[10px] uppercase text-slate-400 font-bold">Pilih Warna / Ukuran Masuk
-                    Stok</label>
-                  <div id="qc-wip-variants"></div>
-                </div>
-              </div>
-
-              <div>
-                <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Simpan di
-                  Rak
-                  Mana</label>
-                <select id="qc-lokasi-tujuan"
-                  class="input-field w-full rounded-xl border border-slate-200 p-2.5 text-sm font-semibold bg-white"></select>
-              </div>
-            </div>
-
-            <div id="qc-no-stock-note"
-              class="hidden rounded-xl border border-rose-200 bg-rose-50 px-3 py-2.5 text-xs text-rose-800">
-              Karena jumlah <strong>Bagus = 0 pcs</strong>, tidak ada barang yang dimasukkan ke rak gudang.
             </div>
 
             <div>
@@ -940,8 +1067,8 @@
           </div>
 
           <button id="btn-submit-qc" type="submit"
-            class="w-full rounded-2xl bg-emerald-600 p-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 active:scale-[.98]">Masukkan
-            ke Rak & Catat Upah</button>
+            class="w-full rounded-2xl bg-emerald-600 p-4 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 active:scale-[.98]">Terima
+            ke Gudang Polos & Catat Upah</button>
         </form>
       </section>
 
@@ -1042,9 +1169,16 @@
           </div>
         </div>
 
-        <!-- Scan or select product -->
-        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mb-4">
-          <p class="text-xs text-slate-500 mb-3">Scan barcode barang untuk mengubah harga modal dan harga jual.</p>
+        <!-- Input Nama Petugas & Scan -->
+        <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mb-4 space-y-3">
+          <div>
+            <label class="mb-1 block text-[10px] font-semibold uppercase tracking-wider text-slate-400">Nama Petugas
+              Pengubah Harga</label>
+            <input id="pricing-reporter-input" type="text"
+              class="input-field w-full rounded-xl border border-slate-200 px-3 py-2.5 text-xs font-semibold text-slate-800"
+              placeholder="Ketik nama petugas...">
+          </div>
+          <p class="text-xs text-slate-500">Scan barcode barang untuk mengubah harga modal dan harga jual.</p>
           <button type="button" id="btn-scan-pricing"
             class="w-full rounded-xl bg-slate-800 p-3 text-sm font-bold text-white shadow-sm flex items-center justify-center gap-2">
             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
@@ -1091,7 +1225,7 @@
     </main>
   </div>
 
-  <!-- Modal Panduan Install App (Fallback jika perangkat/iOS belum mendukung beforeinstallprompt otomatis) -->
+  <!-- Modal Panduan Install App -->
   <div id="install-guide-modal"
     class="fixed inset-0 z-50 hidden items-end justify-center bg-slate-900/60 p-4 backdrop-blur-sm sm:items-center">
     <div class="w-full max-w-sm rounded-2xl border border-indigo-200 bg-white p-5 shadow-2xl space-y-3">
@@ -1135,7 +1269,7 @@
 
     const APP_CONFIG = { GAS_URL: 'https://script.google.com/macros/s/AKfycbxKXb3_yHwkiYS7ncOuDyPjM7ompZXkRhxzvjQleqEEwIfYBgIlPx1FyQ1vkgdBfl7v/exec' };
     const GAS_URL = APP_CONFIG.GAS_URL;
-    const ADMIN_CACHE_KEY = 'IBS_ADMIN_BOOTSTRAP_V6_2';
+    const ADMIN_CACHE_KEY = 'IBS_ADMIN_BOOTSTRAP_V6_4';
     const OPNAME_SESSION_KEY = 'IBS_ACTIVE_OPNAME_SESSION';
     const OPNAME_SCANNED_MAP_KEY = 'IBS_OPNAME_SCANNED_ITEMS_V1';
     const REPORTER_STORAGE_KEY = 'IBS_LAST_ADMIN_NAME';
@@ -1148,11 +1282,14 @@
       locations: [{ value: 'Rak Utama', label: 'Rak Utama' }],
       masterTailor: [],
       stokTailor: [],
+      gudangPolos: [],
+      polosMappings: [],
+      unpaidSummary: { grand_total_upah: 0, total_penjahit: 0 },
       unpaidUpah: { tailors: [], grand_total_upah: 0, total_penjahit: 0 },
       opnameSessions: [],
       activeOpname: null,
       opnameScannedItems: {},
-      currentActivity: 'Masuk',
+      currentActivity: 'Keluar',
       scanContext: 'main',
       currentProduct: null,
       selectedAttributes: {},
@@ -1161,9 +1298,8 @@
       locTo: '',
       isAddingVariants: false,
       attributeMatrixCombos: [],
+      keluarCart: [],
       selectedQcItem: null,
-      qcTargetProduct: null,
-      qcTargetVariantId: '',
       pendingPaySlip: null,
       lastGeneratedSlip: null,
       pricingProduct: null,
@@ -1208,7 +1344,33 @@
       setTimeout(() => el.remove(), 3500);
     }
 
-    // ===== P2-4: HELPER PENGHITUNG PROGRES SCAN LOKAL SESI OPNAME =====
+    // ===== HELPER GUDANG POLOS & MAPPING PRODUK INDUK =====
+    function getGudangPolosStock(idTailor) {
+      const found = STATE.gudangPolos.find(g => String(g.id_tailor || '') === String(idTailor || ''));
+      return found ? (Number(found.stok_ready) || 0) : 0;
+    }
+
+    function findPolosMappingClient(barcode, variantId) {
+      const bNorm = String(barcode || '').trim().toUpperCase();
+      const vNorm = String(variantId || '').trim();
+      const sourceList = (STATE.currentProduct &&
+        String(STATE.currentProduct.barcode || '').trim().toUpperCase() === bNorm &&
+        Array.isArray(STATE.currentProduct.polos_mappings))
+        ? STATE.currentProduct.polos_mappings
+        : STATE.polosMappings;
+
+      let wildcardMatch = null;
+      for (let i = 0; i < sourceList.length; i++) {
+        const m = sourceList[i];
+        if (String(m.barcode_produk || '').trim().toUpperCase() !== bNorm) continue;
+        const mVar = String(m.id_variasi || '*').trim() || '*';
+        if (mVar === vNorm) return m;
+        if (mVar === '*' && !wildcardMatch) wildcardMatch = m;
+      }
+      return wildcardMatch;
+    }
+
+    // ===== HELPER PENGHITUNG PROGRES SCAN LOKAL SESI OPNAME =====
     function loadOpnameScannedStore() {
       try {
         const raw = localStorage.getItem(OPNAME_SCANNED_MAP_KEY);
@@ -1264,18 +1426,15 @@
 
     function updateOpnameProgressBadges() {
       const activeId = STATE.activeOpname ? STATE.activeOpname.session_id : '';
-      const prog = getOpnameSessionProgress(activeId);
-      const badgeText = `Tercatat: ${prog.variantCount} varian`;
+      const localProg = getOpnameSessionProgress(activeId);
+      const serverSession = STATE.opnameSessions.find(s => s.session_id === activeId);
+      const serverCount = serverSession ? (Number(serverSession.counted_variants) || 0) : 0;
+      const totalVariants = Math.max(serverCount, localProg.variantCount);
+      const badgeText = `Tercatat: ${totalVariants} varian`;
 
-      if ($('home-opname-progress-badge')) {
-        $('home-opname-progress-badge').textContent = badgeText;
-      }
-      if ($('scan-opname-progress-badge')) {
-        $('scan-opname-progress-badge').textContent = badgeText;
-      }
-      if ($('form-opname-progress-badge')) {
-        $('form-opname-progress-badge').textContent = badgeText;
-      }
+      if ($('home-opname-progress-badge')) $('home-opname-progress-badge').textContent = badgeText;
+      if ($('scan-opname-progress-badge')) $('scan-opname-progress-badge').textContent = badgeText;
+      if ($('form-opname-progress-badge')) $('form-opname-progress-badge').textContent = badgeText;
     }
 
     async function postApi(action, payload = {}, btn = null, lockText = 'Memproses data...') {
@@ -1339,6 +1498,7 @@
       });
       if (name === 'home') {
         $('header-label').textContent = 'Pilih menu untuk mulai mencatat';
+        updateHomeBadges();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1388,8 +1548,8 @@
 
       if (currentScreenName === 'scan') {
         if (STATE.scanContext === 'tarif-sku') showScreen('tarif');
-        else if (STATE.scanContext === 'qc-target') showScreen('qc');
         else if (STATE.scanContext === 'pricing') showScreen('pricing');
+        else if (STATE.currentActivity === 'Keluar' && STATE.keluarCart.length > 0 && STATE.currentProduct) showScreen('form');
         else showScreen('home');
         return;
       }
@@ -1436,8 +1596,8 @@
 
       if (currentScreenName === 'scan') {
         if (STATE.scanContext === 'tarif-sku') renderScreenUI('tarif');
-        else if (STATE.scanContext === 'qc-target') renderScreenUI('qc');
         else if (STATE.scanContext === 'pricing') renderScreenUI('pricing');
+        else if (STATE.currentActivity === 'Keluar' && STATE.keluarCart.length > 0 && STATE.currentProduct) renderScreenUI('form');
         else renderScreenUI('home');
         return;
       }
@@ -1504,27 +1664,68 @@
       if (Array.isArray(data.stok_tailor)) {
         STATE.stokTailor = data.stok_tailor;
       }
+      if (Array.isArray(data.gudang_polos)) {
+        STATE.gudangPolos = data.gudang_polos;
+      }
+      if (Array.isArray(data.polos_mappings)) {
+        STATE.polosMappings = data.polos_mappings;
+      }
       if (Array.isArray(data.opname_sessions)) {
         STATE.opnameSessions = data.opname_sessions;
+      }
+      if (data.unpaid_summary && typeof data.unpaid_summary === 'object') {
+        STATE.unpaidSummary = data.unpaid_summary;
       }
 
       updateHomeBadges();
       populateLocationSelects();
       if (!$('screen-form').classList.contains('hidden')) {
         renderLocationChoices();
+        if (STATE.currentActivity === 'Keluar') renderKeluarCart();
+        if (STATE.currentActivity === 'KelolaData' && STATE.currentProduct) renderPolosMappingCard();
       }
       renderOpnameSessions();
       renderMasterTailorList();
       renderStokTailorList();
+      renderGudangPolosSummaryCard();
     }
 
     function updateHomeBadges() {
       const totalTailorPcs = STATE.stokTailor.reduce((sum, it) => sum + (Number(it.stok_ready) || 0), 0);
+      const totalPolosPcs = STATE.gudangPolos.reduce((sum, it) => sum + (Number(it.stok_ready) || 0), 0);
       const uniqueSkus = new Set(STATE.masterTailor.map(m => String(m.barcode_kategori || '').toUpperCase()).filter(Boolean));
+
       $('home-badge-tailor-stok').textContent = `${totalTailorPcs.toLocaleString('id-ID')} pcs`;
       $('home-badge-master-tailor').textContent = `${uniqueSkus.size} Kode`;
+      if ($('home-badge-gudang-polos')) {
+        $('home-badge-gudang-polos').textContent = `POLOS: ${totalPolosPcs.toLocaleString('id-ID')} PCS`;
+      }
       if ($('home-badge-locations')) {
         $('home-badge-locations').textContent = `${STATE.locations.length} LOKASI RAK`;
+      }
+
+      // Update dinamis badge tagihan upah beranda
+      const unpaidTotal = Number(STATE.unpaidSummary && STATE.unpaidSummary.grand_total_upah) || 0;
+      const badgeUpah = $('home-badge-unpaid-upah');
+      if (badgeUpah) {
+        if (unpaidTotal > 0) {
+          badgeUpah.textContent = formatRp(unpaidTotal);
+          badgeUpah.className = 'rounded-full bg-violet-600 px-2.5 py-1 text-[10px] font-extrabold text-white';
+        } else {
+          badgeUpah.textContent = 'Lunas';
+          badgeUpah.className = 'rounded-full bg-violet-100 px-2.5 py-1 text-[10px] font-extrabold text-violet-800';
+        }
+      }
+
+      // Banner Keranjang Keluar aktif
+      if ($('home-cart-banner')) {
+        if (STATE.keluarCart.length > 0) {
+          const totalCartPcs = STATE.keluarCart.reduce((s, x) => s + (Number(x.qty) || 0), 0);
+          $('home-cart-banner').classList.remove('hidden');
+          $('home-cart-summary').textContent = `${STATE.keluarCart.length} Item · ${totalCartPcs} Pcs belum diproses`;
+        } else {
+          $('home-cart-banner').classList.add('hidden');
+        }
       }
 
       if (STATE.activeOpname) {
@@ -1539,7 +1740,6 @@
     function populateLocationSelects() {
       const locHtml = STATE.locations.map(l => `<option value="${escapeHtml(l.value)}">${escapeHtml(l.label || l.value)}</option>`).join('');
       if ($('opname-session-loc')) $('opname-session-loc').innerHTML = locHtml;
-      if ($('qc-lokasi-tujuan')) $('qc-lokasi-tujuan').innerHTML = locHtml;
     }
 
     // ===== MENU UTAMA EVENT LISTENERS =====
@@ -1551,6 +1751,27 @@
         startScanScreen(act);
       });
     });
+
+    if ($('btn-resume-keluar-cart')) {
+      $('btn-resume-keluar-cart').addEventListener('click', () => {
+        STATE.currentActivity = 'Keluar';
+        STATE.scanContext = 'main';
+        if (STATE.currentProduct) {
+          renderProductForm();
+          showScreen('form');
+        } else {
+          startScanScreen('Keluar');
+        }
+      });
+    }
+
+    if ($('btn-clear-home-cart')) {
+      $('btn-clear-home-cart').addEventListener('click', () => {
+        STATE.keluarCart = [];
+        updateHomeBadges();
+        toast('Keranjang barang keluar dikosongkan.');
+      });
+    }
 
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
@@ -1565,7 +1786,6 @@
           await loadMasterTailorFull();
         } else if (target === 'qc') {
           $('header-label').textContent = 'Terima Setoran Jahitan';
-          await refreshLocationsOnly(false);
           await loadStokTailorFresh();
         } else if (target === 'upah') {
           $('header-label').textContent = 'Bayar Upah & Slip Gaji';
@@ -1582,7 +1802,7 @@
     $('btn-back-upah').addEventListener('click', goBackInApp);
     $('btn-back-pricing').addEventListener('click', goBackInApp);
 
-    // ===== P2-3: KONTROL LAMPU / FLASH KAMERA (#btn-torch) =====
+    // ===== KONTROL LAMPU / FLASH KAMERA (#btn-torch) =====
     function updateTorchButtonUI(active) {
       const btn = $('btn-torch');
       if (!btn) return;
@@ -1654,20 +1874,26 @@
     // ===== SCANNER KAMERA & INPUT MANUAL =====
     function startScanScreen(activityLabel) {
       const titles = {
-        Masuk: 'Scan Barang Masuk',
-        Keluar: 'Scan Barang Keluar',
+        Keluar: 'Scan Barang Keluar (Pesanan)',
         Mutasi: 'Scan Pindah Rak',
         Opname: 'Scan Hitung Stok',
         CekStok: 'Scan Cek Sisa Stok',
-        KelolaData: 'Scan Tambah / Edit Produk',
+        KelolaData: 'Scan Kelola Data Produk',
         'tarif-sku': 'Scan QR Kode Barang Jahit',
-        'qc-target': 'Scan Produk Tujuan Rak',
         pricing: 'Scan Barang (Ubah Harga)'
       };
       $('scan-title').textContent = titles[activityLabel] || 'Scan Barcode / QR';
       $('manual-barcode').value = '';
       $('manual-form').classList.add('hidden');
       resetTorchState();
+
+      if (activityLabel === 'Keluar' && STATE.keluarCart.length > 0) {
+        const totalPcs = STATE.keluarCart.reduce((s, x) => s + (Number(x.qty) || 0), 0);
+        $('scan-keluar-cart-bar').classList.remove('hidden');
+        $('scan-keluar-cart-info').textContent = `${STATE.keluarCart.length} Item · ${totalPcs} Pcs siap diproses`;
+      } else {
+        $('scan-keluar-cart-bar').classList.add('hidden');
+      }
 
       if (STATE.activeOpname && activityLabel === 'Opname') {
         $('scan-opname-indicator').classList.remove('hidden');
@@ -1679,6 +1905,18 @@
 
       showScreen('scan');
       initScannerCamera();
+    }
+
+    if ($('btn-view-keluar-cart-from-scan')) {
+      $('btn-view-keluar-cart-from-scan').addEventListener('click', async () => {
+        await stopScanner();
+        if (STATE.currentProduct) {
+          renderProductForm();
+          showScreen('form');
+        } else if (STATE.keluarCart.length > 0) {
+          await openProductFormByBarcode(STATE.keluarCart[0].barcode);
+        }
+      });
     }
 
     async function initScannerCamera() {
@@ -1762,13 +2000,6 @@
         return;
       }
 
-      if (STATE.scanContext === 'qc-target') {
-        showScreen('qc');
-        $('qc-manual-barcode').value = code;
-        await lookupQcTargetProduct(code);
-        return;
-      }
-
       if (STATE.scanContext === 'pricing') {
         showScreen('pricing');
         await loadProductForPricing(code);
@@ -1778,7 +2009,7 @@
       await openProductFormByBarcode(code);
     }
 
-    // ===== FORM TRANSAKSI & DATA PRODUK GUDANG UTAMA =====
+    // ===== FORM TRANSAKSI, BULK KELUAR, MAPPING POLOS & DATA PRODUK =====
     async function openProductFormByBarcode(barcode) {
       const act = STATE.currentActivity;
       const includeInactive = act === 'KelolaData';
@@ -1814,6 +2045,7 @@
       $('form-title').textContent = 'Tambah Produk Baru';
       $('form-subtitle').textContent = 'Daftarkan nama produk & pilihan warna/ukuran';
       $('form-barcode').textContent = barcode;
+      $('btn-scan-another-top').classList.add('hidden');
       $('product-status-pill').classList.add('hidden');
       $('product-fields').classList.remove('hidden');
       $('product-name').disabled = false;
@@ -1821,15 +2053,21 @@
       $('product-name').value = '';
       $('product-active').checked = true;
 
+      $('polos-mapping-card').classList.add('hidden');
       $('variant-select-card').classList.add('hidden');
       $('variant-manage-card').classList.add('hidden');
       $('attribute-builder-card').classList.remove('hidden');
       $('location-card').classList.add('hidden');
+      $('keluar-item-entry-card').classList.add('hidden');
+      $('keluar-cart-card').classList.add('hidden');
       $('qty-card').classList.add('hidden');
       $('reporter-card').classList.remove('hidden');
       $('btn-submit').classList.remove('hidden');
       $('btn-submit-text').textContent = 'Simpan Produk Baru';
       $('btn-cancel-add-variants').classList.add('hidden');
+
+      if ($('product-default-hpp')) $('product-default-hpp').value = '';
+      if ($('product-default-harga-jual')) $('product-default-harga-jual').value = '';
 
       $('simple-product').checked = false;
       $('attribute-list').innerHTML = '';
@@ -1843,12 +2081,11 @@
       const act = STATE.currentActivity;
 
       const titles = {
-        Masuk: 'Barang Masuk Rak',
-        Keluar: 'Barang Keluar Rak',
+        Keluar: 'Barang Keluar (Multi-Produk)',
         Mutasi: 'Pindah Antar Rak',
         Opname: 'Hitung Stok Fisik',
         CekStok: 'Rincian Sisa Stok',
-        KelolaData: 'Edit Data Produk'
+        KelolaData: 'Kelola Data Produk'
       };
       $('form-title').textContent = titles[act] || 'Detail Produk';
       $('form-subtitle').textContent = p.nama;
@@ -1870,25 +2107,31 @@
       }
 
       if (act === 'KelolaData') {
+        $('btn-scan-another-top').classList.add('hidden');
         $('product-fields').classList.remove('hidden');
         $('product-name').disabled = false;
         $('product-active').disabled = false;
         $('product-name').value = p.nama;
         $('product-active').checked = p.aktif;
+        $('polos-mapping-card').classList.remove('hidden');
         $('variant-select-card').classList.add('hidden');
         $('variant-manage-card').classList.remove('hidden');
         $('attribute-builder-card').classList.add('hidden');
         $('location-card').classList.add('hidden');
+        $('keluar-item-entry-card').classList.add('hidden');
+        $('keluar-cart-card').classList.add('hidden');
         $('qty-card').classList.add('hidden');
         $('reporter-card').classList.remove('hidden');
         $('btn-submit').classList.remove('hidden');
-        $('btn-submit-text').textContent = 'Simpan Perubahan';
+        $('btn-submit-text').textContent = 'Simpan Perubahan Produk';
         $('btn-cancel-add-variants').classList.add('hidden');
+        renderPolosMappingCard();
         renderVariantManageList();
         return;
       }
 
       $('product-fields').classList.add('hidden');
+      $('polos-mapping-card').classList.add('hidden');
       $('variant-manage-card').classList.add('hidden');
       $('attribute-builder-card').classList.add('hidden');
       $('variant-select-card').classList.remove('hidden');
@@ -1897,12 +2140,32 @@
       renderVariantSelectors();
 
       if (act === 'CekStok') {
+        $('btn-scan-another-top').classList.add('hidden');
         $('location-card').classList.add('hidden');
+        $('keluar-item-entry-card').classList.add('hidden');
+        $('keluar-cart-card').classList.add('hidden');
         $('qty-card').classList.add('hidden');
         $('reporter-card').classList.add('hidden');
         $('btn-submit').classList.add('hidden');
         $('btn-cancel-add-variants').classList.add('hidden');
+      } else if (act === 'Keluar') {
+        $('btn-scan-another-top').classList.remove('hidden');
+        $('keluar-item-entry-card').classList.remove('hidden');
+        $('keluar-cart-card').classList.remove('hidden');
+        $('qty-card').classList.add('hidden');
+        $('reporter-card').classList.remove('hidden');
+        $('btn-submit').classList.remove('hidden');
+        $('btn-cancel-add-variants').classList.add('hidden');
+        $('keluar-qty-input').value = 1;
+        if (STATE.selectedVariant) {
+          $('keluar-price-input').value = Number(STATE.selectedVariant.harga_jual) || 0;
+        }
+        renderLocationChoices();
+        renderKeluarCart();
       } else {
+        $('btn-scan-another-top').classList.add('hidden');
+        $('keluar-item-entry-card').classList.add('hidden');
+        $('keluar-cart-card').classList.add('hidden');
         $('btn-submit').classList.remove('hidden');
         $('btn-cancel-add-variants').classList.add('hidden');
         $('qty-card').classList.remove('hidden');
@@ -1910,8 +2173,123 @@
         $('reporter-card').classList.remove('hidden');
         renderLocationChoices();
         updateQtyContextHint();
-        $('btn-submit-text').textContent = act === 'Opname' ? 'Simpan Hasil Hitung' : `Simpan Barang ${act}`;
+        $('btn-submit-text').textContent = act === 'Opname' ? 'Simpan Hasil Hitung' : 'Simpan Pindah Rak';
       }
+    }
+
+    // ===== KARTU PENGATURAN MAPPING KAOS POLOS (#polos-mapping-card) =====
+    function renderPolosMappingCard() {
+      const p = STATE.currentProduct;
+      if (!p) return;
+
+      // 1. Populate Dropdown Target Variasi Produk
+      const targetVarSelect = $('mapping-target-variant');
+      const variants = p.variants || [];
+      targetVarSelect.innerHTML = [
+        `<option value="*">Semua Variasi Produk Induk Ini (*)</option>`,
+        ...variants.map(v => `<option value="${escapeHtml(v.id)}">${escapeHtml(v.label || 'Standar')}</option>`)
+      ].join('');
+
+      // 2. Populate Dropdown Jenis Kaos/Croptop Polos (MASTER_TAILOR + GUDANG POLOS)
+      const tailorSelect = $('mapping-tailor-id');
+      const seenTailor = new Set();
+      const tailorOptions = [];
+
+      STATE.masterTailor.forEach(m => {
+        if (!m.id_tailor || seenTailor.has(m.id_tailor)) return;
+        seenTailor.add(m.id_tailor);
+        const gpQty = getGudangPolosStock(m.id_tailor);
+        const label = `${m.nama_kategori} (${m.barcode_kategori}) · ${m.warna} · ${m.ukuran} — Polos: ${gpQty} pcs`;
+        tailorOptions.push({ id: m.id_tailor, label });
+      });
+
+      STATE.gudangPolos.forEach(gp => {
+        if (!gp.id_tailor || seenTailor.has(gp.id_tailor)) return;
+        seenTailor.add(gp.id_tailor);
+        const label = `${gp.nama_kategori} (${gp.barcode_kategori}) · ${gp.warna} · ${gp.ukuran} — Polos: ${Number(gp.stok_ready) || 0} pcs`;
+        tailorOptions.push({ id: gp.id_tailor, label });
+      });
+
+      if (tailorOptions.length) {
+        tailorSelect.innerHTML = tailorOptions.map(o => `<option value="${escapeHtml(o.id)}">${escapeHtml(o.label)}</option>`).join('');
+      } else {
+        tailorSelect.innerHTML = `<option value="">-- Belum ada data di Master Tailor --</option>`;
+      }
+
+      // 3. Render Daftar Tautan Aktif Produk Ini
+      const activeList = $('polos-mapping-active-list');
+      const productMappings = Array.isArray(p.polos_mappings)
+        ? p.polos_mappings
+        : STATE.polosMappings.filter(m => String(m.barcode_produk || '').toUpperCase() === String(p.barcode || '').toUpperCase());
+
+      if (!productMappings.length) {
+        activeList.innerHTML = '<p class="rounded-xl bg-slate-50 px-3 py-2.5 text-[11px] text-slate-400">Belum ada tautan kaos polos untuk produk ini (menggunakan stok rak gudang).</p>';
+        return;
+      }
+
+      activeList.innerHTML = productMappings.map(m => {
+        const gpQty = getGudangPolosStock(m.id_tailor);
+        return `
+          <div class="flex items-center justify-between gap-2 rounded-xl border border-teal-100 bg-teal-50/50 px-3 py-2 text-xs">
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-slate-800">${escapeHtml(m.label_variasi || m.id_variasi)}</p>
+              <p class="text-[11px] text-teal-800 truncate">→ ${escapeHtml(m.detail_polos || m.id_tailor)} (${m.qty_per_unit || 1} pcs/unit)</p>
+              <p class="text-[10px] font-semibold text-slate-500">Saldo Gudang Polos: <strong class="text-teal-700">${gpQty} pcs</strong></p>
+            </div>
+            <button type="button" data-del-map-var="${escapeHtml(m.id_variasi)}"
+              class="shrink-0 rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-rose-600 ring-1 ring-rose-200 active:scale-95">
+              Hapus
+            </button>
+          </div>
+        `;
+      }).join('');
+
+      activeList.querySelectorAll('button[data-del-map-var]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const targetVarId = btn.dataset.delMapVar;
+          const res = await postApi('SAVE_POLOS_MAPPING', {
+            barcode_produk: p.barcode,
+            id_variasi: targetVarId,
+            id_tailor: ''
+          }, btn, 'Menghapus tautan kaos polos...');
+          if (res) {
+            toast(res.message);
+            if (res.data && Array.isArray(res.data.polos_mappings)) {
+              STATE.polosMappings = res.data.polos_mappings;
+            }
+            await openProductFormByBarcode(p.barcode);
+          }
+        });
+      });
+    }
+
+    if ($('btn-save-polos-mapping')) {
+      $('btn-save-polos-mapping').addEventListener('click', async () => {
+        const p = STATE.currentProduct;
+        if (!p) return;
+        const id_variasi = $('mapping-target-variant').value || '*';
+        const id_tailor = $('mapping-tailor-id').value;
+        const qty_per_unit = Math.max(1, Math.floor(Number($('mapping-qty-per-unit').value) || 1));
+
+        if (!id_tailor) {
+          return toast('Pilih jenis kaos/croptop polos terlebih dahulu.', 'error');
+        }
+
+        const res = await postApi('SAVE_POLOS_MAPPING', {
+          barcode_produk: p.barcode,
+          id_variasi,
+          id_tailor,
+          qty_per_unit
+        }, $('btn-save-polos-mapping'), 'Menyimpan tautan kaos polos...');
+
+        if (res) {
+          toast(res.message);
+          if (res.data && Array.isArray(res.data.polos_mappings)) {
+            STATE.polosMappings = res.data.polos_mappings;
+          }
+          await openProductFormByBarcode(p.barcode);
+        }
+      });
     }
 
     function updateQtyContextHint() {
@@ -1929,17 +2307,10 @@
         hint.textContent = loc
           ? `Stok tercatat di sistem (${loc}): ${sysStock} pcs. Masukkan total fisik aktual di rak (isi 0 hanya jika stok benar-benar habis).`
           : 'Masukkan jumlah fisik aktual yang ditemukan di rak.';
-      } else if (act === 'Keluar') {
-        lbl.textContent = 'Jumlah Barang Keluar (Pcs)';
-        const avail = Number(vStocks[STATE.locFrom]) || 0;
-        hint.textContent = `Stok tersedia di ${STATE.locFrom || 'rak asal'}: ${avail} pcs (Maksimal keluar: ${avail} pcs).`;
       } else if (act === 'Mutasi') {
         lbl.textContent = 'Jumlah Barang Dipindah (Pcs)';
         const avail = Number(vStocks[STATE.locFrom]) || 0;
         hint.textContent = `Stok tersedia di ${STATE.locFrom || 'rak asal'}: ${avail} pcs.`;
-      } else {
-        lbl.textContent = 'Jumlah Barang Masuk (Pcs)';
-        hint.textContent = `Masukkan jumlah barang masuk ke ${STATE.locTo || 'rak tujuan'} (minimal 1 pcs).`;
       }
     }
 
@@ -1986,6 +2357,11 @@
       STATE.selectedVariant = p.variants.find(v =>
         p.attributes.every(a => v.attributes[a.name] === STATE.selectedAttributes[a.name])
       ) || null;
+
+      if (STATE.currentActivity === 'Keluar' && STATE.selectedVariant && $('keluar-price-input')) {
+        $('keluar-price-input').value = Number(STATE.selectedVariant.harga_jual) || 0;
+      }
+
       updateSelectedVariantSummary();
       if (!$('location-card').classList.contains('hidden')) {
         renderLocationChoices();
@@ -1995,11 +2371,13 @@
 
     function updateSelectedVariantSummary() {
       const sumBox = $('variant-selected-summary');
+      const polosInfo = $('variant-polos-mapping-info');
       const v = STATE.selectedVariant;
       if (!v) {
         sumBox.classList.remove('hidden');
         $('variant-selected-label').textContent = 'Pilihan varian tidak tersedia / nonaktif';
         $('variant-stock-summary').textContent = '';
+        if (polosInfo) polosInfo.classList.add('hidden');
         return;
       }
       sumBox.classList.remove('hidden');
@@ -2007,7 +2385,22 @@
       const stockEntries = Object.entries(v.stocks || {});
       $('variant-stock-summary').textContent = stockEntries.length
         ? stockEntries.map(([rak, q]) => `${rak}: ${q} pcs`).join(' · ')
-        : 'Stok: 0 pcs';
+        : 'Stok rak: 0 pcs';
+
+      if (polosInfo && STATE.currentProduct) {
+        const mapping = findPolosMappingClient(STATE.currentProduct.barcode, v.id);
+        if (mapping) {
+          const gpQty = getGudangPolosStock(mapping.id_tailor);
+          polosInfo.classList.remove('hidden');
+          polosInfo.textContent = `Tautan Gudang Polos: ${mapping.detail_polos || mapping.id_tailor} (${mapping.qty_per_unit || 1} pcs/unit · Tersedia: ${gpQty} pcs)`;
+        } else {
+          polosInfo.classList.add('hidden');
+        }
+      }
+
+      if (STATE.currentActivity === 'Keluar') {
+        renderLocationChoices();
+      }
     }
 
     $('btn-refresh-locations').addEventListener('click', () => refreshLocationsOnly(true));
@@ -2039,11 +2432,21 @@
         if (!locs.some(l => l.value === STATE.locTo)) STATE.locTo = locs[locs.length > 1 ? 1 : 0].value;
       }
 
-      if (act === 'Opname') {
+      if (act === 'Opname' || act === 'CekStok' || act === 'KelolaData') {
         $('location-card').classList.add('hidden');
         updateQtyContextHint();
         return;
       }
+
+      // Pada mode Keluar: jika varian sudah terpetakan ke Gudang Polos, tidak perlu pilih rak asal
+      if (act === 'Keluar' && STATE.currentProduct && STATE.selectedVariant) {
+        const hasMapping = Boolean(findPolosMappingClient(STATE.currentProduct.barcode, STATE.selectedVariant.id));
+        if (hasMapping) {
+          $('location-card').classList.add('hidden');
+          return;
+        }
+      }
+
       $('location-card').classList.remove('hidden');
 
       if (act === 'Keluar' || act === 'Mutasi') {
@@ -2065,11 +2468,8 @@
         $('location-from-wrap').classList.add('hidden');
       }
 
-      if (act === 'Masuk' || act === 'Mutasi') {
+      if (act === 'Mutasi') {
         $('location-to-wrap').classList.remove('hidden');
-        if (act === 'Masuk' && !locs.some(l => l.value === STATE.locTo) && locs.length) {
-          STATE.locTo = locs[0].value;
-        }
         $('location-to-options').innerHTML = locs.map(l => {
           const stk = Number(variantStocks[l.value]) || 0;
           return `
@@ -2088,6 +2488,273 @@
       }
 
       updateQtyContextHint();
+    }
+
+    // ===== KERANJANG BULK BARANG KELUAR MULTI-PRODUK =====
+    function addCurrentVariantToKeluarCart() {
+      const p = STATE.currentProduct;
+      const v = STATE.selectedVariant;
+      if (!p || !v) {
+        return toast('Pilih varian produk terlebih dahulu.', 'error');
+      }
+
+      const rawQty = $('keluar-qty-input').value.trim();
+      const qty = Number(rawQty);
+      if (!rawQty || !Number.isFinite(qty) || qty < 1 || !Number.isInteger(qty)) {
+        $('keluar-qty-input').focus();
+        return toast('Jumlah keluar minimal 1 pcs (bilangan bulat).', 'error');
+      }
+
+      const rawPrice = $('keluar-price-input').value.trim();
+      const hargaJual = rawPrice === '' ? (Number(v.harga_jual) || 0) : Number(rawPrice);
+      if (!Number.isFinite(hargaJual) || hargaJual < 0) {
+        $('keluar-price-input').focus();
+        return toast('Harga jual tidak valid.', 'error');
+      }
+
+      const mapping = findPolosMappingClient(p.barcode, v.id);
+      const locFrom = mapping ? 'Gudang Polos' : (STATE.locFrom || (STATE.locations[0] && STATE.locations[0].value) || 'Rak Utama');
+      const availRack = mapping ? 0 : (Number((v.stocks || {})[locFrom]) || 0);
+
+      const existingIdx = STATE.keluarCart.findIndex(item =>
+        item.barcode === p.barcode &&
+        item.variant_id === v.id &&
+        item.location_from === locFrom
+      );
+
+      if (existingIdx !== -1) {
+        STATE.keluarCart[existingIdx].qty += qty;
+        STATE.keluarCart[existingIdx].harga_jual = hargaJual;
+        STATE.keluarCart[existingIdx].mapping = mapping;
+        STATE.keluarCart[existingIdx].avail_rack = availRack;
+      } else {
+        STATE.keluarCart.push({
+          barcode: p.barcode,
+          nama: p.nama,
+          variant_id: v.id,
+          label: v.label || 'Standar',
+          hpp: Number(v.hpp) || 0,
+          harga_jual: hargaJual,
+          qty,
+          location_from: locFrom,
+          avail_rack: availRack,
+          mapping
+        });
+      }
+
+      $('keluar-qty-input').value = 1;
+      updateHomeBadges();
+      renderKeluarCart();
+      toast(`Ditambahkan ke keranjang: ${p.nama} · ${v.label || 'Standar'} (${qty} pcs)`);
+    }
+
+    function renderKeluarCart() {
+      const listEl = $('keluar-cart-list');
+      const badgeEl = $('keluar-cart-badge');
+      const clearBtn = $('btn-clear-keluar-cart');
+      const polosSummaryBox = $('keluar-polos-summary');
+      const polosSummaryRows = $('keluar-polos-summary-rows');
+      const shortageAlert = $('keluar-shortage-alert');
+      const totalBar = $('keluar-cart-total-bar');
+      const totalOmzetEl = $('keluar-cart-total-omzet');
+      const submitBtn = $('btn-submit');
+      const submitText = $('btn-submit-text');
+
+      if (!listEl) return;
+
+      const cart = STATE.keluarCart;
+      const totalItems = cart.length;
+      const totalQty = cart.reduce((s, it) => s + (Number(it.qty) || 0), 0);
+      const totalOmzet = cart.reduce((s, it) => s + ((Number(it.qty) || 0) * (Number(it.harga_jual) || 0)), 0);
+
+      badgeEl.textContent = `${totalItems} Item · ${totalQty} Pcs`;
+
+      if (!cart.length) {
+        clearBtn.classList.add('hidden');
+        polosSummaryBox.classList.add('hidden');
+        shortageAlert.classList.add('hidden');
+        totalBar.classList.add('hidden');
+        listEl.innerHTML = `<p class="rounded-xl bg-slate-50 p-3 text-center text-xs text-slate-400">Belum ada item di keranjang. Pilih varian di atas lalu klik <strong>+ Tambah ke Daftar Keluar</strong>.</p>`;
+        if (STATE.currentActivity === 'Keluar') {
+          submitBtn.disabled = true;
+          submitText.textContent = 'Proses Semua Barang Keluar (0 Item)';
+        }
+        return;
+      }
+
+      clearBtn.classList.remove('hidden');
+      totalBar.classList.remove('hidden');
+      totalOmzetEl.textContent = formatRp(totalOmzet);
+
+      // Agregasi kebutuhan kaos polos per ID_Tailor & cek stok rak item non-mapping
+      const polosDemandMap = {};
+      const rackDemandMap = {};
+      const shortageMessages = [];
+
+      cart.forEach(it => {
+        if (it.mapping) {
+          const idT = it.mapping.id_tailor;
+          const mult = Math.max(1, Number(it.mapping.qty_per_unit) || 1);
+          const needed = it.qty * mult;
+          if (!polosDemandMap[idT]) {
+            polosDemandMap[idT] = {
+              id_tailor: idT,
+              detail_polos: it.mapping.detail_polos || idT,
+              needed: 0,
+              avail: getGudangPolosStock(idT)
+            };
+          }
+          polosDemandMap[idT].needed += needed;
+        } else {
+          const rKey = `${it.variant_id}||${it.location_from}`;
+          if (!rackDemandMap[rKey]) {
+            rackDemandMap[rKey] = {
+              display: `${it.nama} · ${it.label} (${it.location_from})`,
+              needed: 0,
+              avail: Number(it.avail_rack) || 0
+            };
+          }
+          rackDemandMap[rKey].needed += it.qty;
+        }
+      });
+
+      const polosEntries = Object.values(polosDemandMap);
+      polosEntries.forEach(pe => {
+        if (pe.needed > pe.avail) {
+          shortageMessages.push(`Stok Gudang Polos kurang untuk "${pe.detail_polos}": butuh ${pe.needed} pcs, tersedia ${pe.avail} pcs.`);
+        }
+      });
+
+      Object.values(rackDemandMap).forEach(re => {
+        if (re.needed > re.avail) {
+          shortageMessages.push(`Stok rak kurang untuk "${re.display}": butuh ${re.needed} pcs, tersedia ${re.avail} pcs.`);
+        }
+      });
+
+      listEl.innerHTML = cart.map((it, idx) => {
+        const subOmzet = it.qty * it.harga_jual;
+        const badgeHtml = it.mapping
+          ? `<span class="inline-block rounded bg-teal-50 px-2 py-0.5 text-[10px] font-bold text-teal-800">Polos: ${escapeHtml(it.mapping.detail_polos || it.mapping.id_tailor)} (-${it.qty * (it.mapping.qty_per_unit || 1)} pcs)</span>`
+          : `<span class="inline-block rounded bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600">Dari: ${escapeHtml(it.location_from)}</span>`;
+
+        return `
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <div class="min-w-0 flex-1">
+                <p class="text-xs font-bold text-slate-900 truncate">${escapeHtml(it.nama)} · ${escapeHtml(it.label)}</p>
+                <p class="font-mono text-[10px] text-slate-400">${escapeHtml(it.barcode)} · @ ${formatRp(it.harga_jual)}</p>
+                <div class="mt-1">${badgeHtml}</div>
+              </div>
+              <button type="button" data-cart-remove="${idx}"
+                class="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-white text-xs font-bold text-rose-600 ring-1 ring-slate-200"
+                title="Hapus item">×</button>
+            </div>
+            <div class="flex items-center justify-between border-t border-slate-200/70 pt-2">
+              <div class="inline-flex items-center gap-1.5 rounded-lg bg-white p-1 ring-1 ring-slate-200">
+                <button type="button" data-cart-dec="${idx}"
+                  class="flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 text-xs font-black text-slate-700">−</button>
+                <span class="min-w-[2rem] text-center text-xs font-extrabold text-slate-900">${it.qty}</span>
+                <button type="button" data-cart-inc="${idx}"
+                  class="flex h-6 w-6 items-center justify-center rounded-md bg-indigo-50 text-xs font-black text-indigo-700">+</button>
+              </div>
+              <span class="text-xs font-extrabold text-slate-800">${formatRp(subOmzet)}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      listEl.querySelectorAll('button[data-cart-dec]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.cartDec);
+          if (STATE.keluarCart[idx]) {
+            if (STATE.keluarCart[idx].qty > 1) {
+              STATE.keluarCart[idx].qty -= 1;
+            } else {
+              STATE.keluarCart.splice(idx, 1);
+            }
+            updateHomeBadges();
+            renderKeluarCart();
+          }
+        });
+      });
+
+      listEl.querySelectorAll('button[data-cart-inc]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.cartInc);
+          if (STATE.keluarCart[idx]) {
+            STATE.keluarCart[idx].qty += 1;
+            updateHomeBadges();
+            renderKeluarCart();
+          }
+        });
+      });
+
+      listEl.querySelectorAll('button[data-cart-remove]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.cartRemove);
+          STATE.keluarCart.splice(idx, 1);
+          updateHomeBadges();
+          renderKeluarCart();
+        });
+      });
+
+      if (polosEntries.length > 0) {
+        polosSummaryBox.classList.remove('hidden');
+        polosSummaryRows.innerHTML = polosEntries.map(pe => {
+          const sisa = pe.avail - pe.needed;
+          const isShort = sisa < 0;
+          return `
+            <div class="flex items-center justify-between rounded-lg px-2 py-1 ${isShort ? 'bg-rose-100 text-rose-900 font-bold' : 'bg-white text-slate-700'}">
+              <span class="truncate pr-2">${escapeHtml(pe.detail_polos)}</span>
+              <span class="shrink-0 font-mono text-[11px] font-bold ${isShort ? 'text-rose-700' : 'text-teal-700'}">
+                -${pe.needed} pcs (Sisa: ${sisa} pcs)
+              </span>
+            </div>
+          `;
+        }).join('');
+      } else {
+        polosSummaryBox.classList.add('hidden');
+      }
+
+      if (shortageMessages.length > 0) {
+        shortageAlert.classList.remove('hidden');
+        shortageAlert.innerHTML = shortageMessages.map(msg => `<p>• ${escapeHtml(msg)}</p>`).join('');
+        submitBtn.disabled = true;
+      } else {
+        shortageAlert.classList.add('hidden');
+        submitBtn.disabled = false;
+      }
+
+      submitText.textContent = `Proses Semua Barang Keluar (${totalItems} Item · ${totalQty} Pcs)`;
+    }
+
+    if ($('btn-add-keluar-item')) {
+      $('btn-add-keluar-item').addEventListener('click', addCurrentVariantToKeluarCart);
+    }
+
+    if ($('btn-scan-more-keluar')) {
+      $('btn-scan-more-keluar').addEventListener('click', () => {
+        STATE.currentActivity = 'Keluar';
+        STATE.scanContext = 'main';
+        startScanScreen('Keluar');
+      });
+    }
+
+    if ($('btn-scan-another-top')) {
+      $('btn-scan-another-top').addEventListener('click', () => {
+        STATE.currentActivity = 'Keluar';
+        STATE.scanContext = 'main';
+        startScanScreen('Keluar');
+      });
+    }
+
+    if ($('btn-clear-keluar-cart')) {
+      $('btn-clear-keluar-cart').addEventListener('click', () => {
+        STATE.keluarCart = [];
+        updateHomeBadges();
+        renderKeluarCart();
+        toast('Keranjang keluar dikosongkan.');
+      });
     }
 
     function renderVariantManageList() {
@@ -2232,9 +2899,12 @@
       STATE.isAddingVariants = true;
       $('product-name').disabled = true;
       $('product-active').disabled = true;
+      $('polos-mapping-card').classList.add('hidden');
       $('attribute-builder-card').classList.remove('hidden');
       $('btn-cancel-add-variants').classList.remove('hidden');
       $('btn-submit-text').textContent = 'Simpan Varian Baru';
+      if ($('product-default-hpp')) $('product-default-hpp').value = '';
+      if ($('product-default-harga-jual')) $('product-default-harga-jual').value = '';
       $('attribute-list').innerHTML = '';
       const defs = STATE.currentProduct.attributeDefinitions || [];
       if (defs.length) {
@@ -2258,12 +2928,16 @@
       const act = STATE.currentActivity;
       const barcode = $('form-barcode').textContent.trim();
 
+      // 1. Mode Kelola Data Produk (Create / Add Variants / Update Product)
       if (act === 'KelolaData') {
         if (!pelapor) {
           $('reporter-input').focus();
           return toast('Nama petugas wajib diisi.', 'error');
         }
         localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+
+        const default_hpp = Math.max(0, Number($('product-default-hpp')?.value) || 0);
+        const default_harga_jual = Math.max(0, Number($('product-default-harga-jual')?.value) || 0);
 
         if (!STATE.currentProduct) {
           const nama = $('product-name').value.trim();
@@ -2289,11 +2963,13 @@
             status_aktif: $('product-active').checked,
             attributes: defs,
             variants,
+            default_hpp,
+            default_harga_jual,
             nama_pelapor: pelapor
           }, btn, 'Mendaftarkan produk baru...');
           if (res) {
             toast(res.message);
-            showScreen('home');
+            await openProductFormByBarcode(barcode);
           }
           return;
         }
@@ -2315,6 +2991,8 @@
             barcode,
             attributes: defs,
             variants,
+            default_hpp,
+            default_harga_jual,
             nama_pelapor: pelapor
           }, btn, 'Menambahkan varian baru...');
           if (res) {
@@ -2344,6 +3022,41 @@
         return;
       }
 
+      // 2. Mode Bulk Barang Keluar Multi-Produk (SAVE_BULK_KELUAR)
+      if (act === 'Keluar') {
+        if (!STATE.keluarCart.length) {
+          return toast('Keranjang barang keluar masih kosong. Klik "+ Tambah ke Daftar Keluar" terlebih dahulu.', 'error');
+        }
+        if (!pelapor) {
+          $('reporter-input').focus();
+          return toast('Nama petugas wajib diisi.', 'error');
+        }
+        localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+
+        const batchId = 'BLK-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase();
+        const res = await postApi('SAVE_BULK_KELUAR', {
+          batch_id: batchId,
+          nama_pelapor: pelapor,
+          lokasi_asal: STATE.locFrom || (STATE.locations[0] && STATE.locations[0].value) || 'Rak Utama',
+          items: STATE.keluarCart.map(it => ({
+            barcode: it.barcode,
+            variant_id: it.variant_id,
+            qty: it.qty,
+            harga_jual: it.harga_jual
+          }))
+        }, btn, 'Memproses semua barang keluar...');
+
+        if (res) {
+          STATE.keluarCart = [];
+          updateHomeBadges();
+          toast(res.message);
+          await syncBootstrap(true);
+          showScreen('home');
+        }
+        return;
+      }
+
+      // 3. Mode Opname & Mutasi Rak
       if (!STATE.selectedVariant) return toast('Pilih warna/ukuran produk terlebih dahulu.', 'error');
 
       const rawQty = $('qty-input').value.trim();
@@ -2391,7 +3104,6 @@
           nama_pelapor: pelapor
         }, btn, 'Menyimpan hitungan stok...');
         if (res) {
-          // P2-4: Catat progres scan lokal untuk sesi opname aktif
           recordOpnameScannedItem(sessionId, barcode, variantId, productName, variantLabel, qty);
           toast(res.message);
           startScanScreen('Opname');
@@ -2404,22 +3116,8 @@
         return toast('Jumlah barang minimal 1 pcs.', 'error');
       }
 
-      const variantStocks = STATE.selectedVariant.stocks || {};
-      let payloadLocFrom = '';
-      let payloadLocTo = '';
-
-      if (act === 'Masuk') {
-        if (!STATE.locTo) return toast('Pilih lokasi rak tujuan terlebih dahulu.', 'error');
-        payloadLocTo = STATE.locTo;
-      } else if (act === 'Keluar') {
-        if (!STATE.locFrom) return toast('Pilih lokasi rak asal terlebih dahulu.', 'error');
-        const availStock = Number(variantStocks[STATE.locFrom]) || 0;
-        if (qty > availStock) {
-          $('qty-input').focus();
-          return toast(`Stok di ${STATE.locFrom} tidak mencukupi (Tersedia: ${availStock} pcs).`, 'error');
-        }
-        payloadLocFrom = STATE.locFrom;
-      } else if (act === 'Mutasi') {
+      if (act === 'Mutasi') {
+        const variantStocks = STATE.selectedVariant.stocks || {};
         if (!STATE.locFrom || !STATE.locTo) return toast('Pilih rak asal dan rak tujuan terlebih dahulu.', 'error');
         if (STATE.locFrom === STATE.locTo) {
           return toast('Rak asal dan rak tujuan tidak boleh sama.', 'error');
@@ -2429,26 +3127,24 @@
           $('qty-input').focus();
           return toast(`Stok di ${STATE.locFrom} tidak mencukupi untuk dipindah (Tersedia: ${availStock} pcs).`, 'error');
         }
-        payloadLocFrom = STATE.locFrom;
-        payloadLocTo = STATE.locTo;
-      }
 
-      localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
+        localStorage.setItem(REPORTER_STORAGE_KEY, pelapor);
 
-      const res = await postApi('SAVE_TRANSACTION', {
-        transaction_id: 'TRX-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
-        activity: act,
-        barcode,
-        variant_id: STATE.selectedVariant.id,
-        location_from: payloadLocFrom,
-        location_to: payloadLocTo,
-        qty,
-        nama_pelapor: pelapor
-      }, btn, 'Menyimpan catatan...');
+        const res = await postApi('SAVE_TRANSACTION', {
+          transaction_id: 'TRX-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6).toUpperCase(),
+          activity: 'Mutasi',
+          barcode,
+          variant_id: STATE.selectedVariant.id,
+          location_from: STATE.locFrom,
+          location_to: STATE.locTo,
+          qty,
+          nama_pelapor: pelapor
+        }, btn, 'Menyimpan pindah rak...');
 
-      if (res) {
-        toast(res.message);
-        showScreen('home');
+        if (res) {
+          toast(res.message);
+          showScreen('home');
+        }
       }
     });
 
@@ -2462,9 +3158,13 @@
       }
       box.innerHTML = STATE.opnameSessions.map(s => {
         const prog = getOpnameSessionProgress(s.session_id);
-        const progLabel = prog.variantCount > 0
-          ? `Tercatat di perangkat ini: ${prog.variantCount} varian (${prog.totalQty.toLocaleString('id-ID')} pcs)`
-          : 'Belum ada scan di perangkat ini';
+        const srvCount = Number(s.counted_variants) || 0;
+        const srvQty = Number(s.total_counted_qty) || 0;
+        const totalVar = Math.max(srvCount, prog.variantCount);
+        const totalQty = Math.max(srvQty, prog.totalQty);
+        const progLabel = totalVar > 0
+          ? `Tercatat: ${totalVar} varian (${totalQty.toLocaleString('id-ID')} pcs)`
+          : 'Belum ada item terhitung';
         return `
           <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm space-y-2.5">
             <div class="flex items-start justify-between gap-2">
@@ -2502,21 +3202,28 @@
         btn.addEventListener('click', async () => {
           const sessionId = btn.dataset.approveOpname;
           const sesi = STATE.opnameSessions.find(x => x.session_id === sessionId);
-          const pelapor = $('opname-session-user').value.trim() || $('reporter-input').value.trim();
+          let pelapor = $('opname-session-user').value.trim() || $('reporter-input').value.trim();
           if (!pelapor) {
-            $('opname-session-user').focus();
-            return toast('Isi Nama Petugas terlebih dahulu sebelum menyelesaikan sesi.', 'error');
+            const prompted = window.prompt('Masukkan Nama Petugas Penutup Sesi Opname:', localStorage.getItem(REPORTER_STORAGE_KEY) || '');
+            pelapor = (prompted || '').trim();
+          }
+          if (!pelapor) {
+            return toast('Nama petugas penutup wajib diisi.', 'error');
           }
 
-          // P2-4: Sertakan rekap progres scan lokal pada dialog konfirmasi Selesai
           const prog = getOpnameSessionProgress(sessionId);
+          const srvCount = sesi ? (Number(sesi.counted_variants) || 0) : 0;
+          const srvQty = sesi ? (Number(sesi.total_counted_qty) || 0) : 0;
+          const totalVar = Math.max(srvCount, prog.variantCount);
+          const totalQty = Math.max(srvQty, prog.totalQty);
+
           const previewList = prog.items.slice(0, 5)
             .map(it => `• ${it.nama} (${it.label}): ${it.qty} pcs`)
             .join('\n');
           const moreNote = prog.items.length > 5 ? `\n...dan ${prog.items.length - 5} varian lainnya.` : '';
-          const progressSummaryText = prog.variantCount > 0
-            ? `Progres Tercatat di Perangkat Ini: ${prog.variantCount} varian (Total ${prog.totalQty.toLocaleString('id-ID')} pcs)\n${previewList}${moreNote}\n\n`
-            : `Catatan Progres Lokal: 0 varian discan dari perangkat ini.\n\n`;
+          const progressSummaryText = totalVar > 0
+            ? `Total Tercatat: ${totalVar} varian (${totalQty.toLocaleString('id-ID')} pcs)\n${previewList}${moreNote}\n\n`
+            : `Belum ada item terhitung pada sesi ini.\n\n`;
 
           const labelSesi = sesi ? `${sesi.nama_sesi} (Rak: ${sesi.lokasi})` : sessionId;
           const okClose = window.confirm(
@@ -2664,7 +3371,7 @@
       $('tarif-warna').placeholder = 'Hitam, Putih, Cream';
       $('tarif-warna').value = '';
       $('tarif-ukuran-label').textContent = 'Pilihan Ukuran (Pisah Koma)';
-      $('tarif-ukuran').placeholder = 'S, M, L, XL';
+      $('tarif-ukuran').placeholder = 'ALLSIZE, L, XL';
       $('tarif-ukuran').value = '';
       $('tarif-upah').value = '';
       $('tarif-status-aktif').checked = true;
@@ -2794,13 +3501,14 @@
           const stokVar = STATE.stokTailor
             .filter(s => s.id_tailor === v.id_tailor)
             .reduce((a, b) => a + (Number(b.stok_ready) || 0), 0);
+          const polosVar = getGudangPolosStock(v.id_tailor);
           return `
             <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-2 text-xs">
               <div class="min-w-0 flex-1 pr-2">
                 <p class="font-bold text-slate-800">${escapeHtml(v.warna)} · ${escapeHtml(v.ukuran)}
                   ${v.status_aktif ? '' : '<span class="ml-1 rounded bg-rose-100 px-1.5 py-0.5 text-[9px] text-rose-700">NONAKTIF</span>'}
                 </p>
-                <p class="text-[11px] text-slate-500">Ongkos: <span class="font-bold text-indigo-700">${formatRp(v.upah_per_pcs)}</span>/pcs · Di Penjahit: <span class="font-bold text-emerald-700">${stokVar} pcs</span></p>
+                <p class="text-[11px] text-slate-500">Ongkos: <span class="font-bold text-indigo-700">${formatRp(v.upah_per_pcs)}</span>/pcs · Penjahit: <span class="font-bold text-emerald-700">${stokVar}</span> · Polos: <span class="font-bold text-teal-700">${polosVar}</span></p>
               </div>
               <button type="button" data-edit-tailor="${escapeHtml(v.id_tailor)}"
                 class="rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 shadow-xs ring-1 ring-slate-200">Ubah</button>
@@ -2814,7 +3522,7 @@
               <div>
                 <span class="rounded-md bg-indigo-50 px-2 py-0.5 font-mono text-[11px] font-extrabold text-indigo-700">${escapeHtml(grp.barcode_kategori)}</span>
                 <h4 class="mt-1 text-sm font-bold text-slate-900">${escapeHtml(grp.nama_kategori)}</h4>
-                <p class="text-[11px] text-slate-400">${grp.items.length} pilihan · Siap setor: ${totalStokSku} pcs</p>
+                <p class="text-[11px] text-slate-400">${grp.items.length} pilihan · Siap setor penjahit: ${totalStokSku} pcs</p>
               </div>
               <button type="button" data-add-var-sku="${escapeHtml(grp.barcode_kategori)}"
                 class="rounded-xl bg-indigo-50 px-2.5 py-1.5 text-[11px] font-bold text-indigo-700">+ Warna/Ukuran</button>
@@ -2864,18 +3572,55 @@
 
     $('master-tailor-search').addEventListener('input', renderMasterTailorList);
 
-    // ===== MODUL TERIMA SETORAN JAHITAN & QC =====
+    // ===== MODUL TERIMA SETORAN JAHITAN KE GUDANG POLOS =====
+    function renderGudangPolosSummaryCard() {
+      const totalPolos = STATE.gudangPolos.reduce((s, it) => s + (Number(it.stok_ready) || 0), 0);
+      if ($('gudang-polos-total-pcs')) {
+        $('gudang-polos-total-pcs').textContent = `${totalPolos.toLocaleString('id-ID')} pcs siap pesanan`;
+      }
+      const listEl = $('gudang-polos-stock-list');
+      if (!listEl) return;
+      if (!STATE.gudangPolos.length) {
+        listEl.innerHTML = '<p class="text-slate-400">Belum ada saldo kaos polos di Gudang Polos.</p>';
+        return;
+      }
+      listEl.innerHTML = STATE.gudangPolos.map(gp => `
+        <div class="flex items-center justify-between rounded-lg bg-slate-50 px-2.5 py-1.5">
+          <span class="truncate pr-2 text-slate-700">${escapeHtml(gp.nama_kategori)} · ${escapeHtml(gp.warna)} · ${escapeHtml(gp.ukuran)}</span>
+          <span class="shrink-0 font-bold text-teal-700">${Number(gp.stok_ready) || 0} pcs</span>
+        </div>
+      `).join('');
+    }
+
+    if ($('btn-toggle-polos-detail')) {
+      $('btn-toggle-polos-detail').addEventListener('click', () => {
+        const listEl = $('gudang-polos-stock-list');
+        if (!listEl) return;
+        const isHidden = listEl.classList.toggle('hidden');
+        $('btn-toggle-polos-detail').textContent = isHidden ? 'Lihat Rincian' : 'Tutup Rincian';
+      });
+    }
+
     async function loadStokTailorFresh() {
       $('qc-loading').classList.remove('hidden');
       try {
-        const res = await fetch(`${GAS_URL}?action=GET_STOK_TAILOR&_t=${Date.now()}`);
-        const json = await res.json();
-        if (json.success && json.data && Array.isArray(json.data.items)) {
-          STATE.stokTailor = json.data.items;
-          updateHomeBadges();
+        const [resTailor, resPolos] = await Promise.all([
+          fetch(`${GAS_URL}?action=GET_STOK_TAILOR&_t=${Date.now()}`),
+          fetch(`${GAS_URL}?action=GET_GUDANG_POLOS&_t=${Date.now()}`)
+        ]);
+        const jsonTailor = await resTailor.json();
+        const jsonPolos = await resPolos.json();
+        if (jsonTailor.success && jsonTailor.data && Array.isArray(jsonTailor.data.items)) {
+          STATE.stokTailor = jsonTailor.data.items;
         }
+        if (jsonPolos.success && jsonPolos.data) {
+          if (Array.isArray(jsonPolos.data.gudang_polos)) STATE.gudangPolos = jsonPolos.data.gudang_polos;
+          if (Array.isArray(jsonPolos.data.polos_mappings)) STATE.polosMappings = jsonPolos.data.polos_mappings;
+        }
+        updateHomeBadges();
       } catch (e) { }
       $('qc-loading').classList.add('hidden');
+      renderGudangPolosSummaryCard();
       renderStokTailorList();
     }
 
@@ -2923,7 +3668,7 @@
           </div>
           <button type="button" data-select-qc="${idx}"
             class="mt-3 w-full rounded-xl bg-emerald-600 py-2.5 text-xs font-bold text-white shadow-sm active:scale-[.98]">
-            Terima & Masukkan ke Rak
+            Terima ke Gudang Polos
           </button>
         </div>
       `).join('');
@@ -2935,10 +3680,8 @@
       });
     }
 
-    async function openQcReceiveForm(item) {
+    function openQcReceiveForm(item) {
       STATE.selectedQcItem = item;
-      STATE.qcTargetProduct = null;
-      STATE.qcTargetVariantId = item.id_variasi_tujuan || '';
 
       $('qc-list-wrap').classList.add('hidden');
       $('tailor-filter-wrap').classList.add('hidden');
@@ -2953,17 +3696,11 @@
       $('qc-gagal').value = 0;
       $('qc-alasan-gagal').value = '';
       $('qc-reject-reason-wrap').classList.add('hidden');
-      $('qc-manual-barcode').value = item.barcode_produk_tujuan || '';
-      $('qc-wip-detail').classList.add('hidden');
 
       const savedAdmin = localStorage.getItem(REPORTER_STORAGE_KEY);
       if (savedAdmin && !$('qc-nama').value) $('qc-nama').value = savedAdmin;
 
       updateQcWagePreview();
-
-      if (item.barcode_produk_tujuan) {
-        await lookupQcTargetProduct(item.barcode_produk_tujuan, item.id_variasi_tujuan);
-      }
     }
 
     function updateQcWagePreview() {
@@ -2973,74 +3710,21 @@
       const gagal = Math.max(0, Number($('qc-gagal').value) || 0);
       const sisa = Math.max(0, (Number(it.stok_ready) || 0) - (lolos + gagal));
       const upah = lolos * (Number(it.upah_per_pcs) || 0);
+      const currentPolos = getGudangPolosStock(it.id_tailor);
 
       $('qc-upah-preview').textContent = formatRp(upah);
       $('qc-sisa-stok-text').textContent = `Sisa di penjahit: ${sisa} pcs`;
+      if ($('qc-gudang-polos-after-text')) {
+        $('qc-gudang-polos-after-text').textContent = `Gudang Polos: ${currentPolos} → ${currentPolos + lolos} pcs`;
+      }
       if (gagal > 0) $('qc-reject-reason-wrap').classList.remove('hidden');
       else $('qc-reject-reason-wrap').classList.add('hidden');
-
-      if ($('qc-warehouse-target-fields') && $('qc-no-stock-note')) {
-        if (lolos === 0 && gagal > 0) {
-          $('qc-warehouse-target-fields').classList.add('hidden');
-          $('qc-no-stock-note').classList.remove('hidden');
-        } else {
-          $('qc-warehouse-target-fields').classList.remove('hidden');
-          $('qc-no-stock-note').classList.add('hidden');
-        }
-      }
     }
 
     $('qc-lolos').addEventListener('input', updateQcWagePreview);
     $('qc-gagal').addEventListener('input', updateQcWagePreview);
 
     $('btn-cancel-qc-form').addEventListener('click', goBackInApp);
-
-    $('btn-scan-wip').addEventListener('click', () => {
-      STATE.scanContext = 'qc-target';
-      startScanScreen('qc-target');
-    });
-
-    $('btn-cari-qc-barcode').addEventListener('click', async () => {
-      const code = $('qc-manual-barcode').value.trim();
-      if (!code) return toast('Ketik barcode produk tujuan terlebih dahulu.', 'error');
-      await lookupQcTargetProduct(code);
-    });
-
-    async function lookupQcTargetProduct(barcode, preferredVariantId = '') {
-      const res = await postApi('GET_PRODUCT', { barcode, include_inactive: false }, null, 'Mencari produk gudang...');
-      if (!res || !res.data) return;
-
-      if (Array.isArray(res.data.locations) && res.data.locations.length) {
-        STATE.locations = res.data.locations;
-        populateLocationSelects();
-      }
-
-      STATE.qcTargetProduct = res.data;
-      const variants = res.data.variants || [];
-      if (preferredVariantId && variants.some(v => v.id === preferredVariantId)) {
-        STATE.qcTargetVariantId = preferredVariantId;
-      } else if (variants.length) {
-        STATE.qcTargetVariantId = variants[0].id;
-      }
-
-      $('qc-wip-detail').classList.remove('hidden');
-      $('qc-wip-prod-name').textContent = res.data.nama;
-      $('qc-wip-prod-code').textContent = res.data.barcode;
-
-      $('qc-wip-variants').innerHTML = variants.map(v => `
-        <button type="button" data-qc-var="${escapeHtml(v.id)}"
-          class="choice-btn mr-1.5 mb-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-bold ${STATE.qcTargetVariantId === v.id ? 'selected' : ''}">
-          ${escapeHtml(v.label || 'Standar')}
-        </button>
-      `).join('');
-
-      $('qc-wip-variants').querySelectorAll('button').forEach(b => {
-        b.addEventListener('click', () => {
-          STATE.qcTargetVariantId = b.dataset.qcVar;
-          lookupQcTargetProduct(res.data.barcode, STATE.qcTargetVariantId);
-        });
-      });
-    }
 
     $('form-qc').addEventListener('submit', async e => {
       e.preventDefault();
@@ -3083,38 +3767,6 @@
         return toast('Isi nama petugas penerima.', 'error');
       }
 
-      if (qty_lolos > 0) {
-        if (!STATE.qcTargetProduct || !STATE.qcTargetVariantId) {
-          return toast('Pilih produk & warna/ukuran tujuan di rak.', 'error');
-        }
-        if (!$('qc-lokasi-tujuan').value) {
-          return toast('Pilih lokasi rak tujuan.', 'error');
-        }
-
-        const targetVar = (STATE.qcTargetProduct.variants || []).find(v => v.id === STATE.qcTargetVariantId);
-        if (targetVar) {
-          const attrValues = Object.values(targetVar.attributes || {}).map(v => String(v).trim().toLowerCase());
-          const targetLabelLower = String(targetVar.label || '').toLowerCase();
-          const tailorColor = String(it.warna || '').trim().toLowerCase();
-          const tailorSize = String(it.ukuran || '').trim().toLowerCase();
-
-          const isColorMatch = !tailorColor || tailorColor === '-' ||
-            attrValues.includes(tailorColor) || targetLabelLower.includes(tailorColor);
-          const isSizeMatch = !tailorSize || tailorSize === '-' ||
-            attrValues.includes(tailorSize) || targetLabelLower.includes(tailorSize);
-
-          if (!isColorMatch || !isSizeMatch) {
-            const okMismatch = window.confirm(
-              `Peringatan Ketidaksesuaian Varian!\n\n` +
-              `Setoran Penjahit: ${it.nama_kategori} · ${it.warna} · ${it.ukuran}\n` +
-              `Varian Gudang Dipilih: ${STATE.qcTargetProduct.nama} (${targetVar.label || 'Standar'})\n\n` +
-              `Warna atau ukuran tampak berbeda. Yakin tetap masukkan ke varian gudang tersebut?`
-            );
-            if (!okMismatch) return;
-          }
-        }
-      }
-
       localStorage.setItem(REPORTER_STORAGE_KEY, nama_penerima);
 
       const res = await postApi('TRANSFER_TAILOR_TO_WAREHOUSE', {
@@ -3124,11 +3776,8 @@
         qty_lolos,
         qty_gagal,
         alasan_gagal,
-        barcode_produk_tujuan: qty_lolos > 0 && STATE.qcTargetProduct ? STATE.qcTargetProduct.barcode : '',
-        id_variasi_tujuan: qty_lolos > 0 ? STATE.qcTargetVariantId : '',
-        lokasi_tujuan: qty_lolos > 0 ? $('qc-lokasi-tujuan').value : '',
         nama_penerima
-      }, $('btn-submit-qc'), 'Memasukkan ke rak & mencatat upah...');
+      }, $('btn-submit-qc'), 'Memindahkan ke Gudang Polos & mencatat upah...');
 
       if (res) {
         toast(res.message);
@@ -3148,6 +3797,11 @@
         const json = await res.json();
         if (json.success && json.data) {
           STATE.unpaidUpah = json.data;
+          STATE.unpaidSummary = {
+            grand_total_upah: json.data.grand_total_upah || 0,
+            total_penjahit: json.data.total_penjahit || 0
+          };
+          updateHomeBadges();
         }
       } catch (e) { }
       $('upah-loading').classList.add('hidden');
@@ -3310,6 +3964,16 @@
       startScanScreen('pricing');
     });
 
+    function getPricingReporterName() {
+      const inp = $('pricing-reporter-input');
+      const val = inp ? inp.value.trim() : '';
+      if (val) {
+        localStorage.setItem(REPORTER_STORAGE_KEY, val);
+        return val;
+      }
+      return '';
+    }
+
     async function loadProductForPricing(barcode) {
       const res = await postApi('GET_PRODUCT', { barcode, include_inactive: false }, null, 'Memuat daftar harga...');
       if (!res || !res.data) return;
@@ -3341,6 +4005,12 @@
 
       $('pricing-variant-list').querySelectorAll('button[data-save-var-price]').forEach(btn => {
         btn.addEventListener('click', async () => {
+          const pelapor = getPricingReporterName();
+          if (!pelapor) {
+            $('pricing-reporter-input')?.focus();
+            return toast('Isi Nama Petugas Pengubah Harga terlebih dahulu.', 'error');
+          }
+
           const vid = btn.dataset.saveVarPrice;
           const hppInp = document.querySelector(`.price-hpp-${vid}`);
           const jualInp = document.querySelector(`.price-jual-${vid}`);
@@ -3365,7 +4035,7 @@
           const upd = await postApi('UPDATE_VARIANT_PRICING', {
             barcode: res.data.barcode,
             items: [{ variant_id: vid, hpp, harga_jual }],
-            nama_pelapor: localStorage.getItem(REPORTER_STORAGE_KEY) || 'Admin'
+            nama_pelapor: pelapor
           }, btn, 'Menyimpan harga...');
           if (upd) toast(upd.message);
         });
@@ -3374,6 +4044,12 @@
 
     $('btn-apply-bulk-pricing').addEventListener('click', async () => {
       if (!STATE.pricingProduct) return;
+      const pelapor = getPricingReporterName();
+      if (!pelapor) {
+        $('pricing-reporter-input')?.focus();
+        return toast('Isi Nama Petugas Pengubah Harga terlebih dahulu.', 'error');
+      }
+
       const rawHpp = $('pricing-bulk-hpp').value.trim();
       const rawHarga = $('pricing-bulk-harga').value.trim();
 
@@ -3413,9 +4089,7 @@
         if (!okLoss) return;
       }
 
-      const pelapor = localStorage.getItem(REPORTER_STORAGE_KEY) || 'Admin';
       let res = null;
-
       if (parsedHpp !== null && parsedHarga !== null) {
         res = await postApi('SET_VARIANT_PRICING_BULK', {
           barcode: STATE.pricingProduct.barcode,
@@ -3462,41 +4136,43 @@
       btnInstall.classList.remove('hidden');
       btnInstall.classList.add('inline-flex');
 
-      window.addEventListener('beforeinstallprompt', e => {
-        e.preventDefault();
-        window.__deferredInstallPrompt = e;
-        btnInstall.classList.remove('hidden');
-        btnInstall.classList.add('inline-flex');
-      });
-
       btnInstall.addEventListener('click', async () => {
-        const promptEvent = window.__deferredInstallPrompt;
-        if (promptEvent) {
-          await promptEvent.prompt();
-          const choice = await promptEvent.userChoice;
-          window.__deferredInstallPrompt = null;
-          if (choice && choice.outcome === 'accepted') {
-            btnInstall.classList.add('hidden');
-            btnInstall.classList.remove('inline-flex');
-          }
+        if (window.__deferredInstallPrompt) {
+          try {
+            window.__deferredInstallPrompt.prompt();
+            const choice = await window.__deferredInstallPrompt.userChoice;
+            window.__deferredInstallPrompt = null;
+            if (choice && choice.outcome === 'accepted') {
+              btnInstall.classList.add('hidden');
+              btnInstall.classList.remove('inline-flex');
+              toast('Aplikasi Gudang sedang dipasang di HP Anda.');
+            }
+          } catch (e) { }
           return;
         }
 
-        const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
-        if (stepsBox && modal) {
-          stepsBox.innerHTML = isIos
-            ? `<p><strong>1.</strong> Ketuk ikon <strong>Bagikan (Share ⬆️)</strong> di bagian bawah browser Safari.</p>
-               <p><strong>2.</strong> Gulir ke bawah lalu pilih <strong>Tambahkan ke Layar Utama (Add to Home Screen)</strong>.</p>
-               <p><strong>3.</strong> Ketuk <strong>Tambah (Add)</strong> di pojok kanan atas.</p>`
-            : `<p><strong>1.</strong> Ketuk ikon menu <strong>titik tiga (⋮)</strong> di pojok kanan atas browser Chrome/Edge.</p>
-               <p><strong>2.</strong> Pilih menu <strong>Install App</strong> atau <strong>Tambahkan ke Layar Utama</strong>.</p>
-               <p><strong>3.</strong> Konfirmasi dengan menekan <strong>Install</strong>.</p>`;
-          modal.classList.remove('hidden');
-          modal.classList.add('flex');
+        const ua = navigator.userAgent || '';
+        const isIos = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        if (isIos) {
+          stepsBox.innerHTML = `
+            <p class="font-bold text-slate-900">Untuk Pengguna iPhone / iPad (Safari):</p>
+            <p>1. Ketuk ikon <strong>Bagikan (Share)</strong> di bagian bawah layar Safari.</p>
+            <p>2. Geser ke bawah lalu pilih <strong>"Tambah ke Layar Utama" (Add to Home Screen)</strong>.</p>
+            <p>3. Ketuk <strong>Tambah (Add)</strong> di pojok kanan atas.</p>
+          `;
+        } else {
+          stepsBox.innerHTML = `
+            <p class="font-bold text-slate-900">Untuk Pengguna Android (Chrome):</p>
+            <p>1. Ketuk ikon <strong>titik tiga (⋮)</strong> di pojok kanan atas browser Chrome.</p>
+            <p>2. Pilih menu <strong>"Instal aplikasi"</strong> atau <strong>"Tambahkan ke Layar utama"</strong>.</p>
+            <p>3. Ketuk <strong>Instal</strong> untuk memasang ikon aplikasi di layar utama HP.</p>
+          `;
         }
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
       });
 
-      if (btnCloseGuide && modal) {
+      if (btnCloseGuide) {
         btnCloseGuide.addEventListener('click', () => {
           modal.classList.add('hidden');
           modal.classList.remove('flex');
@@ -3507,12 +4183,12 @@
         window.__deferredInstallPrompt = null;
         btnInstall.classList.add('hidden');
         btnInstall.classList.remove('inline-flex');
-        toast('Aplikasi Gudang berhasil dipasang.');
+        toast('Aplikasi Gudang berhasil terpasang!');
       });
     }
 
     // ===== INISIALISASI AWAL =====
-    document.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', () => {
       try {
         history.replaceState({ screen: 'home' }, '', '#home');
       } catch (e) { }
@@ -3520,20 +4196,21 @@
       initPwaInstallButton();
       loadOpnameScannedStore();
 
-      const savedReporter = localStorage.getItem(REPORTER_STORAGE_KEY);
-      if (savedReporter) {
-        if ($('reporter-input')) $('reporter-input').value = savedReporter;
-        if ($('opname-session-user')) $('opname-session-user').value = savedReporter;
-        if ($('qc-nama')) $('qc-nama').value = savedReporter;
+      const savedAdmin = localStorage.getItem(REPORTER_STORAGE_KEY);
+      if (savedAdmin) {
+        if ($('reporter-input')) $('reporter-input').value = savedAdmin;
+        if ($('opname-session-user')) $('opname-session-user').value = savedAdmin;
+        if ($('qc-nama')) $('qc-nama').value = savedAdmin;
+        if ($('pricing-reporter-input')) $('pricing-reporter-input').value = savedAdmin;
       }
-      const savedOpname = localStorage.getItem(OPNAME_SESSION_KEY);
-      if (savedOpname) {
-        try {
-          STATE.activeOpname = JSON.parse(savedOpname);
-        } catch (e) { }
-      }
+
+      try {
+        const savedOpname = localStorage.getItem(OPNAME_SESSION_KEY);
+        if (savedOpname) STATE.activeOpname = JSON.parse(savedOpname);
+      } catch (e) { }
+
       syncBootstrap(true);
-      setInterval(() => syncBootstrap(false), 25000);
+      setInterval(() => syncBootstrap(false), 30000);
     });
   </script>
 </body>

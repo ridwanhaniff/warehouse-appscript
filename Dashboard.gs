@@ -1,5 +1,5 @@
 /**
- * INA BASIC STORE - Executive Warehouse & Production Dashboard V6.2
+ * INA BASIC STORE - Executive Warehouse & Production Dashboard V6.4
  * Tata Letak Grid Eksekutif 2-Kolom Berdampingan (Side-by-Side Panels):
  * - Kanvas utama 15 kolom (A:O) dengan margin luar (A & O) serta pemisah tengah (H).
  * - Blok KPI Eksekutif 2x4 dengan aksen warna kategori & tipografi hierarkis.
@@ -14,10 +14,72 @@ function onOpen() {
     .addItem('Refresh Dashboard Ringkasan', 'buildDashboardSummary')
     .addItem('Tambah Lokasi Rak Baru', 'promptTambahLokasiRak')
     .addSeparator()
-    .addItem('Migrasi Aman ke Sheet Produksi (V6.2)', 'migrasiKeProduksi')
+    .addItem('Migrasi Aman ke Sheet Produksi (V6.4)', 'migrasiKeProduksi')
     .addItem('Jalankan Setup / Perbarui Struktur', 'setup')
     .addItem('Hapus Tab Lama Tidak Terpakai', 'hapusTabTidakTerpakai')
     .addToUi();
+}
+
+function parseSheetDateV2_(raw) {
+  if (raw instanceof Date) return raw;
+  if (typeof raw === 'number' && isFinite(raw)) {
+    return new Date(Math.round((raw - 25569) * 86400 * 1000));
+  }
+  var str = textV2_(raw);
+  if (!str) return new Date(NaN);
+  var m = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})(?:[,\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?$/);
+  if (m) {
+    var day = parseInt(m[1], 10);
+    var month = parseInt(m[2], 10) - 1;
+    var year = parseInt(m[3], 10);
+    var hour = m[4] ? parseInt(m[4], 10) : 0;
+    var min = m[5] ? parseInt(m[5], 10) : 0;
+    var sec = m[6] ? parseInt(m[6], 10) : 0;
+    return new Date(year, month, day, hour, min, sec);
+  }
+  return new Date(str);
+}
+
+function markDashboardDirty_() {
+  try {
+    PropertiesService.getScriptProperties().setProperty('IBS_DASHBOARD_DIRTY', '1');
+  } catch (e) {}
+}
+
+function refreshDashboardIfDirty_() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var dash = ss.getSheetByName('DASHBOARD');
+  var props = PropertiesService.getScriptProperties();
+  var isDirty = props.getProperty('IBS_DASHBOARD_DIRTY') === '1';
+  var isMissingOrEmpty = !dash || dash.getLastRow() < 5;
+
+  if (!isDirty && !isMissingOrEmpty) {
+    return false;
+  }
+
+  buildDashboardSummary();
+  try {
+    props.deleteProperty('IBS_DASHBOARD_DIRTY');
+  } catch (e) {}
+  return true;
+}
+
+function installDashboardAutoTrigger_() {
+  try {
+    var handlerName = 'refreshDashboardIfDirty_';
+    var triggers = ScriptApp.getProjectTriggers();
+    var exists = triggers.some(function (t) {
+      return t.getHandlerFunction() === handlerName;
+    });
+    if (!exists) {
+      ScriptApp.newTrigger(handlerName)
+        .timeBased()
+        .everyMinutes(5)
+        .create();
+    }
+  } catch (e) {
+    console.warn('installDashboardAutoTrigger_:', e);
+  }
 }
 
 function buildDashboardSummary() {
@@ -41,7 +103,7 @@ function buildDashboardSummary() {
   };
 
   // ==========================================
-  // 1. PENGAMBILAN & AGREGASI DATA V6.2
+  // 1. PENGAMBILAN & AGREGASI DATA V6.4
   // ==========================================
   var masterRows = readObjectsV2_(ss.getSheetByName(IBS.SHEET_MASTER));
   var varRows = readObjectsV2_(ss.getSheetByName(IBS.SHEET_VARIANTS));
@@ -58,12 +120,12 @@ function buildDashboardSummary() {
   var curYear = now.getFullYear();
   var periodeLabel = Utilities.formatDate(now, 'Asia/Jakarta', 'MMMM yyyy');
 
-  // Master Produk
+  // Master Produk (toleransi sel Status_Aktif kosong = aktif)
   var masterMap = {};
   var activeSkuCount = 0;
   masterRows.forEach(function (m) {
     var bCode = upperV2_(m.Barcode);
-    var isAct = booleanV2_(m.Status_Aktif, false);
+    var isAct = booleanV2_(m.Status_Aktif, true);
     masterMap[bCode] = {
       barcode: textV2_(m.Barcode),
       nama: textV2_(m.Nama),
@@ -72,7 +134,7 @@ function buildDashboardSummary() {
     if (isAct) activeSkuCount++;
   });
 
-  // Variasi Produk & Kelengkapan Harga
+  // Variasi Produk & Kelengkapan Harga (toleransi sel Status_Aktif kosong = aktif)
   var variantMap = {};
   var activeVariantCount = 0;
   var missingPriceCount = 0;
@@ -83,7 +145,7 @@ function buildDashboardSummary() {
     var vid = textV2_(v.ID_Variasi);
     var bCode = textV2_(v.Barcode_Induk);
     var mInfo = masterMap[upperV2_(bCode)];
-    var active = booleanV2_(v.Status_Aktif, false) && (!mInfo || mInfo.aktif);
+    var active = booleanV2_(v.Status_Aktif, true) && (!mInfo || mInfo.aktif);
     var hpp = Number(v.HPP) || 0;
     var hj = Number(v.Harga_Jual) || 0;
 
@@ -167,7 +229,7 @@ function buildDashboardSummary() {
 
   logRows.forEach(function (lg) {
     if (upperV2_(lg.Aktivitas) !== 'KELUAR' || upperV2_(lg.Status) !== 'SUCCESS') return;
-    var ts = lg.Timestamp instanceof Date ? lg.Timestamp : new Date(lg.Timestamp);
+    var ts = parseSheetDateV2_(lg.Timestamp);
     if (isNaN(ts.getTime()) || ts.getMonth() !== curMonth || ts.getFullYear() !== curYear) return;
 
     var qty = Number(lg.Qty) || 0;
@@ -194,7 +256,7 @@ function buildDashboardSummary() {
     topSalesMap[vid].profit += profit;
   });
 
-  // Agregasi Gudang Penjahit (MASTER_TAILOR, STOK_TAILOR, LOG_TAILOR)
+  // Agregasi Gudang Penjahit vs Gudang Polos pada STOK_TAILOR
   var masterTailorMap = {};
   masterTailorRows.forEach(function (mt) {
     var idT = textV2_(mt.ID_Tailor);
@@ -209,7 +271,9 @@ function buildDashboardSummary() {
 
   var tailorSummaryMap = {};
   var totalStokTailor = 0;
+  var totalStokGudangPolos = 0;
   var totalEstUpahBerjalan = 0;
+  var gudangPolosNameUpper = upperV2_((typeof IBS !== 'undefined' && IBS.TAILOR_GUDANG_POLOS_NAME) ? IBS.TAILOR_GUDANG_POLOS_NAME : 'GUDANG POLOS');
 
   var ensureTailorSummary = function (namaRaw) {
     var nama = textV2_(namaRaw) || 'Tanpa Nama';
@@ -232,6 +296,14 @@ function buildDashboardSummary() {
   stokTailorRows.forEach(function (st) {
     var qty = Number(st.Stok_Ready) || 0;
     if (qty <= 0) return;
+
+    // Baris dengan Nama_Penjahit === "GUDANG POLOS" diakumulasikan ke totalStokGudangPolos
+    // dan tidak masuk ke tabel monitoring penjahit individual.
+    if (upperV2_(st.Nama_Penjahit) === gudangPolosNameUpper) {
+      totalStokGudangPolos += qty;
+      return;
+    }
+
     var idT = textV2_(st.ID_Tailor);
     var mtInfo = masterTailorMap[idT];
     var upahSat = mtInfo ? mtInfo.upah : 0;
@@ -256,7 +328,7 @@ function buildDashboardSummary() {
     var qtyBagus = Number(lt.Qty_Bagus) || 0;
     var qtyReject = Number(lt.Qty_Reject) || 0;
     var totUpah = Number(lt.Total_Upah) || 0;
-    var ts = lt.Waktu instanceof Date ? lt.Waktu : new Date(lt.Waktu);
+    var ts = parseSheetDateV2_(lt.Waktu);
     var isThisMonth = !isNaN(ts.getTime()) && ts.getMonth() === curMonth && ts.getFullYear() === curYear;
 
     if (jenis === 'TRANSFER_GUDANG') {
@@ -358,7 +430,7 @@ function buildDashboardSummary() {
   dash.setRowHeight(2, 38);
 
   dash.getRange('B3:N3').merge()
-    .setValue('  Periode Laporan: ' + periodeLabel + '   •   Diperbarui: ' + Utilities.formatDate(now, 'Asia/Jakarta', 'dd MMM yyyy HH:mm:ss') + ' WIB   •   Sistem Gudang & Penjahit V6.2')
+    .setValue('  Periode Laporan: ' + periodeLabel + '   •   Diperbarui: ' + Utilities.formatDate(now, 'Asia/Jakarta', 'dd MMM yyyy HH:mm:ss') + ' WIB   •   Sistem Gudang & Penjahit V6.4')
     .setFontSize(9).setFontColor('#cbd5e1')
     .setBackground('#1e293b')
     .setHorizontalAlignment('left').setVerticalAlignment('middle');
@@ -411,7 +483,7 @@ function buildDashboardSummary() {
   dash.setRowHeight(8, 20);
   dash.setRowHeight(9, 10);
 
-  renderModernKpi_(10, 2, 3, 'STOK SIAP DI PENJAHIT (TAILOR)', totalStokTailor, '#,##0" Pcs"', activeTailorCount + ' Penjahit · Est. Upah: ' + fmtIdr_(totalEstUpahBerjalan), '#0d9488');
+  renderModernKpi_(10, 2, 3, 'STOK SIAP DI PENJAHIT (TAILOR)', totalStokTailor, '#,##0" Pcs"', activeTailorCount + ' Penjahit · Gudang Polos Siap Pakai: ' + fmtNum_(totalStokGudangPolos) + ' Pcs', '#0d9488');
   renderModernKpi_(10, 5, 3, 'TAGIHAN UPAH BELUM BAYAR (UNPAID)', totalUnpaidUpah, '"Rp "#,##0', unpaidTailorCount + ' Penjahit Menunggu Slip Gaji', '#7c3aed');
   renderModernKpi_(10, 9, 3, 'SETORAN LOLOS QC (' + periodeLabel.toUpperCase() + ')', qcLolosBulanIni, '#,##0" Pcs"', 'Reject: ' + qcRejectBulanIni + ' Pcs · Lunas: ' + fmtIdr_(paidUpahBulanIni), '#334155');
   renderModernKpi_(10, 12, 3, 'KONTROL STOK & AUDIT DATA', lowStockOnlyCount + ' Item Menipis', null, missingPriceCount + ' Harga Kosong · ' + activeOpnameCount + ' Opname Aktif', '#d97706');
@@ -717,7 +789,7 @@ function buildDashboardSummary() {
 
   var recentEvents = [];
   logRows.slice(-15).forEach(function (lg) {
-    var ts = lg.Timestamp instanceof Date ? lg.Timestamp : new Date(lg.Timestamp);
+    var ts = parseSheetDateV2_(lg.Timestamp);
     if (isNaN(ts.getTime())) return;
     recentEvents.push({
       ts: ts,
@@ -732,7 +804,7 @@ function buildDashboardSummary() {
   });
 
   logTailorRows.slice(-15).forEach(function (lt) {
-    var ts = lt.Waktu instanceof Date ? lt.Waktu : new Date(lt.Waktu);
+    var ts = parseSheetDateV2_(lt.Waktu);
     if (isNaN(ts.getTime())) return;
     recentEvents.push({
       ts: ts,
@@ -797,8 +869,12 @@ function buildDashboardSummary() {
   dash.setFrozenRows(3);
   dash.setFrozenColumns(0);
 
+  try {
+    PropertiesService.getScriptProperties().deleteProperty('IBS_DASHBOARD_DIRTY');
+  } catch (e) {}
+
   SpreadsheetApp.flush();
   try {
-    ss.toast('Dashboard Eksekutif Grid 2-Kolom V6.2 berhasil diperbarui.', 'Ina Basic Store', 4);
+    ss.toast('Dashboard Eksekutif Grid 2-Kolom V6.4 berhasil diperbarui.', 'Ina Basic Store', 4);
   } catch (e) {}
 }
