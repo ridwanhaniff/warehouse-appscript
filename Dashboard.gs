@@ -1,10 +1,10 @@
 /**
- * INA BASIC STORE - Executive Warehouse & Production Dashboard V6.5 (100% Made-to-Order / Gudang Polos)
+ * INA BASIC STORE - Executive Warehouse & Production Dashboard V6.6 (100% Made-to-Order / Gudang Polos)
  * Tata Letak Grid Eksekutif 2-Kolom Berdampingan (Side-by-Side Panels):
  * - Kanvas utama 15 kolom (A:O) dengan margin luar (A & O) serta pemisah tengah (H).
  * - Blok KPI Eksekutif 2x4 berfokus pada Saldo Gudang Polos, Stok Penjahit, Omzet/Profit, & Audit Polos Menipis.
- * - Band 1 (Kiri vs Kanan): Monitoring Stok Penjahit & Upah  ||  Rekap Saldo Gudang Polos per Kategori.
- * - Band 2 (Kiri vs Kanan): Top 10 Produk Terlaris Bulan Ini ||  Peringatan Stok Menipis Gudang Polos (<= 5 Pcs).
+ * - Band 1 (Kiri vs Kanan): Monitoring Stok Penjahit & Upah (UPPERCASE) || Rekap Saldo Gudang Polos per Kategori.
+ * - Band 2 (Kiri vs Kanan): Top 10 Produk Terlaris Bulan Ini || Peringatan Stok Menipis Gudang Polos (<= 5 Pcs).
  * - Band 3 (Lebar Penuh B:N): 8 Log Aktivitas Terbaru (Pesanan Keluar & Gudang Penjahit).
  */
 
@@ -14,7 +14,7 @@ function onOpen() {
     .addItem('Refresh Dashboard Ringkasan', 'buildDashboardSummary')
     .addItem('Aktifkan Auto-Refresh Dashboard (5 Menit)', 'aktifkanAutoRefreshDashboard')
     .addSeparator()
-    .addItem('Migrasi Aman ke Sheet Produksi (V6.5)', 'migrasiKeProduksi')
+    .addItem('Migrasi Aman ke Sheet Produksi (V6.6)', 'migrasiKeProduksi')
     .addItem('Jalankan Setup / Perbarui Struktur', 'setup')
     .addItem('Hapus Tab Lama Tidak Terpakai', 'hapusTabTidakTerpakai')
     .addToUi();
@@ -252,8 +252,8 @@ function buildDashboardSummary() {
   var gudangPolosNameUpper = upperV2_((typeof IBS !== 'undefined' && IBS.TAILOR_GUDANG_POLOS_NAME) ? IBS.TAILOR_GUDANG_POLOS_NAME : 'GUDANG POLOS');
 
   var ensureTailorSummary = function (namaRaw) {
-    var nama = textV2_(namaRaw) || 'Tanpa Nama';
-    var key = upperV2_(nama);
+    var nama = upperV2_(namaRaw) || 'TANPA NAMA';
+    var key = nama;
     if (!tailorSummaryMap[key]) {
       tailorSummaryMap[key] = {
         nama_penjahit: nama,
@@ -377,6 +377,9 @@ function buildDashboardSummary() {
   });
 
   var activeOpnameCount = opnameRows.filter(function (o) { return upperV2_(o.Status) === 'ACTIVE'; }).length;
+  var activePolosOpnameCount = opnameRows.filter(function (o) {
+    return upperV2_(o.Status) === 'ACTIVE' && upperV2_(o.Lokasi) === gudangPolosNameUpper;
+  }).length;
   var avgMargin = pricedVariantCount > 0 ? (totalMarginPctSum / pricedVariantCount) : 0;
   var mappedVariantCount = mappingRows.filter(function (m) { return textV2_(m.Barcode_Produk) !== '' && textV2_(m.ID_Tailor) !== ''; }).length;
 
@@ -418,7 +421,7 @@ function buildDashboardSummary() {
   dash.setRowHeight(2, 38);
 
   dash.getRange('B3:N3').merge()
-    .setValue('  Periode Laporan: ' + periodeLabel + '   •   Diperbarui: ' + Utilities.formatDate(now, 'Asia/Jakarta', 'dd MMM yyyy HH:mm:ss') + ' WIB   •   Sistem 100% Made-to-Order V6.5')
+    .setValue('  Periode Laporan: ' + periodeLabel + '   •   Diperbarui: ' + Utilities.formatDate(now, 'Asia/Jakarta', 'dd MMM yyyy HH:mm:ss') + ' WIB   •   Sistem 100% Made-to-Order V6.6' + (activeOpnameCount > 0 ? '   •   Opname Aktif: ' + activeOpnameCount + ' Sesi' : ''))
     .setFontSize(9).setFontColor('#cbd5e1')
     .setBackground('#1e293b')
     .setHorizontalAlignment('left').setVerticalAlignment('middle');
@@ -474,7 +477,7 @@ function buildDashboardSummary() {
   renderModernKpi_(10, 2, 3, 'TAGIHAN UPAH BELUM BAYAR (UNPAID)', totalUnpaidUpah, '"Rp "#,##0', unpaidTailorCount + ' Penjahit Menunggu Slip Gaji', '#7c3aed');
   renderModernKpi_(10, 5, 3, 'SETORAN LOLOS QC (' + periodeLabel.toUpperCase() + ')', qcLolosBulanIni, '#,##0" Pcs"', 'Reject: ' + qcRejectBulanIni + ' Pcs · Lunas: ' + fmtIdr_(paidUpahBulanIni), '#334155');
   renderModernKpi_(10, 9, 3, 'KATALOG DESAIN & TAUTAN POLOS', activeVariantCount + ' Variasi', null, activeSkuCount + ' Desain · ' + mappedVariantCount + ' Tautan Polos Aktif', '#4f46e5');
-  renderModernKpi_(10, 12, 3, 'STOK MENIPIS GUDANG POLOS (<= 5 PCS)', lowPolosCount + ' Varian Polos', null, outOfStockPolosCount + ' Habis (0 Pcs) · ' + missingPriceCount + ' Harga Kosong', '#d97706');
+  renderModernKpi_(10, 12, 3, 'STOK MENIPIS GUDANG POLOS (<= 5 PCS)', lowPolosCount + ' Varian Polos', null, outOfStockPolosCount + ' Habis (0 Pcs) · ' + (activePolosOpnameCount > 0 ? activePolosOpnameCount + ' Opname Polos Aktif' : missingPriceCount + ' Harga Kosong'), '#d97706');
 
   dash.setRowHeight(10, 5);
   dash.setRowHeight(11, 20);
@@ -799,10 +802,10 @@ function buildDashboardSummary() {
       modul: 'POLOS/JAHIT',
       aktivitas: textV2_(lt.Jenis_Aktivitas),
       detail: textV2_(lt.Detail_Item),
-      asal: textV2_(lt.Nama_Penjahit) || '-',
+      asal: upperV2_(lt.Nama_Penjahit) || '-',
       tujuan: textV2_(lt.Status_Upah) || '-',
       qty: Number(lt.Qty_Bagus) || 0,
-      pelapor: textV2_(lt.ID_Slip) || textV2_(lt.Nama_Penjahit) || '-'
+      pelapor: textV2_(lt.ID_Slip) || upperV2_(lt.Nama_Penjahit) || '-'
     });
   });
 
@@ -863,6 +866,6 @@ function buildDashboardSummary() {
 
   SpreadsheetApp.flush();
   try {
-    ss.toast('Dashboard Made-to-Order & Audit Gudang Polos V6.5 berhasil diperbarui.', 'Ina Basic Store', 4);
+    ss.toast('Dashboard Made-to-Order & Audit Gudang Polos V6.6 berhasil diperbarui.', 'Ina Basic Store', 4);
   } catch (e) {}
 }
