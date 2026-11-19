@@ -4,7 +4,7 @@
  * - Keamanan & Validasi: Sanitasi anti-formula injection (sanitizeSheetText_), validasi bilangan bulat, & format Rupiah
  * - Penguncian Harga Jual: Harga jual & HPP pada Barang Keluar diambil 100% dari VARIASI_PRODUK
  * - Konsolidasi Saldo Gudang Polos: Otomatis menggabungkan & menolkan baris duplikat GUDANG POLOS pada STOK_TAILOR
- * - Stock Opname Gudang Polos: Perhitungan & penyesuaian fisik langsung terhadap stok GUDANG POLOS (STOK_TAILOR)
+ * - Stock Opname Gudang Polos: Perhitungan & penyesuaian fisik langsung terhadap stok GUDANG POLOS (STOK_TAILOR) dengan atomic rollback
  * - Standardisasi Nama Upah: Seluruh nama penjahit & pelapor/admin upah diseragamkan ke HURUF BESAR (UPPERCASE)
  */
 
@@ -983,9 +983,7 @@ function createProductActionV2_(ss, payload) {
   var shMaster = ss.getSheetByName(IBS.SHEET_MASTER);
   var shAttrs = ss.getSheetByName(IBS.SHEET_ATTRIBUTES);
   var shVariants = ss.getSheetByName(IBS.SHEET_VARIANTS);
-  var shStock = ss.getSheetByName(IBS.SHEET_STOCK);
   var shLog = ss.getSheetByName(IBS.SHEET_LOG);
-  var activeLocs = getActiveLocationsV2_(ss);
   var now = new Date();
   var starts = [];
   try {
@@ -1003,8 +1001,8 @@ function createProductActionV2_(ss, payload) {
       applyRowCheckboxV2_(shAttrs, aStart, attrRows.length, 8);
     }
 
+    // Arsitektur 100% Made-to-Order: Tidak menulis baris bersaldo 0 ke STOK_VARIASI
     var variantRows = [];
-    var stockRows = [];
     var baseVarRow = shVariants.getLastRow() + 1;
     variants.forEach(function (v, idx) {
       var id = newVariantIdV2_();
@@ -1018,14 +1016,12 @@ function createProductActionV2_(ss, payload) {
         '=IF(I' + rNum + '>0, I' + rNum + '-H' + rNum + ', 0)',
         '=IF(I' + rNum + '>0, (I' + rNum + '-H' + rNum + ')/I' + rNum + ', 0)'
       ]);
-      activeLocs.forEach(function (loc) { stockRows.push([id, barcode, loc.value, 0, now]); });
     });
     var vStart = appendRowsV2_(shVariants, variantRows, starts);
     applyRowCheckboxV2_(shVariants, vStart, variantRows.length, 5);
     shVariants.getRange(vStart, 8, variantRows.length, 3).setNumberFormat('"Rp "#,##0');
     shVariants.getRange(vStart, 11, variantRows.length, 1).setNumberFormat('0.0%');
 
-    appendRowsV2_(shStock, stockRows, starts);
     var logNewStart = appendRowsV2_(shLog, [[now, trxId, 'ProdukBaru', barcode, '', '', 0, 'SUCCESS', '', name, '', '', name, pelapor, defaultHpp, defaultHargaJual, 0, 0]], starts);
     shLog.getRange(logNewStart, 15, 1, 4).setNumberFormat('"Rp "#,##0');
     SpreadsheetApp.flush();
@@ -1042,6 +1038,8 @@ function createProductActionV2_(ss, payload) {
       if (mapRes && mapRes.success) {
         autoMapInfo = mapRes.data;
         extraMsg = ' & otomatis ditautkan ke Gudang Polos (' + mapRes.data.matched_count + ' variasi).';
+      } else if (mapRes && !mapRes.success) {
+        extraMsg = ' (Peringatan Auto-Match Polos: ' + (mapRes.message || 'gagal menautkan otomatis') + ')';
       }
     }
 
@@ -1108,9 +1106,7 @@ function addVariantsActionV2_(ss, payload) {
 
   var shAttrs = ss.getSheetByName(IBS.SHEET_ATTRIBUTES);
   var shVariants = ss.getSheetByName(IBS.SHEET_VARIANTS);
-  var shStock = ss.getSheetByName(IBS.SHEET_STOCK);
   var shLog = ss.getSheetByName(IBS.SHEET_LOG);
-  var activeLocs = getActiveLocationsV2_(ss);
   var starts = [];
   var changedVariantRows = [];
   var now = new Date();
@@ -1136,7 +1132,8 @@ function addVariantsActionV2_(ss, payload) {
       applyRowCheckboxV2_(shAttrs, aStart, newAttrRows.length, 8);
     }
 
-    var vr = [], sr = [];
+    // Arsitektur 100% Made-to-Order: Tidak menulis baris bersaldo 0 ke STOK_VARIASI
+    var vr = [];
     var baseVarRow = shVariants.getLastRow() + 1;
     variants.forEach(function (v, idx) {
       var id = newVariantIdV2_();
@@ -1147,14 +1144,12 @@ function addVariantsActionV2_(ss, payload) {
         '=IF(I' + rNum + '>0, I' + rNum + '-H' + rNum + ', 0)',
         '=IF(I' + rNum + '>0, (I' + rNum + '-H' + rNum + ')/I' + rNum + ', 0)'
       ]);
-      activeLocs.forEach(function (loc) { sr.push([id, barcode, loc.value, 0, now]); });
     });
     var vStart = appendRowsV2_(shVariants, vr, starts);
     applyRowCheckboxV2_(shVariants, vStart, vr.length, 5);
     shVariants.getRange(vStart, 8, vr.length, 3).setNumberFormat('"Rp "#,##0');
     shVariants.getRange(vStart, 11, vr.length, 1).setNumberFormat('0.0%');
 
-    appendRowsV2_(shStock, sr, starts);
     var logAddVarStart = appendRowsV2_(shLog, [[now, trxId, 'TambahVariasi', barcode, '', '', 0, 'SUCCESS', '', product.name, '', '', product.name, pelapor, defaultHpp, defaultHargaJual, 0, 0]], starts);
     shLog.getRange(logAddVarStart, 15, 1, 4).setNumberFormat('"Rp "#,##0');
     SpreadsheetApp.flush();
@@ -1184,6 +1179,8 @@ function addVariantsActionV2_(ss, payload) {
       });
       if (mapRes && mapRes.success) {
         extraMsg = ' & otomatis ditautkan ke Gudang Polos (' + mapRes.data.matched_count + ' variasi).';
+      } else if (mapRes && !mapRes.success) {
+        extraMsg = ' (Peringatan Auto-Match Polos: ' + (mapRes.message || 'gagal menautkan otomatis') + ')';
       }
     }
 
@@ -2834,11 +2831,10 @@ function transferTailorToWarehouse_(ss, payload) {
   var ukuranLabel = textV2_(stokRec.Ukuran) || (masterRec ? textV2_(masterRec.Ukuran) : '-');
 
   var now = new Date();
-  var existingGudangPolos = stokRows.filter(function (r) {
-    return textV2_(r.ID_Tailor) === idTailor && isGudangPolosName_(r.Nama_Penjahit);
-  })[0];
+  // Audit BE-01: Gunakan findGudangPolosRowInStokTailor_ agar seluruh baris duplikat GUDANG POLOS ikut terkonsolidasi
+  var existingGudangPolos = findGudangPolosRowInStokTailor_(shStokTailor, idTailor);
 
-  var polosRollback = null;
+  var polosRollbacks = [];
   var appendStarts = [];
   var oldTailorQty = currentTailorQty;
   var oldTailorUpdated = shStokTailor.getRange(stokRec._row, 8).getValue();
@@ -2848,17 +2844,22 @@ function transferTailorToWarehouse_(ss, payload) {
     shStokTailor.getRange(stokRec._row, 7, 1, 2).setValues([[sisaStokTailor, now]]);
     shStokTailor.getRange(stokRec._row, 7).setNumberFormat('#,##0');
 
-    var stokGudangPolosBaru = existingGudangPolos ? (Number(existingGudangPolos.Stok_Ready) || 0) : 0;
+    var stokGudangPolosBaru = existingGudangPolos ? existingGudangPolos.stok_ready : 0;
     if (qtyLolos > 0) {
       if (existingGudangPolos) {
-        var oldPolosQty = Number(existingGudangPolos.Stok_Ready) || 0;
-        var oldPolosUpdated = shStokTailor.getRange(existingGudangPolos._row, 8).getValue();
-        stokGudangPolosBaru = oldPolosQty + qtyLolos;
-        shStokTailor.getRange(existingGudangPolos._row, 2, 1, 7).setValues([[
-          IBS.TAILOR_GUDANG_POLOS_NAME, barcodeKat, namaKat, warnaLabel, ukuranLabel, stokGudangPolosBaru, now
-        ]]);
-        shStokTailor.getRange(existingGudangPolos._row, 7).setNumberFormat('#,##0');
-        polosRollback = { type: 'update', row: existingGudangPolos._row, oldQty: oldPolosQty, oldUpdated: oldPolosUpdated };
+        stokGudangPolosBaru = existingGudangPolos.stok_ready + qtyLolos;
+        var gpRows = existingGudangPolos.rows || [existingGudangPolos.row];
+        for (var idx = 0; idx < gpRows.length; idx++) {
+          var targetRowNum = gpRows[idx];
+          var oldRowQty = Number(shStokTailor.getRange(targetRowNum, 7).getValue()) || 0;
+          var oldRowUpdated = shStokTailor.getRange(targetRowNum, 8).getValue();
+          var qtyToWrite = idx === 0 ? stokGudangPolosBaru : 0;
+          shStokTailor.getRange(targetRowNum, 2, 1, 7).setValues([[
+            IBS.TAILOR_GUDANG_POLOS_NAME, barcodeKat, namaKat, warnaLabel, ukuranLabel, qtyToWrite, now
+          ]]);
+          shStokTailor.getRange(targetRowNum, 7).setNumberFormat('#,##0');
+          polosRollbacks.push({ type: 'update', row: targetRowNum, oldQty: oldRowQty, oldUpdated: oldRowUpdated });
+        }
       } else {
         stokGudangPolosBaru = qtyLolos;
         var newPolosRow = shStokTailor.getLastRow() + 1;
@@ -2868,7 +2869,7 @@ function transferTailorToWarehouse_(ss, payload) {
         shStokTailor.getRange(newPolosRow, 1).setNumberFormat('@');
         shStokTailor.getRange(newPolosRow, 3).setNumberFormat('@');
         shStokTailor.getRange(newPolosRow, 7).setNumberFormat('#,##0');
-        polosRollback = { type: 'append', row: newPolosRow };
+        polosRollbacks.push({ type: 'append', row: newPolosRow });
       }
     }
 
@@ -2901,10 +2902,11 @@ function transferTailorToWarehouse_(ss, payload) {
       }
     };
   } catch (err) {
-    if (polosRollback) {
+    for (var rbIdx = polosRollbacks.length - 1; rbIdx >= 0; rbIdx--) {
+      var rbItem = polosRollbacks[rbIdx];
       try {
-        if (polosRollback.type === 'append') shStokTailor.deleteRow(polosRollback.row);
-        else shStokTailor.getRange(polosRollback.row, 7, 1, 2).setValues([[polosRollback.oldQty, polosRollback.oldUpdated]]);
+        if (rbItem.type === 'append') shStokTailor.deleteRow(rbItem.row);
+        else shStokTailor.getRange(rbItem.row, 7, 1, 2).setValues([[rbItem.oldQty, rbItem.oldUpdated]]);
       } catch (rbPolosErr) {}
     }
     rollbackAppendsV2_(appendStarts);
@@ -3003,51 +3005,71 @@ function generatePaySlip_(ss, payload) {
   var totalQtyReject = 0;
   var totalUpah = 0;
   var rincian = [];
+  var rowRollbacks = [];
+  var appendStarts = [];
 
-  matched.forEach(function (r) {
-    shLog.getRange(r._row, 4).setValue(namaPenjahit);
-    shLog.getRange(r._row, 11, 1, 2).setValues([['PAID', slipId]]);
-    shLog.getRange(r._row, 12).setNumberFormat('@');
-    var qBagus = Number(r.Qty_Bagus) || 0;
-    var qReject = Number(r.Qty_Reject) || 0;
-    var uTotal = Number(r.Total_Upah) || 0;
-    totalQtyBagus += qBagus;
-    totalQtyReject += qReject;
-    totalUpah += uTotal;
-    rincian.push({
-      log_id: textV2_(r.Log_ID),
-      waktu: r.Waktu,
-      detail_item: textV2_(r.Detail_Item),
-      qty_bagus: qBagus,
-      qty_reject: qReject,
-      upah_satuan: Number(r.Upah_Satuan) || 0,
-      total_upah: uTotal
+  try {
+    matched.forEach(function (r) {
+      rowRollbacks.push({
+        row: r._row,
+        oldNama: shLog.getRange(r._row, 4).getValue(),
+        oldStatus: shLog.getRange(r._row, 11).getValue(),
+        oldSlip: shLog.getRange(r._row, 12).getValue()
+      });
+      shLog.getRange(r._row, 4).setValue(namaPenjahit);
+      shLog.getRange(r._row, 11, 1, 2).setValues([['PAID', slipId]]);
+      shLog.getRange(r._row, 12).setNumberFormat('@');
+      var qBagus = Number(r.Qty_Bagus) || 0;
+      var qReject = Number(r.Qty_Reject) || 0;
+      var uTotal = Number(r.Total_Upah) || 0;
+      totalQtyBagus += qBagus;
+      totalQtyReject += qReject;
+      totalUpah += uTotal;
+      rincian.push({
+        log_id: textV2_(r.Log_ID),
+        waktu: r.Waktu,
+        detail_item: textV2_(r.Detail_Item),
+        qty_bagus: qBagus,
+        qty_reject: qReject,
+        upah_satuan: Number(r.Upah_Satuan) || 0,
+        total_upah: uTotal
+      });
     });
-  });
 
-  shLog.appendRow([
-    slipId, now, 'PEMBAYARAN_SLIP', namaPenjahit, '',
-    'Pelunasan ' + matched.length + ' transaksi oleh ' + namaAdmin,
-    totalQtyBagus, totalQtyReject, 0, totalUpah, 'PAID', slipId
-  ]);
-  shLog.getRange(shLog.getLastRow(), 7, 1, 4).setNumberFormat('#,##0');
+    var slipStart = appendRowsV2_(shLog, [[
+      slipId, now, 'PEMBAYARAN_SLIP', namaPenjahit, '',
+      'Pelunasan ' + matched.length + ' transaksi oleh ' + namaAdmin,
+      totalQtyBagus, totalQtyReject, 0, totalUpah, 'PAID', slipId
+    ]], appendStarts);
+    shLog.getRange(slipStart, 7, 1, 4).setNumberFormat('#,##0');
 
-  SpreadsheetApp.flush();
-  return {
-    success: true,
-    message: 'Slip Upah ' + slipId + ' berhasil diterbitkan & ditandai LUNAS (PAID).',
-    data: {
-      slip_id: slipId,
-      nama_penjahit: namaPenjahit,
-      tanggal_bayar: now.toISOString(),
-      dibayar_oleh: namaAdmin,
-      jumlah_item: matched.length,
-      total_qty_bagus: totalQtyBagus,
-      total_qty_reject: totalQtyReject,
-      total_upah: totalUpah,
-      rincian: rincian
+    SpreadsheetApp.flush();
+    return {
+      success: true,
+      message: 'Slip Upah ' + slipId + ' berhasil diterbitkan & ditandai LUNAS (PAID).',
+      data: {
+        slip_id: slipId,
+        nama_penjahit: namaPenjahit,
+        tanggal_bayar: now.toISOString(),
+        dibayar_oleh: namaAdmin,
+        jumlah_item: matched.length,
+        total_qty_bagus: totalQtyBagus,
+        total_qty_reject: totalQtyReject,
+        total_upah: totalUpah,
+        rincian: rincian
+      }
+    };
+  } catch (slipErr) {
+    for (var rbIdx = rowRollbacks.length - 1; rbIdx >= 0; rbIdx--) {
+      var rb = rowRollbacks[rbIdx];
+      try {
+        shLog.getRange(rb.row, 4).setValue(rb.oldNama);
+        shLog.getRange(rb.row, 11, 1, 2).setValues([[rb.oldStatus, rb.oldSlip]]);
+      } catch (e) {}
     }
-  };
+    rollbackAppendsV2_(appendStarts);
+    throw slipErr;
+  }
 }
 
 // ==========================================
@@ -3220,58 +3242,84 @@ function approveOpnameSession_(ss, payload) {
       });
     }
 
+    // Audit BE-02: Mekanisme atomic rollback penuh pada cabang GUDANG POLOS
+    var polosChanges = [];
+    var appendedPolosRows = [];
+    var appendLogStarts = [];
     var adjCount = 0;
-    counts.forEach(function (c) {
-      var idTailor = textV2_(c.ID_Variasi);
-      var sku = textV2_(c.Barcode);
-      var qtyFisik = Number(c.Qty_Fisik) || 0;
-      var qtySistem = Number(c.Qty_Sistem_Snapshot) || 0;
-      var diff = qtyFisik - qtySistem;
 
-      var existingPolos = findGudangPolosRowInStokTailor_(shStokTailor, idTailor);
-      if (existingPolos) {
-        var rList = existingPolos.rows || [existingPolos.row];
-        for (var idx = 0; idx < rList.length; idx++) {
-          shStokTailor.getRange(rList[idx], 7, 1, 2).setValues([[idx === 0 ? qtyFisik : 0, now]]);
-          shStokTailor.getRange(rList[idx], 7).setNumberFormat('#,##0');
+    try {
+      counts.forEach(function (c) {
+        var idTailor = textV2_(c.ID_Variasi);
+        var sku = textV2_(c.Barcode);
+        var qtyFisik = Number(c.Qty_Fisik) || 0;
+        var qtySistem = Number(c.Qty_Sistem_Snapshot) || 0;
+        var diff = qtyFisik - qtySistem;
+
+        var existingPolos = findGudangPolosRowInStokTailor_(shStokTailor, idTailor);
+        if (existingPolos) {
+          var rList = existingPolos.rows || [existingPolos.row];
+          for (var idx = 0; idx < rList.length; idx++) {
+            var targetRowNum = rList[idx];
+            var oldQty = Number(shStokTailor.getRange(targetRowNum, 7).getValue()) || 0;
+            var oldUpdated = shStokTailor.getRange(targetRowNum, 8).getValue();
+            shStokTailor.getRange(targetRowNum, 7, 1, 2).setValues([[idx === 0 ? qtyFisik : 0, now]]);
+            shStokTailor.getRange(targetRowNum, 7).setNumberFormat('#,##0');
+            polosChanges.push({ row: targetRowNum, oldQty: oldQty, oldUpdated: oldUpdated });
+          }
+        } else if (qtyFisik > 0) {
+          var mtInfo = mtMap[idTailor] || {};
+          var newRow = shStokTailor.getLastRow() + 1;
+          shStokTailor.getRange(newRow, 1, 1, 8).setValues([[
+            idTailor,
+            IBS.TAILOR_GUDANG_POLOS_NAME,
+            textV2_(mtInfo.Barcode_Kategori) || sku,
+            textV2_(mtInfo.Nama_Kategori) || sku,
+            textV2_(mtInfo.Warna) || '-',
+            textV2_(mtInfo.Ukuran) || '-',
+            qtyFisik,
+            now
+          ]]);
+          shStokTailor.getRange(newRow, 1).setNumberFormat('@');
+          shStokTailor.getRange(newRow, 3).setNumberFormat('@');
+          shStokTailor.getRange(newRow, 7).setNumberFormat('#,##0');
+          appendedPolosRows.push(newRow);
         }
-      } else if (qtyFisik > 0) {
-        var mtInfo = mtMap[idTailor] || {};
-        var newRow = shStokTailor.getLastRow() + 1;
-        shStokTailor.getRange(newRow, 1, 1, 8).setValues([[
-          idTailor,
-          IBS.TAILOR_GUDANG_POLOS_NAME,
-          textV2_(mtInfo.Barcode_Kategori) || sku,
-          textV2_(mtInfo.Nama_Kategori) || sku,
-          textV2_(mtInfo.Warna) || '-',
-          textV2_(mtInfo.Ukuran) || '-',
-          qtyFisik,
-          now
-        ]]);
-        shStokTailor.getRange(newRow, 1).setNumberFormat('@');
-        shStokTailor.getRange(newRow, 3).setNumberFormat('@');
-        shStokTailor.getRange(newRow, 7).setNumberFormat('#,##0');
+
+        if (diff !== 0) {
+          adjCount++;
+          var logId = 'OPN-' + Utilities.getUuid().substring(0, 8).toUpperCase();
+          var detailText = textV2_(c.Label_Variasi) + ' [Opname: ' + qtySistem + ' -> ' + qtyFisik + ' oleh ' + pelapor + ']';
+          var ltStart = appendRowsV2_(shLogTailor, [[
+            logId, now, 'OPNAME_POLOS', IBS.TAILOR_GUDANG_POLOS_NAME, idTailor,
+            detailText, diff, 0, 0, 0, 'OPNAME_ADJ', sessionId
+          ]], appendLogStarts);
+          shLogTailor.getRange(ltStart, 7, 1, 4).setNumberFormat('#,##0');
+          shLogTailor.getRange(ltStart, 12).setNumberFormat('@');
+        }
+      });
+
+      shSesi.getRange(sesi._row, 4).setValue('COMPLETED');
+      shSesi.getRange(sesi._row, 7).setValue(now);
+
+      SpreadsheetApp.flush();
+      return { success: true, message: 'Sesi opname Gudang Polos selesai & dikunci. ' + adjCount + ' penyesuaian stok dicatat.' };
+    } catch (polosErr) {
+      for (var cIdx = polosChanges.length - 1; cIdx >= 0; cIdx--) {
+        var ch = polosChanges[cIdx];
+        try {
+          shStokTailor.getRange(ch.row, 7, 1, 2).setValues([[ch.oldQty, ch.oldUpdated]]);
+        } catch (rbUpdateErr) {}
       }
-
-      if (diff !== 0) {
-        adjCount++;
-        var logId = 'OPN-' + Utilities.getUuid().substring(0, 8).toUpperCase();
-        var detailText = textV2_(c.Label_Variasi) + ' [Opname: ' + qtySistem + ' -> ' + qtyFisik + ' oleh ' + pelapor + ']';
-        shLogTailor.appendRow([
-          logId, now, 'OPNAME_POLOS', IBS.TAILOR_GUDANG_POLOS_NAME, idTailor,
-          detailText, diff, 0, 0, 0, 'OPNAME_ADJ', sessionId
-        ]);
-        var lastLt = shLogTailor.getLastRow();
-        shLogTailor.getRange(lastLt, 7, 1, 4).setNumberFormat('#,##0');
-        shLogTailor.getRange(lastLt, 12).setNumberFormat('@');
-      }
-    });
-
-    shSesi.getRange(sesi._row, 4).setValue('COMPLETED');
-    shSesi.getRange(sesi._row, 7).setValue(now);
-
-    SpreadsheetApp.flush();
-    return { success: true, message: 'Sesi opname Gudang Polos selesai & dikunci. ' + adjCount + ' penyesuaian stok dicatat.' };
+      appendedPolosRows.sort(function (a, b) { return b - a; });
+      appendedPolosRows.forEach(function (rDel) {
+        try {
+          shStokTailor.deleteRow(rDel);
+        } catch (rbDelErr) {}
+      });
+      rollbackAppendsV2_(appendLogStarts);
+      throw polosErr;
+    }
   }
 
   var shStock = ss.getSheetByName(IBS.SHEET_STOCK);
@@ -3301,7 +3349,6 @@ function approveOpnameSession_(ss, payload) {
     }
   });
 
-  var now = new Date();
   var changes = [];
   var logRows = [];
 
