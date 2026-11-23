@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-title" content="Ina Warehouse">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Ina Basic Store · Aplikasi Gudang</title>
-  <!-- Tangkap event beforeinstallprompt sejak awal di <head> dan pastikan manifest/SW valid -->
+  <!-- Tangkap event beforeinstallprompt sejak awal di <head> dan pastikan manifest/ikon valid untuk instalasi langsung -->
   <script>
     window.__deferredInstallPrompt = null;
     window.__appInstalled = false;
@@ -31,7 +31,7 @@
       btn.classList.remove('hidden');
       btn.classList.add('inline-flex');
       if (window.__deferredInstallPrompt && label) {
-        label.textContent = 'Pasang Sekarang';
+        label.textContent = 'Pasang Aplikasi';
         btn.classList.remove('bg-indigo-500', 'hover:bg-indigo-400');
         btn.classList.add('bg-emerald-500', 'hover:bg-emerald-400');
       }
@@ -41,6 +41,7 @@
       e.preventDefault();
       window.__deferredInstallPrompt = e;
       syncInstallButtonVisual();
+      window.dispatchEvent(new Event('ibs:installpromptready'));
     });
 
     window.addEventListener('appinstalled', function () {
@@ -49,7 +50,7 @@
       syncInstallButtonVisual();
     });
 
-    // Pastikan manifest & ikon valid agar Chrome/Edge selalu memicu instalasi langsung
+    // Pastikan manifest & ikon valid agar browser selalu mengizinkan instalasi langsung
     (function ensureInstallableManifest() {
       function makeAppIconDataUrl(size) {
         try {
@@ -73,30 +74,52 @@
         }
       }
 
+      function applyInlineManifest() {
+        var icon192 = makeAppIconDataUrl(192);
+        var icon512 = makeAppIconDataUrl(512);
+        if (!icon192) return;
+        var baseScope = new URL('./', location.href).href;
+        var manifestObj = {
+          id: baseScope,
+          name: 'Ina Basic Store · Aplikasi Gudang',
+          short_name: 'Ina Gudang',
+          start_url: location.href,
+          scope: baseScope,
+          display: 'standalone',
+          background_color: '#0f172a',
+          theme_color: '#0f172a',
+          icons: [
+            { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any' },
+            { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any' }
+          ]
+        };
+        var dataUri = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(manifestObj));
+        var existing = document.querySelector('link[rel="manifest"]');
+        if (existing) {
+          existing.href = dataUri;
+        } else {
+          var link = document.createElement('link');
+          link.rel = 'manifest';
+          link.href = dataUri;
+          document.head.appendChild(link);
+        }
+      }
+
       if (location.protocol.indexOf('http') === 0) {
         fetch('./manifest.webmanifest', { cache: 'no-store' })
-          .then(function (r) { if (!r.ok) throw new Error('missing'); })
+          .then(function (r) {
+            if (!r.ok) throw new Error('missing');
+            return r.json();
+          })
+          .then(function (manifestData) {
+            var icons = Array.isArray(manifestData && manifestData.icons) ? manifestData.icons : [];
+            if (!icons.length || !icons[0].src) throw new Error('no-icons');
+            return fetch(icons[0].src, { cache: 'no-store' }).then(function (iconRes) {
+              if (!iconRes.ok) throw new Error('broken-icon');
+            });
+          })
           .catch(function () {
-            var icon192 = makeAppIconDataUrl(192);
-            var icon512 = makeAppIconDataUrl(512);
-            if (!icon192) return;
-            var manifestObj = {
-              name: 'Ina Basic Store · Aplikasi Gudang',
-              short_name: 'Ina Gudang',
-              start_url: location.href,
-              scope: './',
-              display: 'standalone',
-              background_color: '#0f172a',
-              theme_color: '#0f172a',
-              icons: [
-                { src: icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
-                { src: icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
-              ]
-            };
-            var blob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
-            var blobUrl = URL.createObjectURL(blob);
-            var existing = document.querySelector('link[rel="manifest"]');
-            if (existing) existing.href = blobUrl;
+            applyInlineManifest();
           });
 
         if ('serviceWorker' in navigator) {
@@ -2359,29 +2382,43 @@
         }
       }
 
-      const opBanner = $('home-opname-banner');
-      const sess = STATE.activeOpname;
-      const scannedCount = getOpnameCountedVariants(sess);
+      const opnameBanner = $('home-opname-banner');
+      const counted = getOpnameCountedVariants(STATE.activeOpname);
+      const badgeText = `Tercatat: ${counted} varian`;
+      if ($('scan-opname-progress-badge')) $('scan-opname-progress-badge').textContent = badgeText;
+      if ($('form-opname-progress-badge')) $('form-opname-progress-badge').textContent = badgeText;
 
-      if (opBanner) {
-        if (sess) {
-          const creator = sess.dibuat_oleh || sess.petugas || '-';
-          $('home-opname-title').textContent = `${sess.nama_sesi || 'Opname Polos'} (${creator})`;
-          $('home-opname-progress-badge').textContent = `Tercatat: ${scannedCount} varian`;
-          opBanner.classList.remove('hidden');
+      if (opnameBanner) {
+        if (STATE.activeOpname) {
+          $('home-opname-title').textContent = STATE.activeOpname.nama_sesi || 'Sesi Opname Aktif';
+          if ($('home-opname-progress-badge')) $('home-opname-progress-badge').textContent = badgeText;
+          opnameBanner.classList.remove('hidden');
         } else {
-          opBanner.classList.add('hidden');
+          opnameBanner.classList.add('hidden');
         }
-      }
-      if ($('scan-opname-progress-badge')) {
-        $('scan-opname-progress-badge').textContent = `Tercatat: ${scannedCount} varian`;
-      }
-      if ($('form-opname-progress-badge')) {
-        $('form-opname-progress-badge').textContent = `Tercatat: ${scannedCount} varian`;
       }
     }
 
-    // ===== INSTALASI APLIKASI (PWA 1-KLIK LANGSUNG) =====
+    // ===== INSTALASI APLIKASI (PWA 1-KLIK LANGSUNG TANPA PANDUAN) =====
+    function waitForDeferredInstallPrompt(timeoutMs = 2500) {
+      if (window.__deferredInstallPrompt) {
+        return Promise.resolve(window.__deferredInstallPrompt);
+      }
+      return new Promise(resolve => {
+        let settled = false;
+        const done = promptObj => {
+          if (settled) return;
+          settled = true;
+          window.removeEventListener('ibs:installpromptready', onReady);
+          clearTimeout(timer);
+          resolve(promptObj || null);
+        };
+        const onReady = () => done(window.__deferredInstallPrompt);
+        const timer = setTimeout(() => done(window.__deferredInstallPrompt), timeoutMs);
+        window.addEventListener('ibs:installpromptready', onReady);
+      });
+    }
+
     async function triggerNativeInstallPrompt() {
       const isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
       if (isStandalone || window.__appInstalled) {
@@ -2389,49 +2426,57 @@
         return;
       }
 
-      if (window.__deferredInstallPrompt) {
-        try {
-          const promptEvent = window.__deferredInstallPrompt;
+      const btn = $('btn-install');
+      const label = $('btn-install-label');
+      const prevLabel = label ? label.textContent : 'Pasang Aplikasi';
+
+      if (btn) btn.disabled = true;
+      if (label && !window.__deferredInstallPrompt) label.textContent = 'Menyiapkan...';
+
+      try {
+        const promptEvent = await waitForDeferredInstallPrompt(2500);
+        if (promptEvent) {
           window.__deferredInstallPrompt = null;
           await promptEvent.prompt();
           const choice = await promptEvent.userChoice;
           if (choice && choice.outcome === 'accepted') {
             window.__appInstalled = true;
             syncInstallButtonVisual();
-            toast('Memasang aplikasi ke layar utama...', 'success');
+            toast('Memasang aplikasi ke perangkat...', 'success');
           } else {
             syncInstallButtonVisual();
           }
           return;
-        } catch (err) { }
-      }
+        }
 
-      const ua = navigator.userAgent || '';
-      const isInApp = /WhatsApp|FBAN|FBAV|Instagram|Line|MicroMessenger/i.test(ua);
-      const isIOS = /iPhone|iPad|iPod/i.test(ua);
-      const stepsEl = $('install-guide-steps');
+        const ua = navigator.userAgent || '';
+        const isAndroid = /Android/i.test(ua);
+        const isInApp = /WhatsApp|FBAN|FBAV|Instagram|Line|MicroMessenger/i.test(ua);
 
-      if (isInApp) {
-        stepsEl.innerHTML = `
-          <p class="font-bold text-rose-700">Anda membuka link dari dalam aplikasi chat/sosmed.</p>
-          <p>1. Ketuk ikon <strong>titik tiga (⋮)</strong> atau ikon <strong>Buka di Browser</strong> di pojok layar.</p>
-          <p>2. Pilih <strong>Buka di Chrome / Safari</strong>, lalu tekan <strong>Pasang Aplikasi</strong>.</p>
-        `;
-      } else if (isIOS) {
-        stepsEl.innerHTML = `
-          <p class="font-bold text-slate-900">Cara Pasang di iPhone / iPad (Safari):</p>
-          <p>1. Ketuk ikon <strong>Bagikan (Share)</strong> di bilah bawah Safari.</p>
-          <p>2. Pilih <strong>Tambah ke Layar Utama (Add to Home Screen)</strong>, lalu ketuk <strong>Tambah</strong>.</p>
-        `;
-      } else {
-        stepsEl.innerHTML = `
-          <p class="font-bold text-slate-900">Instalasi Cepat via Menu Browser:</p>
-          <p>1. Ketuk ikon <strong>titik tiga (⋮)</strong> di pojok kanan atas Chrome/Edge.</p>
-          <p>2. Pilih <strong>Tambahkan ke layar utama</strong> atau <strong>Instal aplikasi</strong>.</p>
-        `;
+        // Jika dibuka dari webview chat/sosmed di Android, langsung alihkan ke Google Chrome
+        if (isAndroid && isInApp && location.protocol.indexOf('http') === 0) {
+          const cleanUrl = location.href.replace(/^https?:\/\//i, '');
+          const scheme = location.protocol.replace(':', '');
+          location.href = `intent://${cleanUrl}#Intent;scheme=${scheme};package=com.android.chrome;end`;
+          return;
+        }
+
+        const isIOS = /iPhone|iPad|iPod/i.test(ua);
+        toast(
+          isIOS
+            ? 'Gunakan menu Bagikan (Share) → Tambah ke Layar Utama di Safari.'
+            : 'Pilih menu browser (⋮) → Instal Aplikasi untuk memasang langsung.',
+          'info'
+        );
+      } catch (err) {
+        toast('Pilih menu browser (⋮) → Instal Aplikasi untuk memasang langsung.', 'info');
+      } finally {
+        if (btn) btn.disabled = false;
+        if (label && !window.__appInstalled) {
+          label.textContent = prevLabel;
+          syncInstallButtonVisual();
+        }
       }
-      $('install-guide-modal').classList.remove('hidden');
-      $('install-guide-modal').classList.add('flex');
     }
 
     // ===== PROTEKSI PIN OWNER UNTUK RANGKUMAN (2460) =====
