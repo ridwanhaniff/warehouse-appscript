@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ibs-warehouse-v6-7';
+const CACHE_NAME = 'ibs-warehouse-v6-8';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {
@@ -25,7 +25,7 @@ self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  // Jangan cache permintaan API Google Apps Script
+  // Jangan cache permintaan API Google Apps Script agar data selalu real-time
   if (req.url.includes('script.google.com') || req.url.includes('script.googleusercontent.com')) {
     return;
   }

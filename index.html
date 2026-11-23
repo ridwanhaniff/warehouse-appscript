@@ -959,6 +959,10 @@
                   class="hidden w-full rounded-xl bg-indigo-600 py-2.5 text-xs font-bold text-white shadow-sm active:scale-[.98]">
                   + Buat Otomatis Varian Kurang &amp; Tautkan
                 </button>
+                <button type="button" id="btn-return-to-keluar"
+                  class="hidden w-full rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow-sm active:scale-[.98]">
+                  ← Lanjutkan ke Barang Keluar
+                </button>
               </div>
             </div>
 
@@ -1894,6 +1898,7 @@
       selectedAttributes: {},
       selectedVariant: null,
       isAddingVariants: false,
+      returnToKeluarAfterMapping: false,
       attributeMatrixCombos: [],
       keluarCart: [],
       selectedQcItem: null,
@@ -2011,6 +2016,7 @@
 
       return {
         ...rawProd,
+        isNew: false,
         barcode: String(rawProd.barcode || '').trim(),
         nama: String(rawProd.nama || rawProd.nama_produk || '').trim(),
         nama_produk: String(rawProd.nama || rawProd.nama_produk || '').trim(),
@@ -2280,7 +2286,6 @@
         seenSet.add(id);
 
         if (isFirstBoot) {
-          // Pada pembukaan pertama kali, hanya notif item yang terjadi <= 90 detik terakhir agar tidak spam riwayat lama
           const ts = parseTanggalIndo(item.timestamp);
           const isBrandNew = ts && (Date.now() - ts.getTime() <= 90000);
           if (isBrandNew) {
@@ -2298,7 +2303,6 @@
       saveNotificationStorage();
       updateNotifBellBadge();
 
-      // Kirim notifikasi perangkat nyata untuk aktivitas baru dari server
       if (newItems.length > 0 && 'Notification' in window && Notification.permission === 'granted') {
         const latest = newItems[0];
         const title = newItems.length > 1
@@ -2810,7 +2814,6 @@
         return;
       }
 
-      // 1. Jika prompt instalasi PWA sudah siap, langsung tampilkan dialog instalasi native tanpa jeda
       if (window.__deferredInstallPrompt) {
         const promptEvent = window.__deferredInstallPrompt;
         window.__deferredInstallPrompt = null;
@@ -2830,7 +2833,6 @@
         return;
       }
 
-      // 2. Jika Service Worker baru selesai mendaftar, tunggu prompt PWA siap lalu panggil langsung
       const btn = $('btn-install');
       const label = $('btn-install-label');
       const prevLabel = label ? label.textContent : 'Pasang Aplikasi';
@@ -2861,7 +2863,6 @@
           return;
         }
 
-        // Jika kunjungan pertama SW baru aktif dan belum mengontrol halaman, muat ulang sekali agar prompt PWA langsung aktif
         if ('serviceWorker' in navigator && !navigator.serviceWorker.controller && !sessionStorage.getItem('ibs_sw_reload_once')) {
           sessionStorage.setItem('ibs_sw_reload_once', '1');
           location.reload();
@@ -2977,6 +2978,9 @@
       }
       if (screenName !== 'scan' && isCameraActive) {
         stopScanner();
+      }
+      if (screenName !== 'form') {
+        STATE.returnToKeluarAfterMapping = false;
       }
 
       ALL_SCREENS.forEach(id => {
@@ -3263,6 +3267,7 @@
             if (skuRes && skuRes.success && skuRes.data && Array.isArray(skuRes.data.variants) && skuRes.data.variants.length > 0) {
               const d = skuRes.data;
               STATE.currentProduct = {
+                isNew: false,
                 barcode: d.barcode_kategori || clean,
                 nama: `${d.nama_kategori} (Gudang Polos)`,
                 nama_produk: `${d.nama_kategori} (Gudang Polos)`,
@@ -3295,6 +3300,7 @@
 
         if (STATE.currentActivity === 'KelolaData') {
           STATE.currentProduct = {
+            isNew: true,
             barcode: clean,
             nama: '',
             nama_produk: '',
@@ -3390,6 +3396,14 @@
           $('variant-stock-summary').textContent = `Saldo tercatat di Gudang Polos: ${found.stok_gudang} pcs`;
           $('variant-polos-mapping-info').classList.add('hidden');
           $('variant-unmapped-warning').classList.add('hidden');
+
+          const sid = String(STATE.activeOpname?.session_id || '');
+          const prevEntry = sid && STATE.opnameScannedItems[sid] ? STATE.opnameScannedItems[sid][found.id_tailor] : null;
+          if (prevEntry) {
+            $('qty-hint').textContent = `Sudah tercatat pada sesi ini: ${prevEntry.qty_fisik} pcs · Simpan ulang untuk memperbarui`;
+          } else {
+            $('qty-hint').textContent = 'Masukkan jumlah asli hasil hitungan di rak Gudang Polos';
+          }
           $('qty-input').focus();
         } else {
           $('variant-selected-summary').classList.add('hidden');
@@ -3454,6 +3468,9 @@
           $('product-status-pill').textContent = $('product-active').checked ? 'AKTIF' : 'NONAKTIF';
           $('variant-manage-card').classList.remove('hidden');
           $('polos-mapping-card').classList.remove('hidden');
+          if ($('btn-return-to-keluar')) {
+            $('btn-return-to-keluar').classList.toggle('hidden', !STATE.returnToKeluarAfterMapping);
+          }
           $('btn-submit-text').textContent = 'Simpan Perubahan Produk';
           renderVariantManageList();
           populatePolosCategorySelects();
@@ -3610,14 +3627,18 @@
         const polosQty = getPolosStockQty(mapping.id_tailor, master.barcode_kategori, master.warna || found.warna, master.ukuran || found.ukuran);
         const labelPolos = mapping.detail_polos || `${master.nama_kategori || mapping.id_tailor} (${found.warna} ${found.ukuran})`;
         mappingInfo.textContent = `Bahan Polos: ${labelPolos} · Sisa Gudang Polos: ${polosQty} pcs`;
+        mappingInfo.className = 'mt-2 rounded-lg bg-teal-600/10 px-2.5 py-1.5 text-[11px] font-bold text-teal-900';
         mappingInfo.classList.remove('hidden');
         unmappedWarn.classList.add('hidden');
       } else {
-        mappingInfo.classList.add('hidden');
         if (STATE.currentActivity === 'Keluar') {
+          mappingInfo.classList.add('hidden');
           unmappedWarn.classList.remove('hidden');
         } else {
           unmappedWarn.classList.add('hidden');
+          mappingInfo.textContent = 'Status Tautan: Belum ditautkan ke Gudang Polos';
+          mappingInfo.className = 'mt-2 rounded-lg bg-amber-500/15 px-2.5 py-1.5 text-[11px] font-bold text-amber-900';
+          mappingInfo.classList.remove('hidden');
         }
       }
 
@@ -3840,7 +3861,6 @@
         });
       });
 
-      // Hitung akumulasi pemotongan & cek kecukupan stok Gudang Polos
       const shortages = [];
       const summaryLines = Object.values(demandByTailor).map(d => {
         const master = STATE.masterTailor.find(m => String(m.id_tailor) === String(d.id_tailor)) || {};
@@ -3896,7 +3916,6 @@
 
       if ($('mapping-kategori-tailor')) {
         $('mapping-kategori-tailor').innerHTML = optionsHtml;
-        // Jika produk sudah punya mapping, pilih kategori tersebut secara otomatis
         const prod = STATE.currentProduct;
         const existingMaps = (prod?.polos_mappings && prod.polos_mappings.length)
           ? prod.polos_mappings
@@ -4147,7 +4166,6 @@
     let builderAttributes = [];
 
     function renderAttributeBuilder(existingDefs = null) {
-      const listEl = $('attribute-list');
       const simpleCheck = $('simple-product');
       const addAttrBtn = $('btn-add-attribute');
 
@@ -4362,7 +4380,6 @@
             };
             persistOpnameState();
             showResultBanner('success', 'Opname Tersimpan', res.message || `Hasil hitung ${tv.warna} · ${tv.ukuran} = ${qtyFisik} pcs.`);
-            // Langsung buka kamera lagi untuk scan item opname berikutnya
             setTimeout(() => startScanner('opname'), 450);
           } else {
             showResultBanner('error', 'Gagal Simpan Opname', res?.message || 'Gagal menyimpan hasil hitung.');
@@ -4439,7 +4456,7 @@
         }
         persistReporterName(pelapor);
 
-        const isNewProduct = !prod.variants || prod.variants.length === 0 && !prod.attributeDefinitions?.length && $('variant-manage-card').classList.contains('hidden');
+        const isNewProduct = Boolean(prod.isNew);
 
         // A. Buat Produk Baru
         if (isNewProduct) {
@@ -5277,12 +5294,19 @@
       $('pricing-product-info').classList.remove('hidden');
       $('pricing-prod-name').textContent = prod.nama;
       $('pricing-prod-barcode').textContent = prod.barcode;
-      $('pricing-bulk-card').classList.remove('hidden');
       $('pricing-bulk-hpp').value = '';
       $('pricing-bulk-harga').value = '';
 
       const listEl = $('pricing-variant-list');
       listEl.classList.remove('hidden');
+
+      if (!prod.variants || !prod.variants.length) {
+        $('pricing-bulk-card').classList.add('hidden');
+        listEl.innerHTML = `<div class="rounded-2xl border border-dashed border-slate-300 bg-white p-5 text-center text-xs text-slate-400">Produk ini belum memiliki varian untuk diatur harganya.</div>`;
+        return;
+      }
+
+      $('pricing-bulk-card').classList.remove('hidden');
 
       listEl.innerHTML = prod.variants.map((v, idx) => {
         const hpp = Number(v.hpp) || 0;
@@ -5523,12 +5547,21 @@
       const designKeys = Object.keys(mapByDesign);
       $('dash-map-badge').textContent = `${designKeys.length} Produk`;
       $('dash-map-list').innerHTML = designKeys.length
-        ? designKeys.map(b => `
-            <div class="flex items-center justify-between pt-2 first:pt-0 text-xs">
-              <span class="font-mono font-bold text-slate-800">${escapeHtml(b)}</span>
-              <span class="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">${mapByDesign[b].length} varian tertaut</span>
-            </div>
-          `).join('')
+        ? designKeys.map(b => {
+            const firstMap = mapByDesign[b][0];
+            const catLabel = firstMap && firstMap.detail_polos
+              ? String(firstMap.detail_polos).split('(')[0].trim()
+              : '';
+            return `
+              <div class="flex items-center justify-between gap-2 pt-2 first:pt-0 text-xs">
+                <div class="min-w-0">
+                  <p class="font-mono font-bold text-slate-800">${escapeHtml(b)}</p>
+                  ${catLabel ? `<p class="truncate text-[10px] text-slate-500">Bahan: ${escapeHtml(catLabel)}</p>` : ''}
+                </div>
+                <span class="shrink-0 rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-700">${mapByDesign[b].length} varian tertaut</span>
+              </div>
+            `;
+          }).join('')
         : `<p class="text-xs text-slate-400">Belum ada produk desain yang ditautkan.</p>`;
 
       applyDashboardTabFilter(STATE.dashboardTab);
@@ -5684,7 +5717,15 @@
 
       $('btn-quick-goto-mapping')?.addEventListener('click', () => {
         if (!STATE.currentProduct) return;
+        STATE.returnToKeluarAfterMapping = true;
         STATE.currentActivity = 'KelolaData';
+        openProductFormScreen(true);
+      });
+
+      $('btn-return-to-keluar')?.addEventListener('click', () => {
+        if (!STATE.currentProduct) return;
+        STATE.returnToKeluarAfterMapping = false;
+        STATE.currentActivity = 'Keluar';
         openProductFormScreen(true);
       });
 
