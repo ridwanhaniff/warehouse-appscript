@@ -1,85 +1,69 @@
-const CACHE_NAME = 'ina-warehouse-v6-4';
-const APP_SHELL = ['./', './index.html', './penjahit.html', './manifest.webmanifest', './logo.png', './logo-192.png', './logo-512.png'];
-const CDN = [
-  'https://cdn.tailwindcss.com',
-  'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
-];
+const CACHE_NAME = 'ibs-warehouse-v6-7';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {
-  event.waitUntil((async () => {
-    const cache = await caches.open(CACHE_NAME);
-    await cache.addAll(APP_SHELL);
-    for (const url of CDN) {
-      try {
-        await cache.add(new Request(url, { mode: 'no-cors' }));
-      } catch (err) {
-        console.warn('Cache CDN dilewati:', url, err);
-      }
-    }
-    await self.skipWaiting();
-  })());
-});
-
-self.addEventListener('message', event => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(APP_SHELL).catch(() => Promise.resolve());
+    })
+  );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', event => {
-  event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key)));
-    await self.clients.claim();
-  })());
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
 
+// Wajib ada fetch handler agar browser mengizinkan prompt instalasi PWA (beforeinstallprompt)
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
-  const url = new URL(req.url);
-  if (url.hostname.includes('script.google.com') || url.hostname.includes('script.googleusercontent.com')) {
+  // Jangan cache permintaan API Google Apps Script
+  if (req.url.includes('script.google.com') || req.url.includes('script.googleusercontent.com')) {
     return;
   }
 
-  if (req.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
-        return fresh;
-      } catch (err) {
-        const cached = await caches.match(req);
-        if (cached) return cached;
-        return caches.match('./index.html');
-      }
-    })());
-    return;
-  }
-
-  event.respondWith((async () => {
-    const cached = await caches.match(req);
-    if (cached) {
-      fetch(req).then(async fresh => {
-        if (fresh && (fresh.ok || fresh.type === 'opaque')) {
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(req, fresh.clone());
+  event.respondWith(
+    fetch(req)
+      .then(networkRes => {
+        if (networkRes && networkRes.status === 200 && req.url.startsWith(self.location.origin)) {
+          const copy = networkRes.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
         }
-      }).catch(() => { });
-      return cached;
-    }
+        return networkRes;
+      })
+      .catch(() => {
+        if (req.mode === 'navigate') {
+          return caches.match('./index.html') || caches.match('./');
+        }
+        return caches.match(req);
+      })
+  );
+});
 
-    try {
-      const fresh = await fetch(req);
-      if (fresh && (fresh.ok || fresh.type === 'opaque')) {
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(req, fresh.clone());
+// Menangani klik pada notifikasi sistem perangkat agar langsung membuka/fokus ke aplikasi
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const targetUrl = (event.notification.data && event.notification.data.url) || './index.html';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if ('focus' in client) {
+          return client.focus();
+        }
       }
-      return fresh;
-    } catch (err) {
-      return new Response('', { status: 503, statusText: 'Offline' });
-    }
-  })());
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl);
+      }
+    })
+  );
 });

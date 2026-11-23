@@ -1,24 +1,26 @@
 {
-    "name": "Ina Basic Store Warehouse",
-    "short_name": "Ina Warehouse",
-    "description": "Sistem Manajemen Gudang & Produksi Ina Basic Store",
+    "id": "./",
+    "name": "Ina Basic Store · Aplikasi Gudang",
+    "short_name": "Ina Gudang",
+    "description": "Sistem Gudang Polos & Produksi Made-to-Order Ina Basic Store",
     "start_url": "./index.html",
+    "scope": "./",
     "display": "standalone",
+    "orientation": "portrait",
     "background_color": "#0f172a",
     "theme_color": "#0f172a",
-    "orientation": "portrait-primary",
     "icons": [
         {
             "src": "logo-192.png",
             "sizes": "192x192",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
-            "src": "logo-512.png",
+            "src": "logo.png",
             "sizes": "512x512",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         }
     ]
 }
